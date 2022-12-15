@@ -3,17 +3,22 @@ pragma solidity ^0.8.9;
 
 interface ISwaplace {
 
-    struct erc20Asset {
+    struct ERC20Asset {
         address addr;
         uint256 amount;
     }
-    struct erc721Asset {
+    struct ERC721Asset {
         address addr;
         uint256 tokenId;
     }
+    struct ERC721Options {
+        address addr;
+        uint256 amount;
+    }
     struct Assets {
-        erc20Asset[] erc20;
-        erc721Asset[] erc721;
+        ERC20Asset[] erc20;
+        ERC721Asset[] erc721;
+        ERC721Options[] erc721Options;
     }
 
     struct Trade {

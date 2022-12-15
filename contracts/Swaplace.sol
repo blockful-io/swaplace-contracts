@@ -88,7 +88,8 @@ contract Swaplace is ISwaplace {
         uint256 id, 
         Assets calldata assetsToSend, 
         address withdrawAddress,
-        uint256 imAllowed
+        uint256 index,
+        uint256[] calldata tokenIdsOptions 
     ) external {
 
         // check if the trade exists and if its still valid
@@ -98,27 +99,34 @@ contract Swaplace is ISwaplace {
 
         // must check if there is white list and check if the trade is allowed for the user
         if(trades[id].allowedAddresses.length > 0) {
-            checkAllowedAddress(id, imAllowed, msg.sender);
+            checkAllowedAddress(id, index, msg.sender);
         }
 
         // store the hashproof
         bytes32 hashproof = keccak256(abi.encode(assetsToSend, trades[id].assetsToReceive));
         require(hashproof == trades[id].hashproof, "Hashproof does not match");
 
-        // transfer assetsToSend to the propose withdrawAddress
-        for(uint256 i = 0; i < assetsToSend.erc20.length; i++) {
-            IERC20(assetsToSend.erc20[i].addr).transferFrom(msg.sender, trades[id].withdrawAddress, assetsToSend.erc20[i].amount);
+        // transfer from msg.sender to the trade creator's withdrawAddress
+        for(uint256 i = 0; i < trades[id].assetsToReceive.erc20.length; i++) {
+            IERC20(trades[id].assetsToReceive.erc20[i].addr).transferFrom(msg.sender, trades[id].withdrawAddress, trades[id].assetsToReceive.erc20[i].amount);
         }
-        for(uint256 i = 0; i < assetsToSend.erc721.length; i++) {
-            IERC721(assetsToSend.erc721[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, assetsToSend.erc721[i].tokenId);
+        for(uint256 i = 0; i < trades[id].assetsToReceive.erc20.length; i++) {
+            IERC721(trades[id].assetsToReceive.erc721[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, trades[id].assetsToReceive.erc721[i].tokenId);
         }
 
-        // transfer assetsToReceive from this contract to withdrawAddress
-        for(uint256 i = 0; i < trades[id].assetsToReceive.erc20.length; i++) {
-            IERC20(trades[id].assetsToReceive.erc20[i].addr).transferFrom(address(this), withdrawAddress, trades[id].assetsToReceive.erc20[i].amount);
+        // transfer from this contract(trade creator) to withdrawAddress
+        for(uint256 i = 0; i < trades[id].assetsToSend.erc20.length; i++) {
+            IERC20(trades[id].assetsToSend.erc20[i].addr).transferFrom(address(this), withdrawAddress, trades[id].assetsToReceive.erc20[i].amount);
         }
-        for(uint256 i = 0; i < assetsToSend.erc721.length; i++) {
-            IERC721(trades[id].assetsToReceive.erc721[i].addr).safeTransferFrom(address(this), withdrawAddress, assetsToSend.erc721[i].tokenId);
+        for(uint256 i = 0; i < trades[id].assetsToSend.erc721.length; i++) {
+            IERC721(trades[id].assetsToSend.erc721[i].addr).safeTransferFrom(address(this), withdrawAddress, trades[id].assetsToSend.erc721[i].tokenId);
+        }
+
+        // transfer the assets from options to trade creator, in case there is any
+        for(uint256 i = 0; i < trades[id].assetsToReceive.erc721Options.length; i++) {
+            for(uint256 j = 0; j < trades[id].assetsToReceive.erc721Options[i].amount; j++) {
+                IERC721(trades[id].assetsToReceive.erc721Options[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, tokenIdsOptions[i]);
+            }
         }
 
         // delete the trade
@@ -154,7 +162,7 @@ contract Swaplace is ISwaplace {
 
     /*
     * @param - id - the trade id
-    * @dev - Gets all trades.
+    * @dev - Gets all trade references.
     */
     function getAllTradeReferences(uint256 _tradeId) external view returns(uint256[] memory) {
         return tradeReferences[_tradeId];
@@ -162,15 +170,15 @@ contract Swaplace is ISwaplace {
 
     /*
     * @param - id - the trade id
-    * @dev - Gets all trades.
+    * @dev - Check if the address is allowed to accept the trade.
     */
-    function checkAllowedAddress(uint256 _tradeId, uint256 imAllowed, address addr) public view {
-        require(trades[_tradeId].allowedAddresses[imAllowed] == addr, "Trade not allowed for this address");
+    function checkAllowedAddress(uint256 _tradeId, uint256 index, address addr) public view {
+        require(trades[_tradeId].allowedAddresses[index] == addr, "Trade not allowed for this address");
     }
 
     /*
     * @param - id - the trade id
-    * @dev - Gets all trades.
+    * @dev - Gets the index of the allowed address.
     */
     function getAllowedAddressIndex(uint256 _tradeId, address _address) public view returns(uint256) {
         for(uint256 i = 0; i < trades[_tradeId].allowedAddresses.length; i++) {

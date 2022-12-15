@@ -16,8 +16,6 @@ describe('Swaplace', async function () {
     const signer = await forkWithAddress(
       '0x36cc7b13029b5dee4034745fb4f24034f3f2ffc6',
     )
-
-    
   })
 
   it('Should deploy the contract', async function () {
@@ -26,9 +24,7 @@ describe('Swaplace', async function () {
     // contract.'function'
   })
 
-  it('Should propose a trade', async function () {
-
-  })
+  it('Should propose a trade', async function () {})
 
   it('Should propose a trade that gets accepted', async function () {})
 
