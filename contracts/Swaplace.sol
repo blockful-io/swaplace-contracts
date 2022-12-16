@@ -54,7 +54,9 @@ contract Swaplace is ISwaplace {
         tradeIds++;
 
         // add tradeIdRef to the tradeReferences map
-        tradeReferences[tradeIdRef].push(tradeIds);
+        if(tradeIdRef > 0){
+            tradeReferences[tradeIdRef].push(tradeIds);
+        }
         
         // stores the assets that the user has in the contract
         trades[tradeIds].tradeIdRef = tradeIdRef;
@@ -89,7 +91,7 @@ contract Swaplace is ISwaplace {
         Assets calldata assetsToSend, 
         address withdrawAddress,
         uint256 index,
-        uint256[] calldata tokenIdsOptions 
+        uint256[] memory tokenIdsOptions 
     ) external {
 
         // check if the trade exists and if its still valid

@@ -20,7 +20,6 @@ interface ISwaplace {
         ERC721Asset[] erc721;
         ERC721Options[] erc721Options;
     }
-
     struct Trade {
         uint256 tradeIdRef;
         address proposer;
@@ -64,12 +63,21 @@ interface ISwaplace {
         uint256, 
         Assets calldata, 
         address,
-        uint256
+        uint256,
+        uint256[] memory
     ) external;
 
     function cancelTrade(
         uint256
     ) external;
+
+    function getTrade(
+        uint256
+    ) external view returns(Trade memory);
+
+    function getAllTradeReferences(
+        uint256
+    ) external view returns(uint256[] memory);
 
     function checkAllowedAddress(
         uint256, 

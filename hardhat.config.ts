@@ -1,8 +1,12 @@
 import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import '@nomicfoundation/hardhat-chai-matchers'
+import '@typechain/hardhat'
+import '@nomiclabs/hardhat-ethers'
+import '@nomiclabs/hardhat-solhint'
+import '@nomiclabs/hardhat-truffle5'
+import 'hardhat-gas-reporter'
 import dotenv from 'dotenv'
-
 dotenv.config()
 
 const { ETH_MAINNET_ALCHEMY } = process.env
@@ -16,7 +20,7 @@ const config: HardhatUserConfig = {
     hardhat: {
       forking: {
         url: `${ETH_MAINNET_ALCHEMY}`,
-        blockNumber: 15677043,
+        blockNumber: 16031313,
       },
     },
     // ethereum: {
