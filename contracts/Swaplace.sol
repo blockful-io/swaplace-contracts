@@ -32,19 +32,19 @@ contract Swaplace is ISwaplace {
     */
     function proposeTrade(
         uint256 tradeIdRef,
-        uint256 timestamp,
+        uint256 expirationDate,
         address withdrawAddress,
         address[] calldata allowedAddresses, 
         Assets calldata assetsToSend,
         Assets calldata assetsToReceive
-    ) external {
+    ) external returns(uint256) {
 
         // transfer the assets to the contract
         for(uint256 i = 0; i < assetsToSend.erc20.length; i++) {
-            IERC20(assetsToSend.erc20[i].addr).transferFrom(msg.sender, address(this), assetsToSend.erc20[i].amount);
+            IERC20(assetsToSend.erc20[i].addr).transferFrom(msg.sender, address(this), assetsToSend.erc20[i].amountOrId);
         }
         for(uint256 i = 0; i < assetsToSend.erc721.length; i++) {
-            IERC721(assetsToSend.erc721[i].addr).safeTransferFrom(msg.sender, address(this), assetsToSend.erc721[i].tokenId);
+            IERC721(assetsToSend.erc721[i].addr).safeTransferFrom(msg.sender, address(this), assetsToSend.erc721[i].amountOrId);
         }
 
         // must generate hashproof and store
@@ -61,7 +61,7 @@ contract Swaplace is ISwaplace {
         // stores the assets that the user has in the contract
         trades[tradeIds].tradeIdRef = tradeIdRef;
         trades[tradeIds].proposer = msg.sender;
-        trades[tradeIds].timestamp = block.timestamp + timestamp;
+        trades[tradeIds].expirationDate = block.timestamp + expirationDate;
         trades[tradeIds].withdrawAddress = withdrawAddress;
         trades[tradeIds].allowedAddresses = allowedAddresses;
         trades[tradeIds].hashproof = hashproof;
@@ -70,11 +70,14 @@ contract Swaplace is ISwaplace {
 
         emit TradeProposed(
             tradeIds,
+            tradeIdRef,
+            expirationDate,
             msg.sender,
-            allowedAddresses,
-            timestamp,
-            tradeIdRef
+            withdrawAddress,
+            allowedAddresses
         );
+
+        return tradeIds;
     }
 
     /*
@@ -95,8 +98,8 @@ contract Swaplace is ISwaplace {
     ) external {
 
         // check if the trade exists and if its still valid
-        require(trades[id].timestamp > block.timestamp &&
-                trades[id].timestamp > 0,  
+        require(trades[id].expirationDate > block.timestamp &&
+                trades[id].expirationDate > 0,  
         "Trade is not valid anymore");
 
         // must check if there is white list and check if the trade is allowed for the user
@@ -104,29 +107,32 @@ contract Swaplace is ISwaplace {
             checkAllowedAddress(id, index, msg.sender);
         }
 
-        // store the hashproof
-        bytes32 hashproof = keccak256(abi.encode(assetsToSend, trades[id].assetsToReceive));
+        // check if the hashproof matches
+        bytes32 hashproof = keccak256(abi.encode(trades[id].assetsToSend, assetsToSend));
         require(hashproof == trades[id].hashproof, "Hashproof does not match");
 
         // transfer from msg.sender to the trade creator's withdrawAddress
         for(uint256 i = 0; i < trades[id].assetsToReceive.erc20.length; i++) {
-            IERC20(trades[id].assetsToReceive.erc20[i].addr).transferFrom(msg.sender, trades[id].withdrawAddress, trades[id].assetsToReceive.erc20[i].amount);
+            IERC20(trades[id].assetsToReceive.erc20[i].addr).transferFrom(msg.sender, trades[id].withdrawAddress, trades[id].assetsToReceive.erc20[i].amountOrId);
         }
-        for(uint256 i = 0; i < trades[id].assetsToReceive.erc20.length; i++) {
-            IERC721(trades[id].assetsToReceive.erc721[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, trades[id].assetsToReceive.erc721[i].tokenId);
+        for(uint256 i = 0; i < trades[id].assetsToReceive.erc721.length; i++) {
+            IERC721(trades[id].assetsToReceive.erc721[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, trades[id].assetsToReceive.erc721[i].amountOrId);
         }
 
         // transfer from this contract(trade creator) to withdrawAddress
         for(uint256 i = 0; i < trades[id].assetsToSend.erc20.length; i++) {
-            IERC20(trades[id].assetsToSend.erc20[i].addr).transferFrom(address(this), withdrawAddress, trades[id].assetsToReceive.erc20[i].amount);
+            IERC20(trades[id].assetsToSend.erc20[i].addr).approve(address(this), trades[id].assetsToSend.erc20[i].amountOrId);
+            IERC20(trades[id].assetsToSend.erc20[i].addr).transferFrom(address(this), withdrawAddress, trades[id].assetsToSend.erc20[i].amountOrId);
         }
         for(uint256 i = 0; i < trades[id].assetsToSend.erc721.length; i++) {
-            IERC721(trades[id].assetsToSend.erc721[i].addr).safeTransferFrom(address(this), withdrawAddress, trades[id].assetsToSend.erc721[i].tokenId);
+            IERC721(trades[id].assetsToSend.erc721[i].addr).approve(address(this), trades[id].assetsToSend.erc721[i].amountOrId);
+            IERC721(trades[id].assetsToSend.erc721[i].addr).safeTransferFrom(address(this), withdrawAddress, trades[id].assetsToSend.erc721[i].amountOrId);
         }
 
         // transfer the assets from options to trade creator, in case there is any
         for(uint256 i = 0; i < trades[id].assetsToReceive.erc721Options.length; i++) {
-            for(uint256 j = 0; j < trades[id].assetsToReceive.erc721Options[i].amount; j++) {
+            for(uint256 j = 0; j < trades[id].assetsToReceive.erc721Options[i].amountOrId; j++) {
+                // TODO: Allowance
                 IERC721(trades[id].assetsToReceive.erc721Options[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, tokenIdsOptions[i]);
             }
         }

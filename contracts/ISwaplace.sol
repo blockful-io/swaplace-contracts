@@ -5,15 +5,15 @@ interface ISwaplace {
 
     struct ERC20Asset {
         address addr;
-        uint256 amount;
+        uint256 amountOrId;
     }
     struct ERC721Asset {
         address addr;
-        uint256 tokenId;
+        uint256 amountOrId;
     }
     struct ERC721Options {
         address addr;
-        uint256 amount;
+        uint256 amountOrId;
     }
     struct Assets {
         ERC20Asset[] erc20;
@@ -23,7 +23,7 @@ interface ISwaplace {
     struct Trade {
         uint256 tradeIdRef;
         address proposer;
-        uint256 timestamp;
+        uint256 expirationDate;
         address withdrawAddress;
         address[] allowedAddresses;
         bytes32 hashproof;
@@ -33,10 +33,11 @@ interface ISwaplace {
 
     event TradeProposed(
         uint256 indexed tradeId,
+        uint256 tradeIdRef,
+        uint256 expirationDate,
         address proposer,
-        address[] allowedAddresses,
-        uint256 timestamp,
-        uint256 tradeIdRef
+        address withdrawAddress,
+        address[] allowedAddresses
     );
 
     event TradeAccepted(
@@ -57,7 +58,7 @@ interface ISwaplace {
         address[] calldata, 
         Assets calldata,
         Assets calldata
-    ) external;
+    ) external returns(uint256);
 
     function acceptTrade(        
         uint256, 
