@@ -8,6 +8,7 @@ import { Swaplace, MockERC20, MockERC721 } from '../typechain-types'
 import { abi as abiERC20 } from '../artifacts/contracts/mock/MockERC20.sol/MockERC20.json'
 import { abi as abiERC721 } from '../artifacts/contracts/mock/MockERC721.sol/MockERC721.json'
 import { moveMessagePortToContext } from 'worker_threads'
+import { create } from 'domain'
 const deploy = contracts.deploy
 
 describe('Swaplace', async function () {
@@ -23,6 +24,7 @@ describe('Swaplace', async function () {
     addr: any
     amountOrId: number
   }
+  type ERCTypes = 'erc20' | 'erc721' | 'erc721Options'
   interface Assets {
     erc20: ERC20Asset[]
     erc721: ERC721Asset[]
@@ -207,42 +209,44 @@ describe('Swaplace', async function () {
     }
   }
 
+  // This function will create a mock asset based on the type
+  // @param user: SignerWithAddress
+  // @param contractNames: string[]
+  // @param type: ERCTypes
+  async function createMockAsset(
+    user: SignerWithAddress,
+    contractNames: string[],
+    type: ERCTypes,
+  ): Promise<Assets> {
+    const assetList = []
+    for (const contract of contractNames) {
+      assetList.push(
+        await getMockAssetsToSendOrReceive(
+          user,
+          contract,
+          type,
+          await getRandomArbitrary(1, 100000),
+        ),
+      )
+    }
+    const assets: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    assets[type] = assetList
+
+    return assets
+  }
+
   it('Should propose a trade sending TokenA, asking for TokenB, TokenC, TokenD', async function () {
     // Preparation of Trade Proposal
-    let send_1_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
-      userA,
-      'TokenA',
-      'erc20',
-      100,
-    )
-    let receive_1_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
+    const assetsToBid = await createMockAsset(userA, ['TokenA'], 'erc20')
+    const assetsToAsk = await createMockAsset(
       userB,
-      'TokenB',
+      ['TokenB', 'TokenC', 'TokenD'],
       'erc20',
-      500,
     )
-    let receive_2_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
-      userB,
-      'TokenC',
-      'erc20',
-      700,
-    )
-    let receive_3_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
-      userB,
-      'TokenD',
-      'erc20',
-      800,
-    )
-    let assetsToBid: Assets = {
-      erc20: [send_1_erc20],
-      erc721: [],
-      erc721Options: [],
-    }
-    let assetsToAsk: Assets = {
-      erc20: [receive_1_erc20, receive_2_erc20, receive_3_erc20],
-      erc721: [],
-      erc721Options: [],
-    }
 
     // Allowance for the amount to be transfered
     await allowanceOfAssets(assetsToBid, userA)
