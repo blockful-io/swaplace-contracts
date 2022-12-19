@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 import "./ISwaplace.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 /*
 * @author - Swaplace
@@ -13,7 +14,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 *        It allows users to propose trades and accept them.
 *        The contract will validate the trade and transfer the assets.
 */
-
 contract Swaplace is ISwaplace {
 
     uint256 public tradeIds;
@@ -123,7 +123,7 @@ contract Swaplace is ISwaplace {
         // transfer the options asset from msg.sender to the trade creator
         for(uint256 i = 0; i < assetsToAsk.erc721Options.length; i++) {
             for(; j < assetsToAsk.erc721Options[i].amountOrId; j++) {
-                IERC721(assetsToAsk.erc721Options[i].addr).safeTransferFrom(msg.sender, address(this), tokenIdsOptions[j]);
+                IERC721(assetsToAsk.erc721Options[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, tokenIdsOptions[j]);
             }
         }
 
@@ -133,7 +133,6 @@ contract Swaplace is ISwaplace {
             IERC20(trades[id].assetsToBid.erc20[i].addr).transferFrom(address(this), withdrawAddress, trades[id].assetsToBid.erc20[i].amountOrId);
         }
         for(uint256 i = 0; i < trades[id].assetsToBid.erc721.length; i++) {
-            IERC721(trades[id].assetsToBid.erc721[i].addr).approve(address(this), trades[id].assetsToBid.erc721[i].amountOrId);
             IERC721(trades[id].assetsToBid.erc721[i].addr).safeTransferFrom(address(this), withdrawAddress, trades[id].assetsToBid.erc721[i].amountOrId);
         }
 
@@ -196,6 +195,10 @@ contract Swaplace is ISwaplace {
             }
         }
         revert("Address not allowed to accept this trade");
+    }
+
+    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 
 }
