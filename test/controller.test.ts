@@ -21,7 +21,7 @@ describe('Swaplace', async function () {
   }
   interface ERC721Options {
     addr: any
-    amount: number
+    amountOrId: number
   }
   interface Assets {
     erc20: ERC20Asset[]
@@ -67,6 +67,9 @@ describe('Swaplace', async function () {
     swaplace = await deploy('Swaplace', deployer)
     connectUserA = await swaplace.connect(userA)
     connectUserB = await swaplace.connect(userB)
+    console.log('userA: ', userA.address)
+    console.log('userB: ', userB.address)
+    console.log('swaplace: ', swaplace.address)
   })
 
   // This function is used to impersonate an address
@@ -128,7 +131,11 @@ describe('Swaplace', async function () {
       )
     } else {
       // if the contract already exists, we fetch the instance
-      mockContract = new ethers.Contract(factoryName, abi, deployer)
+      mockContract = new ethers.Contract(
+        findContract.contractAddress,
+        abi,
+        deployer,
+      )
     }
 
     // then we connect to the contract with the signer requesting the assets
@@ -169,20 +176,28 @@ describe('Swaplace', async function () {
   // This will grant allowance for the Assets to be sent to the swaplace contract
   // @params assets: Assets
   // @params user: SignerWithAddress
-  async function allowanceOfAssets(assets: Assets, user: SignerWithAddress) {
+  async function allowanceOfAssets(assets: Assets, signer: SignerWithAddress) {
     for (let i = 0; i < assets.erc20.length; i++) {
-      const contract = new ethers.Contract(assets.erc20[i].addr, abiERC20, user)
+      const contract = new ethers.Contract(
+        assets.erc20[i].addr,
+        abiERC20,
+        signer,
+      )
       let tx = await contract.approve(
         swaplace.address,
         assets.erc20[i].amountOrId,
       )
-      expect(tx).to.not.be.reverted
+      expect(tx).not.to.be.reverted
+      tx = await contract.allowance(signer.address, swaplace.address)
+      expect(tx.toString()).to.be.equal(assets.erc20[i].amountOrId.toString())
     }
+
     for (let i = 0; i < assets.erc721.length; i++) {
+      console.log('2')
       const contract = new ethers.Contract(
         assets.erc721[i].addr,
-        abiERC20,
-        user,
+        abiERC721,
+        signer,
       )
       let tx = await contract.approve(
         swaplace.address,
@@ -190,48 +205,48 @@ describe('Swaplace', async function () {
       )
       expect(tx).to.not.be.reverted
     }
-    for (let i = 0; i < assets.erc721Options.length; i++) {
-      const contract = new ethers.Contract(
-        assets.erc721Options[i].addr,
-        abiERC20,
-        user,
-      )
-      let tx = await contract.approve(
-        swaplace.address,
-        assets.erc20[i].amountOrId,
-      )
-      expect(tx).to.not.be.reverted
-    }
   }
 
-  it('Should propose a trade sending AssetA, asking for AssetB', async function () {
+  it('Should propose a trade sending TokenA, asking for TokenB, TokenC, TokenD', async function () {
     // Preparation of Trade Proposal
-    let send_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
+    let send_1_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
       userA,
       'TokenA',
       'erc20',
-      10,
+      100,
     )
-    let receive_erc20 = await getMockAssetsToSendOrReceive(
+    let receive_1_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
       userB,
       'TokenB',
       'erc20',
-      50,
+      500,
+    )
+    let receive_2_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
+      userB,
+      'TokenC',
+      'erc20',
+      700,
+    )
+    let receive_3_erc20: ERC20Asset = await getMockAssetsToSendOrReceive(
+      userB,
+      'TokenD',
+      'erc20',
+      800,
     )
     let assetsToBid: Assets = {
-      erc20: [send_erc20],
+      erc20: [send_1_erc20],
       erc721: [],
       erc721Options: [],
     }
     let assetsToAsk: Assets = {
-      erc20: [receive_erc20],
+      erc20: [receive_1_erc20, receive_2_erc20, receive_3_erc20],
       erc721: [],
       erc721Options: [],
     }
 
     // Allowance for the amount to be transfered
-    allowanceOfAssets(assetsToBid, userA)
-    allowanceOfAssets(assetsToAsk, userB)
+    await allowanceOfAssets(assetsToBid, userA)
+    await allowanceOfAssets(assetsToAsk, userB)
 
     // Propose Trade
     let tx = await connectUserA.proposeTrade(

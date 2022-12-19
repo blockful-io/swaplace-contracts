@@ -27,8 +27,8 @@ interface ISwaplace {
         address withdrawAddress;
         address[] allowedAddresses;
         bytes32 hashproof;
-        Assets assetsToSend;
-        Assets assetsToReceive;
+        Assets assetsToBid;
+        Assets assetsToAsk;
     }
 
     event TradeProposed(
