@@ -112,18 +112,18 @@ contract Swaplace is ISwaplace {
         require(hashproof == trades[id].hashproof, "Hashproof does not match");
 
         // transfer from msg.sender to the trade creator's withdrawAddress
-        for(uint256 i = 0; i < trades[id].assetsToAsk.erc20.length; i++) {
-            IERC20(trades[id].assetsToAsk.erc20[i].addr).transferFrom(msg.sender, address(this), trades[id].assetsToAsk.erc20[i].amountOrId);
+        for(uint256 i = 0; i < assetsToAsk.erc20.length; i++) {
+            IERC20(assetsToAsk.erc20[i].addr).transferFrom(msg.sender, trades[id].withdrawAddress, assetsToAsk.erc20[i].amountOrId);
         }
-        for(uint256 i = 0; i < trades[id].assetsToAsk.erc721.length; i++) {
-            IERC721(trades[id].assetsToAsk.erc721[i].addr).safeTransferFrom(msg.sender, address(this), trades[id].assetsToAsk.erc721[i].amountOrId);
+        for(uint256 i = 0; i < assetsToAsk.erc721.length; i++) {
+            IERC721(assetsToAsk.erc721[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, assetsToAsk.erc721[i].amountOrId);
         }
 
         uint256 j = 0;
         // transfer the options asset from msg.sender to the trade creator
-        for(uint256 i = 0; i < trades[id].assetsToAsk.erc721Options.length; i++) {
-            for(; j < trades[id].assetsToAsk.erc721Options[i].amountOrId; j++) {
-                IERC721(trades[id].assetsToAsk.erc721Options[i].addr).safeTransferFrom(msg.sender, address(this), tokenIdsOptions[j]);
+        for(uint256 i = 0; i < assetsToAsk.erc721Options.length; i++) {
+            for(; j < assetsToAsk.erc721Options[i].amountOrId; j++) {
+                IERC721(assetsToAsk.erc721Options[i].addr).safeTransferFrom(msg.sender, address(this), tokenIdsOptions[j]);
             }
         }
 
