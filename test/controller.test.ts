@@ -105,9 +105,13 @@ describe('Swaplace', async function () {
     contractName: string,
     type: string,
     amountOrId: number,
-  ): Promise<ERC20Asset | ERC721Asset> {
-    // check which type we'll be hanadling
-    if (type.toUpperCase() !== 'ERC20' && type.toUpperCase() !== 'ERC721') {
+  ): Promise<ERC20Asset | ERC721Asset | ERC721Options> {
+    // check which type we'll be handling
+    if (
+      type.toUpperCase() !== 'ERC20' &&
+      type.toUpperCase() !== 'ERC721' &&
+      type.toUpperCase() !== 'ERC721OPTIONS'
+    ) {
       throw new Error('Invalid type')
     }
 
@@ -144,17 +148,29 @@ describe('Swaplace', async function () {
     // then we connect to the contract with the signer requesting the assets
     const mockConnection = mockContract.connect(signer)
 
-    // if the type is ERC20, we mint to the signer's address
+    // if the type is ERC20, we multiply the decimals
     let amount =
       type.toUpperCase() === 'ERC20'
         ? ethers.utils.parseUnits(amountOrId.toString(), 18)
         : amountOrId
 
-    // mint to the signer's address
-    let tx = await mockConnection.mintTo(signer.address, amount)
-    await expect(tx)
-      .to.emit(mockConnection, 'Transfer')
-      .withArgs(ethers.constants.AddressZero, signer.address, amount)
+    let tx: any
+    if (type.toUpperCase() === 'ERC721OPTIONS') {
+      // in the case of erc721Options, the amountOrId will be the amount of tokens ids to be minted
+      // for (let i = 0; i < amountOrId; i++) {
+      //   let tokenId = await getRandomArbitrary(100, 10000)
+      //   tx = await mockConnection.mintTo(signer.address, tokenId)
+      //   await expect(tx)
+      //     .to.emit(mockConnection, 'Transfer')
+      //     .withArgs(ethers.constants.AddressZero, signer.address, tokenId)
+      // }
+    } else {
+      // mint to the signer's address for erc20 or erc721
+      tx = await mockConnection.mintTo(signer.address, amount)
+      await expect(tx)
+        .to.emit(mockConnection, 'Transfer')
+        .withArgs(ethers.constants.AddressZero, signer.address, amount)
+    }
 
     // add the contract to the mockList
     mockList.push({
@@ -166,15 +182,21 @@ describe('Swaplace', async function () {
     if (type.toUpperCase() === 'ERC20') {
       let asset_erc20: ERC20Asset = {
         addr: mockConnection.address,
-        amountOrId: ethers.utils.parseUnits(amountOrId.toString(), 18),
+        amountOrId: amount,
       }
       return asset_erc20
     } else if (type.toUpperCase() === 'ERC721') {
       let asset_erc721: ERC721Asset = {
         addr: mockConnection.address,
-        amountOrId: amountOrId,
+        amountOrId: Number(amount),
       }
       return asset_erc721
+    } else if (type.toUpperCase() === 'ERC721OPTIONS') {
+      let asset_erc721Options: ERC721Options = {
+        addr: mockConnection.address,
+        amountOrId: Number(amount),
+      }
+      return asset_erc721Options
     }
 
     throw new Error('Impossible error happened')
@@ -225,13 +247,12 @@ describe('Swaplace', async function () {
   ): Promise<Assets> {
     const assetList = []
     for (const contract of contractNames) {
+      let amount =
+        type == 'erc721Options'
+          ? await getRandomArbitrary(1, 5)
+          : await getRandomArbitrary(1, 10000)
       assetList.push(
-        await getMockAssetsToSendOrReceive(
-          user,
-          contract,
-          type,
-          await getRandomArbitrary(1, 100000),
-        ),
+        await getMockAssetsToSendOrReceive(user, contract, type, amount),
       )
     }
     assets[type] = assetList
@@ -406,7 +427,7 @@ describe('Swaplace', async function () {
     tradeCount++
   })
 
-  it('Should propose and accept a trade sending tokenA, asking for tokenB, but fail by not providing allowance', async function () {
+  it('Should propose and accept a trade sending tokenA, asking for tokenB, but fail by not providing allowance or assets', async function () {
     // Create assets to send or receive, bid or ask
     let assetsToBid: Assets = {
       erc20: [],
@@ -470,7 +491,7 @@ describe('Swaplace', async function () {
     tradeCount++
   })
 
-  it('Should propose and accept a trade sending nftA, asking for nftB, but fail by not providing allowance', async function () {
+  it('Should propose and accept a trade sending nftA, asking for nftB, but fail by not providing allowance or assets', async function () {
     // Create assets to send or receive, bid or ask
     let assetsToBid: Assets = {
       erc20: [],
@@ -534,7 +555,7 @@ describe('Swaplace', async function () {
     tradeCount++
   })
 
-  it('Should propose and accept a trade sending both erc20 and erc721', async function () {
+  it('Should propose and accept a trade sending both erc20 and erc721, but fail due to adultarition in the hashproof', async function () {
     // Create assets to send or receive, bid or ask
     let assetsToBid: Assets = {
       erc20: [],
@@ -547,30 +568,10 @@ describe('Swaplace', async function () {
       erc721Options: [],
     }
     // We add will deploy the contract names, mint to the user and add the trade assets to the bid/ask
-    assetsToBid = await createMockAsset(
-      assetsToBid,
-      userA,
-      ['tokenA', 'tokenB'],
-      'erc20',
-    )
-    assetsToBid = await createMockAsset(
-      assetsToBid,
-      userA,
-      ['nftA', 'nftD'],
-      'erc721',
-    )
-    assetsToAsk = await createMockAsset(
-      assetsToAsk,
-      userB,
-      ['tokenA', 'tokenB'],
-      'erc20',
-    )
-    assetsToAsk = await createMockAsset(
-      assetsToAsk,
-      userB,
-      ['nftB', 'nftC'],
-      'erc721',
-    )
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['tokenA'], 'erc20')
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['nftA'], 'erc721')
+    assetsToAsk = await createMockAsset(assetsToAsk, userB, ['tokenB'], 'erc20')
+    assetsToAsk = await createMockAsset(assetsToAsk, userB, ['nftB'], 'erc721')
 
     // Allowance for the amount to be transfered
     await allowanceOfAssets(assetsToBid, userA)
@@ -589,12 +590,118 @@ describe('Swaplace', async function () {
       .to.emit(swaplace, 'TradeProposed')
       .withArgs(tradeCount, 0, DAYS, userA.address, userA.address, [])
 
+    // We'll mess up the assetsToAsk by saying that we'll be sending no assets at all
+    assetsToAsk['erc20'][0].amountOrId = ethers.utils.parseUnits('0', 18)
+
+    // Accept Trade
+    await expect(
+      connectUserB.acceptTrade(
+        tradeCount, // trade id for which the trade will be accepted
+        assetsToAsk,
+        userB.address, // the withdraw address for the trade
+        0, // the index of allowance in case the trade has an allowedAddress list
+        [], // the token idsOptions asked by the trace creator
+      ),
+    ).to.be.revertedWith('Hashproof does not match')
+    tradeCount++
+  })
+
+  it('Should propose and accept a trade sending both erc20 and erc721, but fail due to trade timestamp expiration', async function () {
+    // Create assets to send or receive, bid or ask
+    let assetsToBid: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    let assetsToAsk: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    // We add will deploy the contract names, mint to the user and add the trade assets to the bid/ask
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['tokenA'], 'erc20')
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['nftA'], 'erc721')
+    assetsToAsk = await createMockAsset(assetsToAsk, userB, ['tokenB'], 'erc20')
+    assetsToAsk = await createMockAsset(assetsToAsk, userB, ['nftB'], 'erc721')
+
+    // Allowance for the amount to be transfered
+    await allowanceOfAssets(assetsToBid, userA)
+    await allowanceOfAssets(assetsToAsk, userB)
+
+    // Propose Trade
+    let tx = await connectUserA.proposeTrade(
+      0, // tradeRefId -> 0 because there is no other trades
+      DAYS, // expirationDate
+      userA.address, // withdrawAddress
+      [], // allowedAddress list, only those listed can accept the trade
+      assetsToBid,
+      assetsToAsk,
+    )
+    await expect(tx)
+      .to.emit(swaplace, 'TradeProposed')
+      .withArgs(tradeCount, 0, DAYS, userA.address, userA.address, [])
+
+    // Advance time to the expiration date
+    await evm.advanceTime(DAYS)
+
+    // Accept Trade
+    await expect(
+      connectUserB.acceptTrade(
+        tradeCount, // trade id for which the trade will be accepted
+        assetsToAsk,
+        userB.address, // the withdraw address for the trade
+        0, // the index of allowance in case the trade has an allowedAddress list
+        [], // the token idsOptions asked by the trace creator
+      ),
+    ).to.be.revertedWith('Trade is not valid anymore')
+    tradeCount++
+  })
+
+  it('Should propose and accept a trade sending nftA, asking for nftB, must be in the allowlist', async function () {
+    // Create assets to send or receive, bid or ask
+    let assetsToBid: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    let assetsToAsk: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    // We add will deploy the contract names, mint to the user and add the trade assets to the bid/ask
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['nftA'], 'erc721')
+    assetsToAsk = await createMockAsset(assetsToAsk, userB, ['nftB'], 'erc721')
+
+    // Allowance for the amount to be transfered
+    await allowanceOfAssets(assetsToBid, userA)
+    await allowanceOfAssets(assetsToAsk, userB)
+
+    // Propose Trade -- notice the userB is in the allow list
+    let tx = await connectUserA.proposeTrade(
+      0, // tradeRefId -> 0 because there is no other trades
+      DAYS, // expirationDate
+      userA.address, // withdrawAddress
+      [userB.address], // allowedAddress list, only those listed can accept the trade
+      assetsToBid,
+      assetsToAsk,
+    )
+    await expect(tx)
+      .to.emit(swaplace, 'TradeProposed')
+      .withArgs(tradeCount, 0, DAYS, userA.address, userA.address, [])
+
+    // We must first discover if we are in the allow list, to save, we'll do off-chain check
+    let allowedIndex = await connectUserB.getAllowedAddressIndex(
+      tradeCount,
+      userB.address,
+    )
+
     // Accept Trade
     tx = await connectUserB.acceptTrade(
       tradeCount, // trade id for which the trade will be accepted
       assetsToAsk,
       userB.address, // the withdraw address for the trade
-      0, // the index of allowance in case the trade has an allowedAddress list
+      allowedIndex, // the index of allowance in case the trade has an allowedAddress list
       [], // the token idsOptions asked by the trace creator
     )
     await expect(tx)
@@ -603,14 +710,195 @@ describe('Swaplace', async function () {
     tradeCount++
   })
 
-  it('Should propose a trade that gets another proposal tradeB. Then ', async function () {})
-  it('Should propose a trade that gets another proposal tradeB. Then ', async function () {})
-  it('Should propose a trade that gets another proposal tradeB. Then ', async function () {})
-  it('Should propose a trade that gets another proposal tradeB. Then ', async function () {})
-  it('Should propose a trade that gets another proposal tradeB. Then ', async function () {})
+  it('Should propose and accept a trade sending nftA, asking for nftB, but fail by not being in the allowlist', async function () {
+    // Create assets to send or receive, bid or ask
+    let assetsToBid: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    let assetsToAsk: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    // We add will deploy the contract names, mint to the user and add the trade assets to the bid/ask
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['nftA'], 'erc721')
+    assetsToAsk = await createMockAsset(assetsToAsk, userB, ['nftB'], 'erc721')
 
-  it('Should propose a trade in exchnage for random nft using options ', async function () {})
-  it('Should propose a trade in exchnage for random nft using options, but fail by not providing allowance ', async function () {})
-  it('Should propose a trade in exchnage for random nft using options, but fail due to lack of assets ', async function () {})
-  it('Should propose a trade in exchnage for random nft using options, but fail due to wrong Assets input', async function () {})
+    // Allowance for the amount to be transfered
+    await allowanceOfAssets(assetsToBid, userA)
+    await allowanceOfAssets(assetsToAsk, userB)
+
+    // Propose Trade -- notice the userB is in the allow list
+    let tx = await connectUserA.proposeTrade(
+      0, // tradeRefId -> 0 because there is no other trades
+      DAYS, // expirationDate
+      userA.address, // withdrawAddress
+      [receiverA.address, receiverB.address], // allowedAddress list, only those listed can accept the trade
+      assetsToBid,
+      assetsToAsk,
+    )
+    await expect(tx)
+      .to.emit(swaplace, 'TradeProposed')
+      .withArgs(tradeCount, 0, DAYS, userA.address, userA.address, [])
+
+    // We must first discover if we are in the allow list, to save, we'll do off-chain check
+    // Now we are expecting not to be on the allow list
+    await expect(connectUserB.getAllowedAddressIndex(tradeCount, userB.address))
+      .to.be.reverted
+
+    // Accept Trade -- passing random index -trying 0 because there is one ref there
+    await expect(
+      connectUserB.acceptTrade(
+        tradeCount, // trade id for which the trade will be accepted
+        assetsToAsk,
+        userB.address, // the withdraw address for the trade
+        0, // the index of allowance in case the trade has an allowedAddress list
+        [], // the token idsOptions asked by the trace creator
+      ),
+    ).to.be.revertedWith('Trade not allowed for this address')
+    tradeCount++
+  })
+
+  it('Should propose and accept a trade in exchange for random nft using options ', async function () {
+    // Create assets to send or receive, bid or ask
+    let assetsToBid: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    let assetsToAsk: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    // We add will deploy the contract names, mint to the user and add the trade assets to the bid/ask
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['nftA'], 'erc721')
+    assetsToAsk = await createMockAsset(
+      assetsToAsk,
+      userB,
+      ['nftBo', 'nftCo', 'nftDo'],
+      'erc721Options',
+    )
+
+    // Allowance for the amount to be transfered - don't handle erc721options
+    await allowanceOfAssets(assetsToBid, userA)
+    await allowanceOfAssets(assetsToAsk, userB)
+
+    // Propose Trade
+    let tx = await connectUserA.proposeTrade(
+      0, // tradeRefId -> 0 because there is no other trades
+      DAYS, // expirationDate
+      userA.address, // withdrawAddress
+      [], // allowedAddress list, only those listed can accept the trade
+      assetsToBid,
+      assetsToAsk,
+    )
+    await expect(tx)
+      .to.emit(swaplace, 'TradeProposed')
+      .withArgs(tradeCount, 0, DAYS, userA.address, userA.address, [])
+
+    // Get the tokens for idOptions
+    let idOptions = []
+    // The contracts where deployed in creaMockAsset, so we just need to get the instance
+    for (let i = 0; i < assetsToAsk.erc721Options.length; i++) {
+      const connectERC721 = new ethers.Contract(
+        assetsToAsk.erc721Options[i].addr,
+        abiERC721,
+        userB,
+      )
+      for (let j = 0; j < assetsToAsk.erc721Options[i].amountOrId; j++) {
+        // We mint a random tokenId for each in amountOrId
+        let tokenId = await getRandomArbitrary(100, 10000)
+        await connectERC721.mintTo(userB.address, tokenId)
+        // We ask allowance for the transfer
+        await connectERC721.approve(swaplace.address, tokenId)
+        // We add the token id to the array
+        idOptions.push(tokenId)
+      }
+    }
+    // Accept Trade
+    tx = await connectUserB.acceptTrade(
+      tradeCount, // trade id for which the trade will be accepted
+      assetsToAsk,
+      userB.address, // the withdraw address for the trade
+      0, // the index of allowance map in case the trade has an allowedAddress list
+      idOptions, // the token idsOptions asked by the trade creator
+    )
+    await expect(tx)
+      .to.emit(swaplace, 'TradeAccepted')
+      .withArgs(tradeCount, userB.address, userB.address)
+    tradeCount++
+  })
+
+  it('Should propose and accept a trade in exchnage for random nft using options, but fail by not providing allowance or lack of assets', async function () {
+    // Create assets to send or receive, bid or ask
+    let assetsToBid: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    let assetsToAsk: Assets = {
+      erc20: [],
+      erc721: [],
+      erc721Options: [],
+    }
+    // We add will deploy the contract names, mint to the user and add the trade assets to the bid/ask
+    assetsToBid = await createMockAsset(assetsToBid, userA, ['nftA'], 'erc721')
+    assetsToAsk = await createMockAsset(
+      assetsToAsk,
+      userB,
+      ['nftBo', 'nftCo', 'nftDo'],
+      'erc721Options',
+    )
+
+    // Allowance for the amount to be transfered - don't handle erc721options
+    await allowanceOfAssets(assetsToBid, userA)
+    await allowanceOfAssets(assetsToAsk, userB)
+
+    // Propose Trade
+    let tx = await connectUserA.proposeTrade(
+      0, // tradeRefId -> 0 because there is no other trades
+      DAYS, // expirationDate
+      userA.address, // withdrawAddress
+      [], // allowedAddress list, only those listed can accept the trade
+      assetsToBid,
+      assetsToAsk,
+    )
+    await expect(tx)
+      .to.emit(swaplace, 'TradeProposed')
+      .withArgs(tradeCount, 0, DAYS, userA.address, userA.address, [])
+
+    // Get the tokens for idOptions
+    let idOptions = []
+    // The contracts where deployed in creaMockAsset, so we just need to get the instance
+    for (let i = 0; i < assetsToAsk.erc721Options.length; i++) {
+      const connectERC721 = new ethers.Contract(
+        assetsToAsk.erc721Options[i].addr,
+        abiERC721,
+        userB,
+      )
+      for (let j = 0; j < assetsToAsk.erc721Options[i].amountOrId; j++) {
+        // We mint a random tokenId for each in amountOrId
+        let tokenId = await getRandomArbitrary(100, 10000)
+        await connectERC721.mintTo(userB.address, tokenId)
+        // We ask allowance for the transfer -- we take off the allowance
+        // await connectERC721.approve(swaplace.address, tokenId)
+        // We add the token id to the array
+        idOptions.push(tokenId)
+      }
+    }
+    // Accept Trade
+    await expect(
+      connectUserB.acceptTrade(
+        tradeCount, // trade id for which the trade will be accepted
+        assetsToAsk,
+        userB.address, // the withdraw address for the trade
+        0, // the index of allowance map in case the trade has an allowedAddress list
+        idOptions, // the token idsOptions asked by the trade creator
+      ),
+    ).to.be.revertedWith('ERC721: caller is not token owner or approved')
+    tradeCount++
+  })
 })

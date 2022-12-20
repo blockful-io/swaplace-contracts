@@ -119,11 +119,13 @@ contract Swaplace is ISwaplace {
             IERC721(assetsToAsk.erc721[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, assetsToAsk.erc721[i].amountOrId);
         }
 
-        uint256 j = 0;
+        
         // transfer the options asset from msg.sender to the trade creator
+        uint256 h = 0;
         for(uint256 i = 0; i < assetsToAsk.erc721Options.length; i++) {
-            for(; j < assetsToAsk.erc721Options[i].amountOrId; j++) {
-                IERC721(assetsToAsk.erc721Options[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, tokenIdsOptions[j]);
+            for(uint256 j = 0; j < assetsToAsk.erc721Options[i].amountOrId; j++) {
+                IERC721(assetsToAsk.erc721Options[i].addr).safeTransferFrom(msg.sender, trades[id].withdrawAddress, tokenIdsOptions[h]);
+                h++;
             }
         }
 
