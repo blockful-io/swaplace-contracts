@@ -7,12 +7,16 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
  * @author - Blockful.io
  * @dev - Swaplace is a decentralized exchange for ERC20 and ERC721 tokens.
  *        It allows users to propose trades and accept them.
- *        The contract will validate the trade and transfer the assets.
+ *        The contract will validate the trade, then transfer the assets.
  */
 contract SwaplaceV2 {
-    function sayHi() public pure returns (string memory) {
-        return "hi";
-    }
+    function createTrade() public {}
+
+    function acceptTrade() public {}
+
+    function cancelTrade() public {}
+
+    function getTrade() public view {}
 
     /* Receive ETH */
     receive() external payable {}

@@ -186,7 +186,7 @@ contract Swaplace is ISwaplace {
         emit TradeAccepted(id, msg.sender, withdrawAddress);
     }
 
-    // make a get function to make a ready Assets var returned from the trade proposalz
+    // make a get function to make a ready Assets var returned from the trade proposal
 
     /*
      * @param - id - the trade id
@@ -198,7 +198,7 @@ contract Swaplace is ISwaplace {
             "Only the proposer can cancel the trade"
         );
         delete trades[_tradeId];
-        // must send assets back kkkkk
+        // must send assets back hahaha
         emit TradeCancelled(_tradeId, msg.sender);
     }
 
