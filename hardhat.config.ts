@@ -9,7 +9,7 @@ import "hardhat-gas-reporter";
 import dotenv from "dotenv";
 dotenv.config();
 
-const { GOERLI, ETH, PRIVATE_KEY } = process.env;
+const { GOERLI, ETH, PRIVATE_KEY, PRIVATE_KEY_USER } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
@@ -29,7 +29,7 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       url: `${GOERLI}`,
-      accounts: [`${PRIVATE_KEY}`],
+      accounts: [`${PRIVATE_KEY}`, `${PRIVATE_KEY_USER}`],
     },
   },
 };

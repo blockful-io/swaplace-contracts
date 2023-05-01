@@ -7,10 +7,12 @@ describe("Swaplace", async function () {
   let MockERC20: Contract;
   let MockERC721: Contract;
   let owner: string;
+  let user: string;
 
   before(async () => {
-    const [signer] = await ethers.getSigners();
+    const [signer, accountOne] = await ethers.getSigners();
     owner = signer.address;
+    user = accountOne.address;
 
     const swaplaceFactory = await ethers.getContractFactory("SwaplaceV2", signer);
     const MockERC20Factory = await ethers.getContractFactory("MockERC20", signer);
@@ -36,4 +38,6 @@ describe("Swaplace", async function () {
     expect(await MockERC721.mintTo(owner)).to.be.ok;
     expect(await MockERC721.balanceOf(owner)).to.be.equals(1);
   });
+
+  it("Should create a new trade", async function () {});
 });
