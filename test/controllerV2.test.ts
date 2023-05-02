@@ -91,7 +91,7 @@ describe("Swaplace", async function () {
     expect(trade[2][1].toString()).to.be.equals(ERC721Asset.toString());
   });
 
-  it("Should build a trade in a single function call for both { ERC20, ERC721 }", async function () {
+  it("Should build a trade in a single function for both { ERC20, ERC721 }", async function () {
     const expiry = (await Swaplace.getDay()) * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
@@ -123,5 +123,11 @@ describe("Swaplace", async function () {
 
     expect(trade[2][0].toString()).to.be.equals(firstAsset.toString());
     expect(trade[2][1].toString()).to.be.equals(secondAsset.toString());
+  });
+
+  it("Should revert while building asset with invalid asset type", async function () {
+    const invalidAssetType = 2;
+    await Swaplace.makeAsset(MockERC20.address, 1000, invalidAssetType);
+    await expect(Swaplace.makeAsset(MockERC20.address, 1000, invalidAssetType)).to.be.reverted;
   });
 });
