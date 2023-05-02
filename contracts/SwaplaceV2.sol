@@ -5,11 +5,24 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-// import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+error ExpiryTooOld(uint256 timestamp);
+error ExpiryMustBeBiggerThanOneDay(uint256 timestamp);
+error CannotBeZeroAddress(address addr);
+error LengthMismatchWhenComposing(
+    uint256 addr,
+    uint256 amountOrId,
+    uint256 assetType
+);
 
-error expiryTooOld(uint256 timestamp);
-
-/*
+/* v2.0.0
+ *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
+ * |\   __  \ |\  \      |\   __  \ |\   ____\ |\  \|\  \  |\  _____\|\  \|\  \ |\  \
+ * \ \  \|\ /_\ \  \     \ \  \|\  \\ \  \___| \ \  \/  /|_\ \  \__/ \ \  \\\  \\ \  \
+ *  \ \   __  \\ \  \     \ \  \\\  \\ \  \     \ \   ___  \\ \   __\ \ \  \\\  \\ \  \
+ *   \ \  \|\  \\ \  \____ \ \  \\\  \\ \  \____ \ \  \\ \  \\ \  \_|  \ \  \\\  \\ \  \____
+ *    \ \_______\\ \_______\\ \_______\\ \_______\\ \__\\ \__\\ \__\    \ \_______\\ \_______\
+ *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
+ *
  * @author - Blockful.io
  * @dev - Swaplace is a decentralized exchange for ERC20 and ERC721 tokens.
  *        It allows users to propose trades and accept them.
@@ -66,7 +79,7 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
     function valid(uint256 expiry) public view {
         // Required the expiration date to be at least 1 day in the future
         if (expiry < block.timestamp + 1 days) {
-            revert expiryTooOld(expiry);
+            revert ExpiryTooOld(expiry);
         }
     }
 
@@ -79,24 +92,45 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
     }
 
     function makeTrade(
+        address owner,
         uint256 expiry,
         Asset[] memory assets
-    ) public view returns (Trade memory) {
-        return Trade(msg.sender, expiry, assets);
+    ) public pure returns (Trade memory) {
+        return Trade(owner, expiry, assets);
     }
 
-    // function composeTrade(
-    //     uint256 expiry,
-    //     address[] memory addrs,
-    //     uint256[] memory amountsOrIds,
-    //     AssetType[] memory assetTypes
-    // ) public view returns (Trade memory) {
-    //     Asset[] memory assets = new Asset[](addrs.length);
-    //     for (uint256 i = 0; i < addrs.length; i++) {
-    //         assets[i] = makeAsset(addrs[i], amountsOrIds[i], assetTypes[i]);
-    //     }
-    //     return makeTrade(expiry, assets);
-    // }
+    function composeTrade(
+        address owner,
+        uint256 expiry,
+        address[] memory addrs,
+        uint256[] memory amountsOrIds,
+        AssetType[] memory assetTypes
+    ) public pure returns (Trade memory) {
+        if (
+            addrs.length != amountsOrIds.length ||
+            addrs.length != assetTypes.length
+        ) {
+            revert LengthMismatchWhenComposing(
+                addrs.length,
+                amountsOrIds.length,
+                assetTypes.length
+            );
+        }
+
+        if (expiry < 1 days) {
+            revert ExpiryMustBeBiggerThanOneDay(expiry);
+        }
+
+        if (owner == address(0)) {
+            revert CannotBeZeroAddress(owner);
+        }
+
+        Asset[] memory assets = new Asset[](addrs.length);
+        for (uint256 i = 0; i < addrs.length; i++) {
+            assets[i] = makeAsset(addrs[i], amountsOrIds[i], assetTypes[i]);
+        }
+        return makeTrade(owner, expiry, assets);
+    }
 
     function supportsInterface(
         bytes4 interfaceID

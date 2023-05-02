@@ -65,8 +65,8 @@ describe("Swaplace", async function () {
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
     const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
 
-    const ERC20Trade = await Swaplace.makeTrade(expiry, [ERC20Asset]);
-    const ERC721Trade = await Swaplace.makeTrade(expiry, [ERC721Asset]);
+    const ERC20Trade = await Swaplace.makeTrade(owner, expiry, [ERC20Asset]);
+    const ERC721Trade = await Swaplace.makeTrade(owner, expiry, [ERC721Asset]);
 
     expect(ERC20Trade[0]).to.be.equals(owner);
     expect(ERC20Trade[1]).to.be.equals(expiry);
@@ -83,11 +83,45 @@ describe("Swaplace", async function () {
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
     const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
 
-    const trade = await Swaplace.makeTrade(expiry, [ERC20Asset, ERC721Asset]);
+    const trade = await Swaplace.makeTrade(owner, expiry, [ERC20Asset, ERC721Asset]);
 
     expect(trade[0]).to.be.equals(owner);
     expect(trade[1]).to.be.equals(expiry);
     expect(trade[2][0].toString()).to.be.equals(ERC20Asset.toString());
     expect(trade[2][1].toString()).to.be.equals(ERC721Asset.toString());
+  });
+
+  it("Should build a trade in a single function call for both { ERC20, ERC721 }", async function () {
+    const expiry = (await Swaplace.getDay()) * 2;
+
+    const assetsContractAddrs = [MockERC20.address, MockERC721.address];
+    const assetsAmountsOrId = [1000, 1];
+    const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
+
+    const trade = await Swaplace.composeTrade(
+      owner,
+      expiry,
+      assetsContractAddrs,
+      assetsAmountsOrId,
+      assetTypes
+    );
+
+    expect(trade[0]).to.be.equals(owner);
+    expect(trade[1]).to.be.equals(expiry);
+
+    const firstAsset = await Swaplace.makeAsset(
+      assetsContractAddrs[0],
+      assetsAmountsOrId[0],
+      assetTypes[0]
+    );
+
+    const secondAsset = await Swaplace.makeAsset(
+      assetsContractAddrs[1],
+      assetsAmountsOrId[1],
+      assetTypes[1]
+    );
+
+    expect(trade[2][0].toString()).to.be.equals(firstAsset.toString());
+    expect(trade[2][1].toString()).to.be.equals(secondAsset.toString());
   });
 });
