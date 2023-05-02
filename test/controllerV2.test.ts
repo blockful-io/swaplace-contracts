@@ -39,5 +39,55 @@ describe("Swaplace", async function () {
     expect(await MockERC721.balanceOf(owner)).to.be.equals(1);
   });
 
-  it("Should create a new trade", async function () {});
+  it("Should build expiration timestamp", async function () {
+    const day = await Swaplace.getDay();
+    const week = day * 7;
+
+    expect(day.toString()).to.be.equals("86400");
+    expect(week.toString()).to.be.equals("604800");
+  });
+
+  it("Should build assets for { ERC20, ERC721 }", async function () {
+    const erc20 = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
+    expect(erc20[0].toString()).to.be.equals(MockERC20.address);
+    expect(erc20[1].toString()).to.be.equals("1000");
+    expect(erc20[2].toString()).to.be.equals("0");
+
+    const erc721 = await Swaplace.makeAsset(MockERC721.address, 1, 1);
+    expect(erc721[0].toString()).to.be.equals(MockERC721.address);
+    expect(erc721[1].toString()).to.be.equals("1");
+    expect(erc721[2].toString()).to.be.equals("1");
+  });
+
+  it("Should build single trades for { ERC20, ERC721 }", async function () {
+    const expiry = (await Swaplace.getDay()) * 2;
+
+    const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
+    const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
+
+    const ERC20Trade = await Swaplace.makeTrade(expiry, [ERC20Asset]);
+    const ERC721Trade = await Swaplace.makeTrade(expiry, [ERC721Asset]);
+
+    expect(ERC20Trade[0]).to.be.equals(owner);
+    expect(ERC20Trade[1]).to.be.equals(expiry);
+    expect(ERC20Trade[2][0].toString()).to.be.equals(ERC20Asset.toString());
+
+    expect(ERC721Trade[0]).to.be.equals(owner);
+    expect(ERC721Trade[1]).to.be.equals(expiry);
+    expect(ERC721Trade[2][0].toString()).to.be.equals(ERC721Asset.toString());
+  });
+
+  it("Should build single trade containing both { ERC20, ERC721 }", async function () {
+    const expiry = (await Swaplace.getDay()) * 2;
+
+    const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
+    const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
+
+    const trade = await Swaplace.makeTrade(expiry, [ERC20Asset, ERC721Asset]);
+
+    expect(trade[0]).to.be.equals(owner);
+    expect(trade[1]).to.be.equals(expiry);
+    expect(trade[2][0].toString()).to.be.equals(ERC20Asset.toString());
+    expect(trade[2][1].toString()).to.be.equals(ERC721Asset.toString());
+  });
 });
