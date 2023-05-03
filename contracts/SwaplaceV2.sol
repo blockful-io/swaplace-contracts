@@ -93,11 +93,13 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         if (assetType != AssetType.ERC20 && assetType != AssetType.ERC721) {
             revert InvalidAssetType(uint256(assetType));
         }
+
         if (assetType == AssetType.ERC20) {
             if (amountOrId == 0) {
                 revert CannotBeZeroAmountWhenERC20(amountOrId);
             }
         }
+
         return Asset(addr, amountOrId, assetType);
     }
 
@@ -106,6 +108,14 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         uint256 expiry,
         Asset[] memory assets
     ) public pure returns (Trade memory) {
+        if (owner == address(0)) {
+            revert CannotBeZeroAddress(owner);
+        }
+
+        if (expiry < 1 days) {
+            revert ExpiryMustBeBiggerThanOneDay(expiry);
+        }
+
         return Trade(owner, expiry, assets);
     }
 
@@ -127,18 +137,11 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
             );
         }
 
-        if (expiry < 1 days) {
-            revert ExpiryMustBeBiggerThanOneDay(expiry);
-        }
-
-        if (owner == address(0)) {
-            revert CannotBeZeroAddress(owner);
-        }
-
         Asset[] memory assets = new Asset[](addrs.length);
         for (uint256 i = 0; i < addrs.length; i++) {
             assets[i] = makeAsset(addrs[i], amountsOrIds[i], assetTypes[i]);
         }
+
         return makeTrade(owner, expiry, assets);
     }
 
