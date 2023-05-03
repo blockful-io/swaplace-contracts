@@ -51,7 +51,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should build expiration timestamp", async function () {
-    const day = await Swaplace.getDay();
+    const day = await Swaplace.day();
     const week = day * 7;
 
     expect(day.toString()).to.be.equals("86400");
@@ -71,7 +71,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should build single trades for { ERC20, ERC721 }", async function () {
-    const expiry = (await Swaplace.getDay()) * 2;
+    const expiry = (await Swaplace.day()) * 2;
 
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
     const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
@@ -89,7 +89,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should build single trade containing both { ERC20, ERC721 }", async function () {
-    const expiry = (await Swaplace.getDay()) * 2;
+    const expiry = (await Swaplace.day()) * 2;
 
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
     const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
@@ -103,7 +103,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should compose a trade in a single function for both { ERC20, ERC721 }", async function () {
-    const expiry = (await Swaplace.getDay()) * 2;
+    const expiry = (await Swaplace.day()) * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
     const assetsAmountsOrId = [1000, 1];
@@ -151,7 +151,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should revert while building trade with 'owner' as address zero", async function () {
-    const expiry = (await Swaplace.getDay()) * 2;
+    const expiry = (await Swaplace.day()) * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
     const assetsAmountsOrId = [1000, 1];
@@ -169,7 +169,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should revert while building trade without minimum expiry period", async function () {
-    const expiry = (await Swaplace.getDay()) / 2;
+    const expiry = (await Swaplace.day()) / 2;
 
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
 
@@ -180,7 +180,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should revert while composing trade with mismatching inputs length", async function () {
-    const expiry = (await Swaplace.getDay()) * 2;
+    const expiry = (await Swaplace.day()) * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
     const assetsAmountsOrId = [1000, 1, 999];
@@ -197,8 +197,39 @@ describe("Swaplace", async function () {
     ).to.be.revertedWithCustomError(Swaplace, "LengthMismatchWhenComposing");
   });
 
-  it("Should do something", async function () {
+  it("Should create a trade", async function () {
+    const expiry = (await Swaplace.day()) * 2;
 
+    const assetsContractAddrs = [MockERC20.address, MockERC721.address];
+    const assetsAmountsOrId = [1000, 1];
+    const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
+    const trade = await Swaplace.composeTrade(
+      owner,
+      expiry,
+      assetsContractAddrs,
+      assetsAmountsOrId,
+      assetTypes
+    );
+
+    // Create the first trade
+    expect(await Swaplace.createTrade(trade)).to.be.ok;
+
+    // Return the first trade and compare with trade input
+    let tradeResult = await Swaplace.getTrade(1);
+    expect(tradeResult.toString()).to.be.equal(trade.toString());
+
+    // Expect ownerOf trade 1 to be the trade creator
+    let tradeIds = await Swaplace.ownerOf(owner);
+    expect(tradeIds[0].toString()).to.be.equal("1");
+
+    // Create a second trade
+    expect(await Swaplace.createTrade(trade)).to.be.ok;
+
+    // Expect ownerOf trade 1 and 2 to be the trade creator
+    tradeIds = await Swaplace.ownerOf(owner);
+    tradeIds.forEach((element: any, index: any) => {
+      expect(element.toString()).to.be.equal((index + 1).toString());
+    });
   });
 });

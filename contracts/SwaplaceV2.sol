@@ -5,7 +5,6 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-error ExpiryTooOld(uint256 timestamp);
 error ExpiryMustBeBiggerThanOneDay(uint256 timestamp);
 error CannotBeZeroAddress(address addr);
 error CannotBeZeroAmountWhenERC20(uint256 amountOrId);
@@ -52,36 +51,33 @@ interface ISwaplaceV2 {
 }
 
 contract SwaplaceV2 is ISwaplaceV2, IERC165 {
-    mapping(bytes32 => Trade) public trades;
+    uint256 public tradeCount = 0;
 
-    function createTrade(uint256 expiry, Asset[] calldata assets) public {
-        valid(expiry);
-        bytes32 id = generateTradeId(msg.sender, expiry);
+    mapping(uint256 => Trade) private trades;
+    mapping(address => uint256[]) private owners;
 
-        for (uint256 i = 0; i < assets.length; i++) {
-            if (assets[i].assetType == AssetType.ERC20) {}
-            if (assets[i].assetType == AssetType.ERC721) {}
-        } // this would calculate for everysingle one, maybe not necessary in case we pre-request them
+    function createTrade(Trade calldata trade) public returns (uint256) {
+        valid(trade.expiry);
 
-        trades[id].owner = msg.sender;
-        trades[id].expiry = expiry;
+        tradeCount++;
+        trades[tradeCount] = trade;
+        owners[msg.sender].push(tradeCount);
+
+        // for (uint256 i = 0; i < trade.assets.length; i++) {
+        //     if (trade.assets[i].assetType == AssetType.ERC20) {}
+        //     if (trade.assets[i].assetType == AssetType.ERC721) {}
+        // }
+        return tradeCount;
     }
 
     function acceptTrade() public {}
 
     function cancelTrade() public {}
 
-    function generateTradeId(
-        address owner,
-        uint256 expiry
-    ) public view returns (bytes32 id) {
-        id = keccak256(abi.encodePacked(owner, expiry, block.timestamp));
-    }
-
-    function valid(uint256 expiry) public view {
+    function valid(uint256 expiry) public pure {
         // Required the expiration date to be at least 1 day in the future
-        if (expiry < block.timestamp + 1 days) {
-            revert ExpiryTooOld(expiry);
+        if (expiry < 1 days) {
+            revert ExpiryMustBeBiggerThanOneDay(expiry);
         }
     }
 
@@ -108,12 +104,10 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         uint256 expiry,
         Asset[] memory assets
     ) public pure returns (Trade memory) {
+        valid(expiry);
+
         if (owner == address(0)) {
             revert CannotBeZeroAddress(owner);
-        }
-
-        if (expiry < 1 days) {
-            revert ExpiryMustBeBiggerThanOneDay(expiry);
         }
 
         return Trade(owner, expiry, assets);
@@ -145,18 +139,24 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         return makeTrade(owner, expiry, assets);
     }
 
+    function getTrade(uint256 id) public view returns (Trade memory) {
+        return trades[id];
+    }
+
+    function ownerOf(address addr) public view returns (uint256[] memory) {
+        return owners[addr];
+    }
+
+    function day() public pure returns (uint256) {
+        return 1 days;
+    }
+
     function supportsInterface(
         bytes4 interfaceID
     ) external pure override(IERC165, ISwaplaceV2) returns (bool) {
         return
             interfaceID == type(IERC165).interfaceId ||
             interfaceID == type(ISwaplaceV2).interfaceId;
-    }
-
-    function getTrade() public view {}
-
-    function getDay() public pure returns (uint256) {
-        return 1 days;
     }
 
     /* Receive ETH */
