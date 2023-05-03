@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 error ExpiryTooOld(uint256 timestamp);
 error ExpiryMustBeBiggerThanOneDay(uint256 timestamp);
 error CannotBeZeroAddress(address addr);
+error CannotBeZeroAmountWhenERC20(uint256 amountOrId);
+error InvalidAssetType(uint256 assetType);
 error LengthMismatchWhenComposing(
     uint256 addr,
     uint256 amountOrId,
@@ -88,6 +90,14 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         uint256 amountOrId,
         AssetType assetType
     ) public pure returns (Asset memory) {
+        if (assetType != AssetType.ERC20 && assetType != AssetType.ERC721) {
+            revert InvalidAssetType(uint256(assetType));
+        }
+        if (assetType == AssetType.ERC20) {
+            if (amountOrId == 0) {
+                revert CannotBeZeroAmountWhenERC20(amountOrId);
+            }
+        }
         return Asset(addr, amountOrId, assetType);
     }
 

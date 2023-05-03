@@ -127,7 +127,12 @@ describe("Swaplace", async function () {
 
   it("Should revert while building asset with invalid asset type", async function () {
     const invalidAssetType = 2;
-    await Swaplace.makeAsset(MockERC20.address, 1000, invalidAssetType);
     await expect(Swaplace.makeAsset(MockERC20.address, 1000, invalidAssetType)).to.be.reverted;
+  });
+
+  it("Should revert while building asset with zero amount as type ERC20, but not for ERC721", async function () {
+    await expect(Swaplace.makeAsset(MockERC20.address, 0, 0)).to.be.reverted;
+
+    await expect(Swaplace.makeAsset(MockERC721.address, 0, 1)).to.not.be.reverted;
   });
 });
