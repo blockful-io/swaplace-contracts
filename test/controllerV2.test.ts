@@ -299,7 +299,7 @@ describe("Swaplace", async function () {
     expect(await MockERC721.getApproved(1)).to.be.equal(Swaplace.address);
   });
 
-  it("Should create trade, allowances as 'owner' then accept as 'user'", async function () {
+  it("Should create trade and allowances as 'owner' then accept as 'user'", async function () {
     // Mint tokens for test execution
 
     expect(await MockERC20.mintTo(owner, 1000)).to.be.ok;

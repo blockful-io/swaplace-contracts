@@ -68,7 +68,16 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         return tradeCount;
     }
 
-    function acceptTrade() public {}
+    function acceptTrade() public {
+
+        // must choose the trade id
+
+        // must match ask criteria
+
+        // must send bid to msg.sender
+
+        // must revert in case assets are not correctly distributted
+    }
 
     function cancelTrade() public {}
 
