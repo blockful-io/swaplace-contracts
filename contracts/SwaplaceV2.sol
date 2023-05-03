@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 error ExpiryMustBeBiggerThanOneDay(uint256 timestamp);
+error CannotInputEmptyAssets();
 error CannotBeZeroAddress(address addr);
 error CannotBeZeroAmountWhenERC20(uint256 amountOrId);
 error InvalidAssetType(uint256 assetType);
@@ -45,6 +46,7 @@ interface ISwaplaceV2 {
         address owner;
         uint256 expiry;
         Asset[] assets;
+        Asset[] asking;
     }
 
     function supportsInterface(bytes4 interfaceID) external pure returns (bool);
@@ -63,10 +65,6 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         trades[tradeCount] = trade;
         owners[msg.sender].push(tradeCount);
 
-        // for (uint256 i = 0; i < trade.assets.length; i++) {
-        //     if (trade.assets[i].assetType == AssetType.ERC20) {}
-        //     if (trade.assets[i].assetType == AssetType.ERC721) {}
-        // }
         return tradeCount;
     }
 
@@ -102,7 +100,8 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
     function makeTrade(
         address owner,
         uint256 expiry,
-        Asset[] memory assets
+        Asset[] memory assets,
+        Asset[] memory asking
     ) public pure returns (Trade memory) {
         valid(expiry);
 
@@ -110,7 +109,11 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
             revert CannotBeZeroAddress(owner);
         }
 
-        return Trade(owner, expiry, assets);
+        if (assets.length == 0 || asking.length == 0) {
+            revert CannotInputEmptyAssets();
+        }
+
+        return Trade(owner, expiry, assets, asking);
     }
 
     function composeTrade(
@@ -118,7 +121,8 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         uint256 expiry,
         address[] memory addrs,
         uint256[] memory amountsOrIds,
-        AssetType[] memory assetTypes
+        AssetType[] memory assetTypes,
+        uint256 indexFlipSide
     ) public pure returns (Trade memory) {
         if (
             addrs.length != amountsOrIds.length ||
@@ -131,12 +135,21 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
             );
         }
 
-        Asset[] memory assets = new Asset[](addrs.length);
-        for (uint256 i = 0; i < addrs.length; i++) {
+        Asset[] memory assets = new Asset[](indexFlipSide);
+        for (uint256 i = 0; i < indexFlipSide; i++) {
             assets[i] = makeAsset(addrs[i], amountsOrIds[i], assetTypes[i]);
         }
 
-        return makeTrade(owner, expiry, assets);
+        Asset[] memory asking = new Asset[](addrs.length - indexFlipSide);
+        for (uint256 i = indexFlipSide; i < addrs.length; i++) {
+            asking[i - indexFlipSide] = makeAsset(
+                addrs[i],
+                amountsOrIds[i],
+                assetTypes[i]
+            );
+        }
+
+        return makeTrade(owner, expiry, assets, asking);
     }
 
     function getTrade(uint256 id) public view returns (Trade memory) {
