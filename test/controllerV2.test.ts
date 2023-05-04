@@ -349,10 +349,6 @@ describe("Swaplace", async function () {
   // });
 
   it("Should break the world", async function () {
-    const ex1 = 13; // 1 + 2 + 8
-    const test = await Swaplace.getNFTIds(ex1);
-    console.log(test);
-
     const trade = await Swaplace.composeTrade(
       owner, // Trade creator
       day * 2, // Expiry
@@ -363,19 +359,5 @@ describe("Swaplace", async function () {
     );
 
     await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-    await Swaplace.createTrade(trade);
-
-    const test2 = await Swaplace.ownersOfV2(owner, 0);
-    console.log(test2);
   });
 });

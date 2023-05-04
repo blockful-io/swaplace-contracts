@@ -58,10 +58,6 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
     mapping(uint256 => Trade) private trades;
     mapping(address => uint256[]) private owners;
 
-    mapping(address => mapping(uint256 => uint256)) private ownersV2;
-
-    // mapping(address => uint256) private ownersV2;
-
     function createTrade(Trade calldata trade) public returns (uint256) {
         valid(trade.expiry);
 
@@ -72,87 +68,8 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         trades[tradeCount] = trade;
         trades[tradeCount].expiry += block.timestamp; // explain this
         owners[msg.sender].push(tradeCount); // develop this
-
-        ownersV2[msg.sender][tradeCount / 255] += 2 ** (tradeCount - 1);
-
         return tradeCount;
     }
-
-    ////
-
-    function ownersOfV2(
-        address addr,
-        uint256 set
-    ) public view returns (uint256[] memory) {
-        return getNFTIds(ownersV2[addr][set]);
-    }
-
-    function getNFTIds(uint256 nftSum) public pure returns (uint256[] memory) {
-        uint256[] memory nftIds = new uint256[](256);
-        uint256 index = 0;
-        uint256 indexSizeResult = 0;
-
-        while (nftSum > 0) {
-            if (nftSum % 2 == 1) {
-                nftIds[index] = 2 ** index;
-                indexSizeResult++;
-            }
-
-            index++;
-            nftSum = nftSum / 2;
-        }
-
-        uint256 indexResult = 0;
-        uint256[] memory result = new uint256[](indexSizeResult);
-        for (uint256 j = 0; j < index; j++) {
-            if (nftIds[j] != 0) {
-                result[indexResult] = log2(nftIds[j]) + 1;
-                indexResult++;
-            }
-        }
-
-        return result;
-    }
-
-    function log2(uint256 value) internal pure returns (uint256) {
-        uint256 result = 0;
-        unchecked {
-            if (value >> 128 > 0) {
-                value >>= 128;
-                result += 128;
-            }
-            if (value >> 64 > 0) {
-                value >>= 64;
-                result += 64;
-            }
-            if (value >> 32 > 0) {
-                value >>= 32;
-                result += 32;
-            }
-            if (value >> 16 > 0) {
-                value >>= 16;
-                result += 16;
-            }
-            if (value >> 8 > 0) {
-                value >>= 8;
-                result += 8;
-            }
-            if (value >> 4 > 0) {
-                value >>= 4;
-                result += 4;
-            }
-            if (value >> 2 > 0) {
-                value >>= 2;
-                result += 2;
-            }
-            if (value >> 1 > 0) {
-                result += 1;
-            }
-        }
-        return result;
-    }
-
-    /////
 
     function acceptTrade() public {
         // must choose the trade id
