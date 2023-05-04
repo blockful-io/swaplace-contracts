@@ -350,18 +350,32 @@ describe("Swaplace", async function () {
 
   it("Should break the world", async function () {
     const ex1 = 13; // 1 + 2 + 8
-    const ex2 = 63; // 1 + 2 + 4 + 8 + 16 + 32
-    const ex3 = 256;
-    const ex4 = 1356;
-
     const test = await Swaplace.getNFTIds(ex1);
-    const test2 = await Swaplace.getNFTIds(ex2);
-    const test3 = await Swaplace.getNFTIds(ex3);
-    const test4 = await Swaplace.getNFTIds(ex4);
-
     console.log(test);
+
+    const trade = await Swaplace.composeTrade(
+      owner, // Trade creator
+      day * 2, // Expiry
+      [MockERC20.address, MockERC721.address, MockERC721.address],
+      [1000, 1, 2], // Amount or Id
+      [0, 1, 1], // 0 = ERC20, 1 = ERC721
+      2 // Index of the asset that will be flipped from bid to ask
+    );
+
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+    await Swaplace.createTrade(trade);
+
+    const test2 = await Swaplace.ownersOfV2(owner, 0);
     console.log(test2);
-    console.log(test3);
-    console.log(test4);
   });
 });

@@ -58,6 +58,10 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
     mapping(uint256 => Trade) private trades;
     mapping(address => uint256[]) private owners;
 
+    mapping(address => mapping(uint256 => uint256)) private ownersV2;
+
+    // mapping(address => uint256) private ownersV2;
+
     function createTrade(Trade calldata trade) public returns (uint256) {
         valid(trade.expiry);
 
@@ -69,16 +73,19 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         trades[tradeCount].expiry += block.timestamp; // explain this
         owners[msg.sender].push(tradeCount); // develop this
 
-        // get block.timestamp
-        // convert to string
-        // breakdown into years, weeks, days and msg.sender
-        // tripple mapping(mapping(mapping()))
-        // reserve an array of owned NFTs based
+        ownersV2[msg.sender][tradeCount / 255] += 2 ** (tradeCount - 1);
 
         return tradeCount;
     }
 
     ////
+
+    function ownersOfV2(
+        address addr,
+        uint256 set
+    ) public view returns (uint256[] memory) {
+        return getNFTIds(ownersV2[addr][set]);
+    }
 
     function getNFTIds(uint256 nftSum) public pure returns (uint256[] memory) {
         uint256[] memory nftIds = new uint256[](256);
