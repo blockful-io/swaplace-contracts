@@ -53,7 +53,7 @@ interface ISwaplaceV2 {
 }
 
 contract SwaplaceV2 is ISwaplaceV2, IERC165 {
-    uint256 public tradeCount = 0;
+    uint256 public tradeId = 0;
 
     mapping(uint256 => Trade) private trades;
     mapping(address => uint256[]) private owners;
@@ -62,13 +62,13 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         valid(trade.expiry);
 
         unchecked {
-            tradeCount++;
+            tradeId++;
         }
 
-        trades[tradeCount] = trade;
-        trades[tradeCount].expiry += block.timestamp; // explain this
-        owners[msg.sender].push(tradeCount); // develop this
-        return tradeCount;
+        trades[tradeId] = trade;
+        trades[tradeId].expiry += block.timestamp; // explain this
+        owners[msg.sender].push(tradeId); // develop this
+        return tradeId;
     }
 
     function acceptTrade() public {
