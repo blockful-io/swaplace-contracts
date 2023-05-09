@@ -56,7 +56,7 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
     uint256 public tradeId = 0;
 
     mapping(uint256 => Trade) private trades;
-    mapping(address => uint256[]) private owners;
+    mapping(address => uint256[]) private creators;
 
     function createTrade(Trade calldata trade) public returns (uint256) {
         valid(trade.expiry);
@@ -67,13 +67,36 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
 
         trades[tradeId] = trade;
         trades[tradeId].expiry += block.timestamp; // explain this
-        owners[msg.sender].push(tradeId); // develop this
+
+        creators[msg.sender].push(tradeId); // develop this
+
         return tradeId;
     }
 
-    function acceptTrade() public {
+    function acceptTrade(uint256 tradeId) public {
         // must choose the trade id
-        // must match ask criteria
+        Trade memory trade = trades[tradeId];
+
+        // must match ask criteria by owning the assets
+        // contract must be the operator of the assets
+        for (uint256 i = 0; i < trade.asking.length; i++) {
+            Asset memory asking = trade.asking[i];
+
+            if (asking.assetType == AssetType.ERC20) {
+                IERC20(asking.addr).transferFrom(
+                    msg.sender,
+                    trade.owner,
+                    asking.amountOrId
+                );
+            } else if (asking.assetType == AssetType.ERC721) {
+                IERC721(asking.addr).transferFrom(
+                    msg.sender,
+                    trade.owner,
+                    asking.amountOrId
+                );
+            }
+        }
+
         // must send bid to msg.sender
         // must revert in case assets are not correctly distributted
     }
@@ -168,8 +191,8 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         return trades[id];
     }
 
-    function ownerOf(address addr) public view returns (uint256[] memory) {
-        return owners[addr];
+    function getTradesBy(address addr) public view returns (uint256[] memory) {
+        return creators[addr];
     }
 
     function supportsInterface(
