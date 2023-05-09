@@ -15,6 +15,7 @@ error LengthMismatchWhenComposing(
     uint256 amountOrId,
     uint256 assetType
 );
+error FunctionCallFailedWithReason(bytes reason);
 
 /* v2.0.0
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -52,6 +53,14 @@ interface ISwaplaceV2 {
     function supportsInterface(bytes4 interfaceID) external pure returns (bool);
 }
 
+interface IUniversalTransfer {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amountOrId
+    ) external;
+}
+
 contract SwaplaceV2 is ISwaplaceV2, IERC165 {
     uint256 public tradeId = 0;
 
@@ -73,32 +82,46 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         return tradeId;
     }
 
-    function acceptTrade(uint256 tradeId) public {
-        // must choose the trade id
-        Trade memory trade = trades[tradeId];
+    //// TEST GROUND
 
-        // must match ask criteria by owning the assets
-        // contract must be the operator of the assets
-        for (uint256 i = 0; i < trade.asking.length; i++) {
-            Asset memory asking = trade.asking[i];
+    // Encode the transferFrom function
+    function getEncodedTransfer(
+        address from,
+        address to,
+        uint256 amountOrId
+    ) public pure returns (bytes memory data) {
+        data = abi.encodeWithSelector(
+            IUniversalTransfer.transferFrom.selector,
+            from,
+            to,
+            amountOrId
+        );
+    }
 
-            if (asking.assetType == AssetType.ERC20) {
-                IERC20(asking.addr).transferFrom(
-                    msg.sender,
-                    trade.owner,
-                    asking.amountOrId
-                );
-            } else if (asking.assetType == AssetType.ERC721) {
-                IERC721(asking.addr).transferFrom(
-                    msg.sender,
-                    trade.owner,
-                    asking.amountOrId
-                );
-            }
+    function acceptTrade(uint256 _tradeId) public {
+        // Must pick the trade id
+        Trade memory trade = trades[_tradeId];
+
+        Asset[] memory assets = trade.asking;
+        for (uint256 i = 0; i < assets.length; i++) {
+            IUniversalTransfer(assets[i].addr).transferFrom(
+                msg.sender,
+                trade.owner,
+                assets[i].amountOrId
+            );
         }
 
-        // must send bid to msg.sender
-        // must revert in case assets are not correctly distributted
+        assets = trade.assets;
+        for (uint256 i = 0; i < assets.length; i++) {
+            IUniversalTransfer(assets[i].addr).transferFrom(
+                trade.owner,
+                msg.sender,
+                assets[i].amountOrId
+            );
+        }
+
+        // Delete the trade as it is completed
+        delete (trades[_tradeId]);
     }
 
     function cancelTrade() public {}

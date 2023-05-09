@@ -312,12 +312,17 @@ describe("Swaplace", async function () {
 
     await MockERC20.mintTo(owner, 1000);
     await MockERC721.mintTo(owner);
+    let lastMinted = await MockERC721.totalSupply();
 
     // Ask user to approve for future token transfers
 
-    let lastMinted = await MockERC721.totalSupply();
     await MockERC20.approve(Swaplace.address, 1000);
     await MockERC721.approve(Swaplace.address, lastMinted);
+
+    // Mint tokens to accept the trade
+
+    await MockERC721.mintTo(acceptee.address); // NFT id: 2
+    lastMinted = await MockERC721.totalSupply();
 
     // Compose a trade bidding 1000 Tokens and 1 NFT and asking for 1 NFT (id: 2)
 
@@ -325,7 +330,7 @@ describe("Swaplace", async function () {
       owner, // Trade creator
       day * 2, // Expiry
       [MockERC20.address, MockERC721.address, MockERC721.address],
-      [1000, 1, 2], // Amount or Id
+      [1000, 1, lastMinted], // Amount or Id
       [0, 1, 1], // 0 = ERC20, 1 = ERC721
       2 // Index of the asset that will be flipped from bid to ask
     );
@@ -336,18 +341,68 @@ describe("Swaplace", async function () {
 
     /* { Trade Acceptee } */
 
-    // Mint tokens to accept the trade
+    // Ask user to approve for its own token transfer
 
-    await MockERC721.mintTo(acceptee.address); // NFT id: 2
-
-    // Ask user to approve for its own token transfers
-
-    lastMinted = await MockERC721.totalSupply();
     await MockERC721.connect(acceptee).approve(Swaplace.address, lastMinted);
 
-    // Accept the trade
+    // Get information before the trade
 
-    await Swaplace.connect(acceptee).acceptTrade(1);
+    const ownerOfLastMinted = await MockERC721.ownerOf(lastMinted);
+    console.log(
+      "TokenId is: ",
+      lastMinted,
+      ".\n Owner of last minted is: ",
+      ownerOfLastMinted,
+      " and it should be: ",
+      acceptee.address,
+      ".\n The receiver of this trade is: ",
+      owner,
+      "."
+    );
+
+    const approvedAddrOfTokenId = await MockERC721.getApproved(lastMinted);
+    console.log("\nToken Approved and the operator is: ", approvedAddrOfTokenId);
+    console.log(
+      "Swaplace address is: ",
+      Swaplace.address,
+      " and should be allowed to move the assets"
+    );
+
+    // Should encode the trade with selector firs
+    const encoded = MockERC721.interface.encodeFunctionData(
+      "transferFrom(address,address,uint256)",
+      [acceptee.address, owner, trade.asking[0].amountOrId]
+    );
+    const onChainEncoded = await Swaplace.connect(acceptee).getEncodedTransfer(
+      acceptee.address,
+      owner,
+      trade.asking[0].amountOrId
+    );
+    console.log("\nThe asked TokenId is: ", trade.asking[0].amountOrId);
+    console.log("The FROM address is: ", acceptee.address);
+    console.log("The TO address is: ", owner);
+    console.log("\nEncoded data is: ", encoded);
+    expect(onChainEncoded).to.be.equal(encoded);
+
+    // Accept the trades
+
+    const tradeId = await Swaplace.tradeId();
+    console.log("\nTradeId is: ", tradeId.toString());
+    // await Swaplace.connect(acceptee).acceptTrade(tradeId);
+
+    // Estimate gas of trades
+    const gasEstimate = await Swaplace.connect(acceptee).estimateGas.acceptTrade(tradeId);
+    console.log("\nGas estimation for accepting a trade: ", gasEstimate.toString());
+
+    // First token minted must belong to the acceptee after the trade
+
+    // const ownerOf1 = await MockERC721.ownerOf(1);
+    // expect(ownerOf1).to.be.equal(acceptee.address);
+
+    // Second token minted must belong to the trade owner
+
+    // const ownerOfLast = await MockERC721.ownerOf(lastMinted);
+    // expect(ownerOfLast).to.be.equal(owner);
   });
 
   // it("Should break the world", async function () {
