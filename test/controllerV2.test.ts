@@ -389,6 +389,13 @@ describe("Swaplace", async function () {
   it("Should revert for trades that were already accepted", async function () {});
   it("Should revert for trades where trade owner differs from msg.sender", async function () {});
   it("Should revert for malfunctioning low-level calls", async function () {});
+  it("Should be able to cancel trades", async function () {});
+  it("Should not be able to cancel not owned trades", async function () {});
+  it("Should be able to accept a trade 1-1", async function () {});
+  it("Should be able to accept a trade 1-N", async function () {});
+  it("Should be able to accept a trade N-1", async function () {});
+  it("Should be able to accept a trade N-N", async function () {});
+
   // it("Should break the world", async function () {
   // const gasEstimate = await Swaplace.connect(acceptee).estimateGas.acceptTrade(tradeId);
   // console.log("\nGas estimation for accepting a trade: ", gasEstimate.toString());

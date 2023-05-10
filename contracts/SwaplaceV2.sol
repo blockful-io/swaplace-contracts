@@ -18,7 +18,7 @@ error LengthMismatchWhenComposing(
     uint256 assetType
 );
 error OwnerMustBeMsgSender();
-error TradeExpired();
+error TradeExpired(uint256 id);
 
 /* v2.0.0
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -117,7 +117,7 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
         Trade memory trade = trades[_tradeId];
 
         if (trade.expiry < block.timestamp) {
-            revert TradeExpired();
+            revert TradeExpired(_tradeId);
         }
 
         Asset[] memory assets = trade.asking;
@@ -169,7 +169,19 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
         trades[_tradeId].expiry = 0;
     }
 
-    function cancelTrade() public {}
+    function cancelTrade(uint256 _tradeId) public {
+        Trade memory trade = trades[_tradeId];
+
+        if (trade.expiry < block.timestamp) {
+            revert TradeExpired(_tradeId);
+        }
+
+        if (trade.owner == msg.sender) {
+            revert OwnerMustBeMsgSender();
+        }
+
+        trades[_tradeId].expiry = 0;
+    }
 
     function valid(address owner, uint256 expiry) internal view {
         if (owner == address(0)) {
