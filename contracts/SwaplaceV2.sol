@@ -2,20 +2,22 @@
 pragma solidity ^0.8.17;
 
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 error ExpiryMustBeBiggerThanOneDay(uint256 timestamp);
 error CannotInputEmptyAssets();
 error CannotBeZeroAddress();
-error CannotBeZeroAmountWhenERC20();
+error CannotBeZeroForAmountOrCall();
 error InvalidAssetType(uint256 assetType);
 error LengthMismatchWhenComposing(
     uint256 addr,
-    uint256 amountOrId,
+    uint256 amountOrIdOrCall,
     uint256 assetType
 );
 error FunctionCallFailedWithReason(bytes reason);
+error ERROR(bytes32 fuckyou);
 
 /* v2.0.0
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -34,12 +36,13 @@ error FunctionCallFailedWithReason(bytes reason);
 interface ISwaplaceV2 {
     enum AssetType {
         ERC20,
-        ERC721
+        ERC721,
+        FUNCTION_CALL
     }
 
     struct Asset {
         address addr;
-        uint256 amountOrId;
+        uint256 amountOrIdOrCall;
         AssetType assetType;
     }
 
@@ -57,15 +60,40 @@ interface IUniversalTransfer {
     function transferFrom(
         address from,
         address to,
-        uint256 amountOrId
+        uint256 amountOrIdOrCall
     ) external;
 }
 
-contract SwaplaceV2 is ISwaplaceV2, IERC165 {
+contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
     uint256 public tradeId = 0;
 
     mapping(uint256 => Trade) private trades;
     mapping(address => uint256[]) private creators;
+
+    /// Executions
+
+    uint256 public index = 0;
+    mapping(bytes32 => bytes) private executions;
+
+    function registerExecution(bytes calldata data) public {
+        index++;
+        bytes32 id = keccak256(abi.encodePacked(index, msg.sender, data));
+        executions[id] = data;
+    }
+
+    function getExecutionId(
+        uint256 _index,
+        address _addr,
+        bytes memory data
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_index, _addr, data));
+    }
+
+    function getExecutions(bytes32 id) public view returns (bytes memory) {
+        return executions[id];
+    }
+
+    /// Trades
 
     function createTrade(Trade calldata trade) public returns (uint256) {
         valid(trade.expiry);
@@ -84,44 +112,50 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
 
     //// TEST GROUND
 
-    // Encode the transferFrom function
-    function getEncodedTransfer(
-        address from,
-        address to,
-        uint256 amountOrId
-    ) public pure returns (bytes memory data) {
-        data = abi.encodeWithSelector(
-            IUniversalTransfer.transferFrom.selector,
-            from,
-            to,
-            amountOrId
-        );
-    }
-
     function acceptTrade(uint256 _tradeId) public {
-        // Must pick the trade id
         Trade memory trade = trades[_tradeId];
 
         Asset[] memory assets = trade.asking;
+
         for (uint256 i = 0; i < assets.length; i++) {
-            IUniversalTransfer(assets[i].addr).transferFrom(
-                msg.sender,
-                trade.owner,
-                assets[i].amountOrId
-            );
+            if (assets[i].assetType == AssetType.FUNCTION_CALL) {
+                (bool success, bytes memory reason) = assets[i].addr.call(
+                    executions[bytes32(assets[i].amountOrIdOrCall)]
+                );
+
+                if (!success) {
+                    revert FunctionCallFailedWithReason(reason);
+                }
+            } else {
+                IUniversalTransfer(assets[i].addr).transferFrom(
+                    msg.sender,
+                    trade.owner,
+                    assets[i].amountOrIdOrCall
+                );
+            }
         }
 
         assets = trade.assets;
+
         for (uint256 i = 0; i < assets.length; i++) {
-            IUniversalTransfer(assets[i].addr).transferFrom(
-                trade.owner,
-                msg.sender,
-                assets[i].amountOrId
-            );
+            if (assets[i].assetType == AssetType.FUNCTION_CALL) {
+                (bool success, bytes memory reason) = assets[i].addr.call(
+                    executions[bytes32(assets[i].amountOrIdOrCall)]
+                );
+
+                if (!success) {
+                    revert FunctionCallFailedWithReason(reason);
+                }
+            } else {
+                IUniversalTransfer(assets[i].addr).transferFrom(
+                    trade.owner,
+                    msg.sender,
+                    assets[i].amountOrIdOrCall
+                );
+            }
         }
 
-        // Delete the trade as it is completed
-        delete (trades[_tradeId]);
+        // delete (trades[_tradeId]);
     }
 
     function cancelTrade() public {}
@@ -133,20 +167,31 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         }
     }
 
+    // Could we use amountOrIdOrCallOrData ??
+    // I think we can use amountOrIdOrCallOrData = uint256(executionData)
     function makeAsset(
         address addr,
-        uint256 amountOrId,
+        uint256 amountOrIdOrCall,
         AssetType assetType
     ) public pure returns (Asset memory) {
-        if (assetType != AssetType.ERC20 && assetType != AssetType.ERC721) {
+        // I think this will never enter because the input of "AssetType" is an enum that assures it
+        if (
+            assetType != AssetType.ERC20 &&
+            assetType != AssetType.ERC721 &&
+            assetType != AssetType.FUNCTION_CALL
+        ) {
             revert InvalidAssetType(uint256(assetType));
         }
+        // Review if the above should be removed
 
-        if (assetType == AssetType.ERC20 && amountOrId == 0) {
-            revert CannotBeZeroAmountWhenERC20();
+        if (
+            (assetType == AssetType.ERC20 && amountOrIdOrCall == 0) ||
+            (assetType == AssetType.FUNCTION_CALL && amountOrIdOrCall == 0)
+        ) {
+            revert CannotBeZeroForAmountOrCall();
         }
 
-        return Asset(addr, amountOrId, assetType);
+        return Asset(addr, amountOrIdOrCall, assetType);
     }
 
     function makeTrade(
@@ -172,24 +217,28 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         address owner,
         uint256 expiry,
         address[] memory addrs,
-        uint256[] memory amountsOrIds,
+        uint256[] memory amountsOrIdsOrCalls,
         AssetType[] memory assetTypes,
         uint256 indexFlipSide
     ) public pure returns (Trade memory) {
         if (
-            addrs.length != amountsOrIds.length ||
+            addrs.length != amountsOrIdsOrCalls.length ||
             addrs.length != assetTypes.length
         ) {
             revert LengthMismatchWhenComposing(
                 addrs.length,
-                amountsOrIds.length,
+                amountsOrIdsOrCalls.length,
                 assetTypes.length
             );
         }
 
         Asset[] memory assets = new Asset[](indexFlipSide);
         for (uint256 i = 0; i < indexFlipSide; ) {
-            assets[i] = makeAsset(addrs[i], amountsOrIds[i], assetTypes[i]);
+            assets[i] = makeAsset(
+                addrs[i],
+                amountsOrIdsOrCalls[i],
+                assetTypes[i]
+            );
             unchecked {
                 i++;
             }
@@ -199,7 +248,7 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165 {
         for (uint256 i = indexFlipSide; i < addrs.length; ) {
             asking[i - indexFlipSide] = makeAsset(
                 addrs[i],
-                amountsOrIds[i],
+                amountsOrIdsOrCalls[i],
                 assetTypes[i]
             );
             unchecked {

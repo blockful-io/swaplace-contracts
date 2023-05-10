@@ -163,14 +163,14 @@ describe("Swaplace", async function () {
   });
 
   it("Should revert while building asset with invalid asset type", async function () {
-    const invalidAssetType = 2;
+    const invalidAssetType = 3;
     await expect(Swaplace.makeAsset(MockERC20.address, 1000, invalidAssetType)).to.be.reverted;
   });
 
   it("Should revert while building asset with zero amount as type ERC20, but not for ERC721", async function () {
     await expect(Swaplace.makeAsset(MockERC20.address, 0, 0)).to.be.revertedWithCustomError(
       Swaplace,
-      "CannotBeZeroAmountWhenERC20"
+      "CannotBeZeroForAmountOrCall"
     );
 
     await expect(Swaplace.makeAsset(MockERC721.address, 0, 1)).to.not.be.reverted;
@@ -308,7 +308,7 @@ describe("Swaplace", async function () {
   it("Should create trade and allowances as 'owner' then accept as 'user'", async function () {
     /* { Trade Owner } */
 
-    // Mint tokens for test execution
+    // Mint tokens for owner
 
     await MockERC20.mintTo(owner, 1000);
     await MockERC721.mintTo(owner);
@@ -324,6 +324,19 @@ describe("Swaplace", async function () {
     await MockERC721.mintTo(acceptee.address); // NFT id: 2
     lastMinted = await MockERC721.totalSupply();
 
+    // Should encode ans test the execution call
+
+    const index = await Swaplace.index();
+    const data = MockERC721.interface.encodeFunctionData("transferFrom(address,address,uint256)", [
+      acceptee.address,
+      owner,
+      lastMinted,
+    ]);
+    const executionData = await Swaplace.getExecutionId(index + 1, acceptee.address, data);
+
+    await Swaplace.connect(acceptee).registerExecution(data);
+    expect(await Swaplace.getExecutions(executionData)).to.be.equal(data);
+
     // Compose a trade bidding 1000 Tokens and 1 NFT and asking for 1 NFT (id: 2)
 
     const trade = await Swaplace.composeTrade(
@@ -331,7 +344,7 @@ describe("Swaplace", async function () {
       day * 2, // Expiry
       [MockERC20.address, MockERC721.address, MockERC721.address],
       [1000, 1, lastMinted], // Amount or Id
-      [0, 1, 1], // 0 = ERC20, 1 = ERC721
+      [0, 1, 1], // 0 = ERC20, 1 = ERC721, 2 = FUNCTION_CALL
       2 // Index of the asset that will be flipped from bid to ask
     );
 
@@ -345,45 +358,6 @@ describe("Swaplace", async function () {
 
     await MockERC721.connect(acceptee).approve(Swaplace.address, lastMinted);
 
-    // Get information before the trade
-
-    const ownerOfLastMinted = await MockERC721.ownerOf(lastMinted);
-    console.log(
-      "TokenId is: ",
-      lastMinted,
-      ".\n Owner of last minted is: ",
-      ownerOfLastMinted,
-      " and it should be: ",
-      acceptee.address,
-      ".\n The receiver of this trade is: ",
-      owner,
-      "."
-    );
-
-    const approvedAddrOfTokenId = await MockERC721.getApproved(lastMinted);
-    console.log("\nToken Approved and the operator is: ", approvedAddrOfTokenId);
-    console.log(
-      "Swaplace address is: ",
-      Swaplace.address,
-      " and should be allowed to move the assets"
-    );
-
-    // Should encode the trade with selector firs
-    const encoded = MockERC721.interface.encodeFunctionData(
-      "transferFrom(address,address,uint256)",
-      [acceptee.address, owner, trade.asking[0].amountOrId]
-    );
-    const onChainEncoded = await Swaplace.connect(acceptee).getEncodedTransfer(
-      acceptee.address,
-      owner,
-      trade.asking[0].amountOrId
-    );
-    console.log("\nThe asked TokenId is: ", trade.asking[0].amountOrId);
-    console.log("The FROM address is: ", acceptee.address);
-    console.log("The TO address is: ", owner);
-    console.log("\nEncoded data is: ", encoded);
-    expect(onChainEncoded).to.be.equal(encoded);
-
     // Accept the trades
 
     const tradeId = await Swaplace.tradeId();
@@ -393,6 +367,8 @@ describe("Swaplace", async function () {
     // Estimate gas of trades
     const gasEstimate = await Swaplace.connect(acceptee).estimateGas.acceptTrade(tradeId);
     console.log("\nGas estimation for accepting a trade: ", gasEstimate.toString());
+
+    // Testing encoding stuff
 
     // First token minted must belong to the acceptee after the trade
 
