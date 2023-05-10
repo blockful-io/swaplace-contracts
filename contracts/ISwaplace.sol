@@ -3,6 +3,8 @@ pragma solidity ^0.8.9;
 
 interface ISwaplace {
 
+    // address, amount, type instead of tree structs
+
     struct ERC20Asset {
         address addr;
         uint256 amountOrId;

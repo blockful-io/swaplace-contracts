@@ -1,33 +1,37 @@
-import { HardhatUserConfig } from 'hardhat/config'
-import '@nomicfoundation/hardhat-toolbox'
-import '@nomicfoundation/hardhat-chai-matchers'
-import '@typechain/hardhat'
-import '@nomiclabs/hardhat-ethers'
-import '@nomiclabs/hardhat-solhint'
-import '@nomiclabs/hardhat-truffle5'
-import 'hardhat-gas-reporter'
-import dotenv from 'dotenv'
-dotenv.config()
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "@nomicfoundation/hardhat-chai-matchers";
+import "@typechain/hardhat";
+import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-solhint";
+import "@nomiclabs/hardhat-truffle5";
+import "hardhat-gas-reporter";
+import dotenv from "dotenv";
+dotenv.config();
 
-const { ETH_MAINNET_ALCHEMY } = process.env
+const { GOERLI, ETH, PRIVATE_KEY, PRIVATE_KEY_USER } = process.env;
 
 const config: HardhatUserConfig = {
-  solidity: '0.8.9',
-  gasReporter: {
-    enabled: true,
+  solidity: "0.8.17",
+  defaultNetwork: "hardhat",
+  // gasReporter: {
+  //   enabled: true,
+  // },
+  etherscan: {
+    apiKey: "U5CSWDUSV4PWJXAK23SUK6MVITQSVYZXV7",
   },
   networks: {
     hardhat: {
       forking: {
-        url: `${ETH_MAINNET_ALCHEMY}`,
+        url: `${ETH}`,
         blockNumber: 16031313,
       },
     },
-    // ethereum: {
-    //   url: `${ETH}`,
-    //   accounts: [`${ETH_ACC_1}`],
-    // },
+    goerli: {
+      url: `${GOERLI}`,
+      accounts: [`${PRIVATE_KEY}`, `${PRIVATE_KEY_USER}`],
+    },
   },
-}
+};
 
-export default config
+export default config;
