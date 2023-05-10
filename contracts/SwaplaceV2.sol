@@ -6,17 +6,18 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-error ExpiryMustBeBiggerThanOneDay(uint256 timestamp);
-error CannotInputEmptyAssets();
+error CannotBeEmptyAssets();
+error CannotBeLesserThanOneDay(uint256 timestamp);
 error CannotBeZeroAddress();
 error CannotBeZeroForAmountOrCall();
+error FunctionCallFailedWithReason(bytes reason);
 error InvalidAssetType(uint256 assetType);
 error LengthMismatchWhenComposing(
     uint256 addr,
     uint256 amountOrIdOrCall,
     uint256 assetType
 );
-error FunctionCallFailedWithReason(bytes reason);
+error OwnerMustBeMsgSender();
 error TradeExpired();
 
 /* v2.0.0
@@ -68,9 +69,9 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
     uint256 public tradeId = 0;
 
     mapping(uint256 => Trade) private trades;
-    mapping(address => uint256[]) private creators;
+    mapping(address => uint256[]) private tradesOwned;
 
-    /// Executions
+    /// Executions - Will be moved to a new contract, then imported here
 
     uint256 public index = 0;
     mapping(bytes32 => bytes) private executions;
@@ -95,8 +96,10 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
 
     /// Trades
 
-    function createTrade(Trade calldata trade) public returns (uint256) {
-        valid(trade.expiry);
+    function createTrade(
+        Trade calldata trade
+    ) public nonReentrant returns (uint256) {
+        valid(trade.owner, trade.expiry);
 
         unchecked {
             tradeId++;
@@ -105,12 +108,10 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
         trades[tradeId] = trade;
         trades[tradeId].expiry += block.timestamp; // explain this
 
-        creators[msg.sender].push(tradeId); // develop this
+        tradesOwned[msg.sender].push(tradeId); // develop this
 
         return tradeId;
     }
-
-    //// TEST GROUND
 
     function acceptTrade(uint256 _tradeId) public nonReentrant {
         Trade memory trade = trades[_tradeId];
@@ -170,10 +171,23 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
 
     function cancelTrade() public {}
 
-    function valid(uint256 expiry) public pure {
+    function valid(address owner, uint256 expiry) internal view {
+        if (owner == address(0)) {
+            revert CannotBeZeroAddress();
+        }
+        if (owner != msg.sender) {
+            revert OwnerMustBeMsgSender();
+        }
         // Required the expiration date to be at least 1 day in the future
         if (expiry < 1 days) {
-            revert ExpiryMustBeBiggerThanOneDay(expiry);
+            revert CannotBeLesserThanOneDay(expiry);
+        }
+    }
+
+    function valid(uint256 expiry) internal pure {
+        // Required the expiration date to be at least 1 day in the future
+        if (expiry < 1 days) {
+            revert CannotBeLesserThanOneDay(expiry);
         }
     }
 
@@ -213,7 +227,7 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
         }
 
         if (assets.length == 0 || asking.length == 0) {
-            revert CannotInputEmptyAssets();
+            revert CannotBeEmptyAssets();
         }
 
         return Trade(owner, expiry, assets, asking);
@@ -270,7 +284,7 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
     }
 
     function getTradesBy(address addr) public view returns (uint256[] memory) {
-        return creators[addr];
+        return tradesOwned[addr];
     }
 
     function supportsInterface(

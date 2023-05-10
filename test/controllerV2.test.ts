@@ -183,7 +183,7 @@ describe("Swaplace", async function () {
 
     await expect(
       Swaplace.makeTrade(owner, expiry, [ERC20Asset], [ERC20Asset])
-    ).to.be.revertedWithCustomError(Swaplace, "ExpiryMustBeBiggerThanOneDay");
+    ).to.be.revertedWithCustomError(Swaplace, "CannotBeLesserThanOneDay");
   });
 
   it("Should revert while building trade with 'owner' as address zero", async function () {
@@ -224,7 +224,7 @@ describe("Swaplace", async function () {
         assetTypes,
         indexFlipSide
       )
-    ).to.be.revertedWithCustomError(Swaplace, "CannotInputEmptyAssets");
+    ).to.be.revertedWithCustomError(Swaplace, "CannotBeEmptyAssets");
 
     indexFlipSide = 2;
 
@@ -237,7 +237,7 @@ describe("Swaplace", async function () {
         assetTypes,
         indexFlipSide
       )
-    ).to.be.revertedWithCustomError(Swaplace, "CannotInputEmptyAssets");
+    ).to.be.revertedWithCustomError(Swaplace, "CannotBeEmptyAssets");
   });
 
   it("Should revert while composing trade with mismatching inputs length", async function () {
@@ -305,7 +305,7 @@ describe("Swaplace", async function () {
     expect(await MockERC721.getApproved(1)).to.be.equal(Swaplace.address);
   });
 
-  it("Should create trade and allowances as 'owner' then accept as 'user'", async function () {
+  it("Should create trade using function call, set allowances and accept the trade", async function () {
     /* { Trade Owner } */
 
     // Mint tokens for owner
@@ -361,31 +361,39 @@ describe("Swaplace", async function () {
     // Accept the trades
 
     const tradeId = await Swaplace.tradeId();
-    // await Swaplace.connect(acceptee).acceptTrade(tradeId);
-    // await expect(Swaplace.connect(acceptee).acceptTrade(tradeId)).to.be.revertedWithCustomError(
-    //   Swaplace,
-    //   "TradeExpired"
-    // );
+    await Swaplace.connect(acceptee).acceptTrade(tradeId);
 
-    // Estimate gas of trades
-    const gasEstimate = await Swaplace.connect(acceptee).estimateGas.acceptTrade(tradeId);
-    console.log("\nGas estimation for accepting a trade: ", gasEstimate.toString());
+    // Expect to be reverted when trying to accept the same trade again
+    await expect(Swaplace.connect(acceptee).acceptTrade(tradeId)).to.be.revertedWithCustomError(
+      Swaplace,
+      "TradeExpired"
+    );
 
-    // Testing encoding stuff
+    // First ERC721 token minted must belong to the acceptee after the trade
 
-    // First token minted must belong to the acceptee after the trade
+    const ownerOf1 = await MockERC721.ownerOf(1);
+    expect(ownerOf1).to.be.equal(acceptee.address);
 
-    // const ownerOf1 = await MockERC721.ownerOf(1);
-    // expect(ownerOf1).to.be.equal(acceptee.address);
+    // First ERC20 token minted must belong to the acceptee after the trade
+
+    const ownerOf2 = await MockERC20.balanceOf(acceptee.address);
+    expect(ownerOf2).to.be.equal(1000);
 
     // Second token minted must belong to the trade owner
 
-    // const ownerOfLast = await MockERC721.ownerOf(lastMinted);
-    // expect(ownerOfLast).to.be.equal(owner);
+    const ownerOfLast = await MockERC721.ownerOf(lastMinted);
+    expect(ownerOfLast).to.be.equal(owner);
   });
 
+  it("Should revert for expired trades", async function () {});
+  it("Should revert for trades that were already accepted", async function () {});
+  it("Should revert for trades where trade owner differs from msg.sender", async function () {});
+  it("Should revert for malfunctioning low-level calls", async function () {});
   // it("Should break the world", async function () {
+  // const gasEstimate = await Swaplace.connect(acceptee).estimateGas.acceptTrade(tradeId);
+  // console.log("\nGas estimation for accepting a trade: ", gasEstimate.toString());
   //   const trade = await Swaplace.composeTrade(
+
   //     owner, // Trade creator
   //     day * 2, // Expiry
   //     [MockERC20.address, MockERC721.address, MockERC721.address],
