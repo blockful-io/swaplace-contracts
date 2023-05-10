@@ -361,8 +361,11 @@ describe("Swaplace", async function () {
     // Accept the trades
 
     const tradeId = await Swaplace.tradeId();
-    console.log("\nTradeId is: ", tradeId.toString());
     // await Swaplace.connect(acceptee).acceptTrade(tradeId);
+    // await expect(Swaplace.connect(acceptee).acceptTrade(tradeId)).to.be.revertedWithCustomError(
+    //   Swaplace,
+    //   "TradeExpired"
+    // );
 
     // Estimate gas of trades
     const gasEstimate = await Swaplace.connect(acceptee).estimateGas.acceptTrade(tradeId);

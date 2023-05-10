@@ -3,8 +3,8 @@ pragma solidity ^0.8.17;
 
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 error ExpiryMustBeBiggerThanOneDay(uint256 timestamp);
 error CannotInputEmptyAssets();
@@ -17,7 +17,7 @@ error LengthMismatchWhenComposing(
     uint256 assetType
 );
 error FunctionCallFailedWithReason(bytes reason);
-error ERROR(bytes32 fuckyou);
+error TradeExpired();
 
 /* v2.0.0
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -112,12 +112,16 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
 
     //// TEST GROUND
 
-    function acceptTrade(uint256 _tradeId) public {
+    function acceptTrade(uint256 _tradeId) public nonReentrant {
         Trade memory trade = trades[_tradeId];
+
+        if (trade.expiry < block.timestamp) {
+            revert TradeExpired();
+        }
 
         Asset[] memory assets = trade.asking;
 
-        for (uint256 i = 0; i < assets.length; i++) {
+        for (uint256 i = 0; i < assets.length; ) {
             if (assets[i].assetType == AssetType.FUNCTION_CALL) {
                 (bool success, bytes memory reason) = assets[i].addr.call(
                     executions[bytes32(assets[i].amountOrIdOrCall)]
@@ -132,12 +136,15 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
                     trade.owner,
                     assets[i].amountOrIdOrCall
                 );
+            }
+            unchecked {
+                i++;
             }
         }
 
         assets = trade.assets;
 
-        for (uint256 i = 0; i < assets.length; i++) {
+        for (uint256 i = 0; i < assets.length; ) {
             if (assets[i].assetType == AssetType.FUNCTION_CALL) {
                 (bool success, bytes memory reason) = assets[i].addr.call(
                     executions[bytes32(assets[i].amountOrIdOrCall)]
@@ -153,9 +160,12 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
                     assets[i].amountOrIdOrCall
                 );
             }
+            unchecked {
+                i++;
+            }
         }
 
-        // delete (trades[_tradeId]);
+        trades[_tradeId].expiry = 0;
     }
 
     function cancelTrade() public {}
@@ -167,14 +177,11 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
         }
     }
 
-    // Could we use amountOrIdOrCallOrData ??
-    // I think we can use amountOrIdOrCallOrData = uint256(executionData)
     function makeAsset(
         address addr,
         uint256 amountOrIdOrCall,
         AssetType assetType
     ) public pure returns (Asset memory) {
-        // I think this will never enter because the input of "AssetType" is an enum that assures it
         if (
             assetType != AssetType.ERC20 &&
             assetType != AssetType.ERC721 &&
@@ -182,7 +189,6 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
         ) {
             revert InvalidAssetType(uint256(assetType));
         }
-        // Review if the above should be removed
 
         if (
             (assetType == AssetType.ERC20 && amountOrIdOrCall == 0) ||
