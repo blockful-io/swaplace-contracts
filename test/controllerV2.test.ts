@@ -117,7 +117,7 @@ describe("Swaplace", async function () {
     expect(trade[3][1].toString()).to.be.equals(ERC721Asset.toString());
   });
 
-  it("Should compose a trade in a single function for both { ERC20, ERC721 }", async function () {
+  it("Should be able to compose a trade in a single function for both { ERC20, ERC721 }", async function () {
     const expiry = day * 2;
 
     // The point in the asset index that we'll flip from bid to ask
@@ -252,7 +252,13 @@ describe("Swaplace", async function () {
     ).to.be.revertedWithCustomError(Swaplace, "LengthMismatchWhenComposing");
   });
 
-  it("Should create a trade and validate the storage refs", async function () {
+  it("Should be able to encode a function call", async function () {});
+  it("Should be able to register an execution", async function () {});
+  it("Should be able to generate an execution Id", async function () {});
+  it("Should be able to retrieve executions with it's id", async function () {});
+  it("Should revert when execution id is unknown", async function () {});
+
+  it("Should be able to create a trade and validate", async function () {
     const expiry = day * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
@@ -290,7 +296,7 @@ describe("Swaplace", async function () {
     });
   });
 
-  it("Should create and validate allowances", async function () {
+  it("Should be able to create a trade and validate assets allowances", async function () {
     // Mint tokens for test execution
 
     await MockERC20.mintTo(owner, 1000);
@@ -305,7 +311,13 @@ describe("Swaplace", async function () {
     expect(await MockERC721.getApproved(1)).to.be.equal(Swaplace.address);
   });
 
-  it("Should create trade using function call, set allowances and accept the trade", async function () {
+  it("Should be able to cancel trades", async function () {});
+  it("Should not be able to cancel not owned trades", async function () {});
+  it("Should not be able to cancel expired trades", async function () {});
+
+  it("Should be able to accept a trade { ERC20 }", async function () {});
+  it("Should be able to accept a trade { ERC721 }", async function () {});
+  it("Should be able to accept a trade { Function Call }", async function () {
     /* { Trade Owner } */
 
     // Mint tokens for owner
@@ -385,12 +397,18 @@ describe("Swaplace", async function () {
     expect(ownerOfLast).to.be.equal(owner);
   });
 
-  it("Should revert for expired trades", async function () {});
-  it("Should revert for trades that were already accepted", async function () {});
-  it("Should revert for trades where trade owner differs from msg.sender", async function () {});
-  it("Should revert for malfunctioning low-level calls", async function () {});
-  it("Should be able to cancel trades", async function () {});
-  it("Should not be able to cancel not owned trades", async function () {});
+  it("Should revert when creating trades with address 0 as owner", async function () {});
+  it("Should revert when creating trades not belonging to msg.sender", async function () {});
+  it("Should revert when creating trades with expiry being lesser than one day", async function () {});
+
+  it("Should revert when accepting trades with expiration done", async function () {});
+  it("Should revert when accepting trades with trades that were already accepted", async function () {});
+  it("Should revert when accepting trades with trades where trade owner differs from msg.sender", async function () {});
+  it("Should revert when accepting trades with malfunctioning low-level calls", async function () {});
+  it("Should revert when accepting trades with lacking allowance { ERC20 }", async function () {});
+  it("Should revert when accepting trades with lacking allowance { ERC721 }", async function () {});
+  it("Should revert when accepting trades with lacking allowance { Function Call }", async function () {});
+
   it("Should be able to accept a trade 1-1", async function () {});
   it("Should be able to accept a trade 1-N", async function () {});
   it("Should be able to accept a trade N-1", async function () {});
