@@ -251,7 +251,7 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
         address[] memory addrs,
         uint256[] memory amountsOrIdsOrCalls,
         AssetType[] memory assetTypes,
-        uint256 indexFlipSide
+        uint256 indexFlipToAsking
     ) public pure returns (Trade memory) {
         if (
             addrs.length != amountsOrIdsOrCalls.length ||
@@ -264,8 +264,8 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
             );
         }
 
-        Asset[] memory assets = new Asset[](indexFlipSide);
-        for (uint256 i = 0; i < indexFlipSide; ) {
+        Asset[] memory assets = new Asset[](indexFlipToAsking);
+        for (uint256 i = 0; i < indexFlipToAsking; ) {
             assets[i] = makeAsset(
                 addrs[i],
                 amountsOrIdsOrCalls[i],
@@ -276,9 +276,9 @@ contract SwaplaceV2 is ISwaplaceV2, IERC165, ReentrancyGuard {
             }
         }
 
-        Asset[] memory asking = new Asset[](addrs.length - indexFlipSide);
-        for (uint256 i = indexFlipSide; i < addrs.length; ) {
-            asking[i - indexFlipSide] = makeAsset(
+        Asset[] memory asking = new Asset[](addrs.length - indexFlipToAsking);
+        for (uint256 i = indexFlipToAsking; i < addrs.length; ) {
+            asking[i - indexFlipToAsking] = makeAsset(
                 addrs[i],
                 amountsOrIdsOrCalls[i],
                 assetTypes[i]
