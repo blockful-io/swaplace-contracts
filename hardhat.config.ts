@@ -9,7 +9,7 @@ import "hardhat-gas-reporter";
 import dotenv from "dotenv";
 dotenv.config();
 
-const { GOERLI, ETH, PRIVATE_KEY, PRIVATE_KEY_USER } = process.env;
+const { GOERLI, ETH, PRIVATE_KEY, PRIVATE_KEY_USER, POLYSCAN } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
@@ -18,7 +18,7 @@ const config: HardhatUserConfig = {
   //   enabled: true,
   // },
   etherscan: {
-    apiKey: "U5CSWDUSV4PWJXAK23SUK6MVITQSVYZXV7",
+    apiKey: `${POLYSCAN}`,
   },
   networks: {
     hardhat: {
