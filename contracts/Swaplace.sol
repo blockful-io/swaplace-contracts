@@ -1,262 +1,309 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import "./ISwaplace.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+error CannotBeEmptyAssets();
+error CannotBeLesserThanOneDay(uint256 timestamp);
+error CannotBeZeroAddress();
+error CannotBeZeroForAmountOrCall();
+error FunctionCallFailedWithReason(bytes reason);
+error InvalidAssetType(uint256 assetType);
+error LengthMismatchWhenComposing(
+    uint256 addr,
+    uint256 amountOrIdOrCall,
+    uint256 assetType
+);
+error OwnerMustBeMsgSender();
+error TradeExpired(uint256 id);
 
-/*
- * @author - Swaplace
+/* v2.0.0
+ *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
+ * |\   __  \ |\  \      |\   __  \ |\   ____\ |\  \|\  \  |\  _____\|\  \|\  \ |\  \
+ * \ \  \|\ /_\ \  \     \ \  \|\  \\ \  \___| \ \  \/  /|_\ \  \__/ \ \  \\\  \\ \  \
+ *  \ \   __  \\ \  \     \ \  \\\  \\ \  \     \ \   ___  \\ \   __\ \ \  \\\  \\ \  \
+ *   \ \  \|\  \\ \  \____ \ \  \\\  \\ \  \____ \ \  \\ \  \\ \  \_|  \ \  \\\  \\ \  \____
+ *    \ \_______\\ \_______\\ \_______\\ \_______\\ \__\\ \__\\ \__\    \ \_______\\ \_______\
+ *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
+ *
+ * @author - Blockful.io
  * @dev - Swaplace is a decentralized exchange for ERC20 and ERC721 tokens.
  *        It allows users to propose trades and accept them.
- *        The contract will validate the trade and transfer the assets.
+ *        The contract will validate the trade, then transfer the assets.
  */
-contract Swaplace is ISwaplace {
-    // is lacking ETH_RECEIVER
-
-    uint256 public tradeIds;
-
-    mapping(uint256 => Trade) public trades;
-    mapping(uint256 => uint256[]) public tradeReferences;
-
-    /*
-     * @param - tradeIdRef - the trade id reference
-     * @param - timestamp - the time in seconds that the trade will be valid
-     * @param - withdrawAddress - the address where the assets will be sent
-     * @param - allowedAddresses - the addresses that are allowed to accept the trade
-     * @param - assetsToAsk - the assets that the user wants to send
-     * @param - assetsToBid - the assets that the user wants to receive
-     * @dev - Proposes a trade by providing assetsToAsk and assetsToBid.
-     */
-    function proposeTrade(
-        uint256 tradeIdRef,
-        uint256 expirationDate,
-        address withdrawAddress,
-        address[] calldata allowedAddresses,
-        Assets calldata assetsToBid,
-        Assets calldata assetsToAsk
-    ) external returns (uint256) {
-        // transfer the assets to the contract
-        for (uint256 i = 0; i < assetsToBid.erc20.length; i++) {
-            IERC20(assetsToBid.erc20[i].addr).transferFrom(
-                msg.sender,
-                address(this),
-                assetsToBid.erc20[i].amountOrId
-            );
-        }
-        for (uint256 i = 0; i < assetsToBid.erc721.length; i++) {
-            IERC721(assetsToBid.erc721[i].addr).safeTransferFrom(
-                msg.sender,
-                address(this),
-                assetsToBid.erc721[i].amountOrId
-            );
-        }
-
-        // increment tradeId
-        // this should be the only counter
-        // why???
-        tradeIds++;
-
-        // must generate hashproof and store
-        // must also have a unique variable to this hash like the tradeId
-        bytes32 hashproof = keccak256(
-            abi.encode(assetsToBid, assetsToAsk, tradeIds)
-        );
-
-        // add tradeIdRef to the tradeReferences map
-        if (tradeIdRef > 0) {
-            tradeReferences[tradeIdRef].push(tradeIds);
-        }
-
-        // stores the assets that the user has in the contract
-        trades[tradeIds].tradeIdRef = tradeIdRef;
-        trades[tradeIds].proposer = msg.sender;
-        trades[tradeIds].expirationDate = block.timestamp + expirationDate;
-        trades[tradeIds].withdrawAddress = withdrawAddress;
-        trades[tradeIds].allowedAddresses = allowedAddresses;
-        trades[tradeIds].hashproof = hashproof;
-        trades[tradeIds].assetsToBid = assetsToBid;
-        trades[tradeIds].assetsToAsk = assetsToAsk;
-
-        emit TradeProposed(
-            tradeIds,
-            tradeIdRef,
-            expirationDate,
-            msg.sender,
-            withdrawAddress,
-            allowedAddresses
-        );
-
-        return tradeIds;
+interface ISwaplace {
+    enum AssetType {
+        ERC20,
+        ERC721,
+        FUNCTION_CALL
     }
 
-    /*
-     * @param - id - the trade id
-     * @param - assetsToAsk - the assets that the user wants to send
-     * @param - withdrawAddress - the address where the assets will be sent
-     * @param - imAllowed - the index of the allowedAddresses array that the msg.sender is
-     * @dev - Accepts a trade by providing requested assets.
-     *        The transfer function will validate that.
-     *        The hashproof will match assetsToAsk with the one in the trade map.
-     */
-    function acceptTrade(
-        uint256 id,
-        Assets calldata assetsToAsk,
-        address withdrawAddress,
-        uint256 index,
-        uint256[] memory tokenIdsOptions
-    ) external {
-        // check if the trade exists and if its still valid
-        require(
-            trades[id].expirationDate > block.timestamp,
-            "Trade is not valid anymore"
-        );
+    struct Asset {
+        address addr;
+        uint256 amountOrIdOrCall;
+        AssetType assetType;
+    }
 
-        // must check if there is white list and check if the trade is allowed for the user
-        if (trades[id].allowedAddresses.length > 0) {
-            checkAllowedAddress(id, index, msg.sender);
+    struct Trade {
+        address owner;
+        uint256 expiry;
+        Asset[] assets;
+        Asset[] asking;
+    }
+
+    function supportsInterface(bytes4 interfaceID) external pure returns (bool);
+}
+
+interface IUniversalTransfer {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amountOrIdOrCall
+    ) external;
+}
+
+contract Swaplace is ISwaplace, IERC165, ReentrancyGuard {
+    uint256 public tradeId = 0;
+
+    mapping(uint256 => Trade) private trades;
+    mapping(address => uint256[]) private tradesOwned;
+
+    /// Executions - Will be moved to a new contract, then imported here
+
+    uint256 public index = 0;
+    mapping(bytes32 => bytes) private executions;
+
+    function registerExecution(bytes calldata data) public {
+        index++;
+        bytes32 id = keccak256(abi.encodePacked(index, msg.sender, data));
+        executions[id] = data;
+    }
+
+    function getExecutionId(
+        uint256 _index,
+        address _addr,
+        bytes memory data
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_index, _addr, data));
+    }
+
+    function getExecutions(bytes32 id) public view returns (bytes memory) {
+        return executions[id];
+    }
+
+    /// Trades
+
+    function createTrade(
+        Trade calldata trade
+    ) public nonReentrant returns (uint256) {
+        valid(trade.owner, trade.expiry);
+
+        unchecked {
+            tradeId++;
         }
 
-        // check if the hashproof matches
-        bytes32 hashproof = keccak256(
-            abi.encode(trades[id].assetsToBid, assetsToAsk, id)
-        );
-        require(hashproof == trades[id].hashproof, "Hashproof does not match");
+        trades[tradeId] = trade;
+        trades[tradeId].expiry += block.timestamp;
 
-        // transfer from msg.sender to the trade creator's withdrawAddress
-        for (uint256 i = 0; i < assetsToAsk.erc20.length; i++) {
-            IERC20(assetsToAsk.erc20[i].addr).transferFrom(
-                msg.sender,
-                trades[id].withdrawAddress,
-                assetsToAsk.erc20[i].amountOrId
-            );
-        }
-        for (uint256 i = 0; i < assetsToAsk.erc721.length; i++) {
-            IERC721(assetsToAsk.erc721[i].addr).safeTransferFrom(
-                msg.sender,
-                trades[id].withdrawAddress,
-                assetsToAsk.erc721[i].amountOrId
-            );
+        tradesOwned[msg.sender].push(tradeId);
+
+        return tradeId;
+    }
+
+    function acceptTrade(uint256 _tradeId) public nonReentrant {
+        Trade memory trade = trades[_tradeId];
+
+        if (trade.expiry < block.timestamp) {
+            revert TradeExpired(_tradeId);
         }
 
-        // transfer the options asset from msg.sender to the trade creator
-        uint256 h = 0;
-        for (uint256 i = 0; i < assetsToAsk.erc721Options.length; i++) {
-            for (
-                uint256 j = 0;
-                j < assetsToAsk.erc721Options[i].amountOrId; //this is bad
-                // should not mix bot mechanics in the same contract or function
-                j++
-            ) {
-                IERC721(assetsToAsk.erc721Options[i].addr).safeTransferFrom(
-                    msg.sender,
-                    trades[id].withdrawAddress,
-                    assetsToAsk.erc721Options[i].amountOrId
+        Asset[] memory assets = trade.asking;
+
+        for (uint256 i = 0; i < assets.length; ) {
+            if (assets[i].assetType == AssetType.FUNCTION_CALL) {
+                (bool success, bytes memory reason) = assets[i].addr.call(
+                    executions[bytes32(assets[i].amountOrIdOrCall)]
                 );
-                h++;
+
+                if (!success) {
+                    revert FunctionCallFailedWithReason(reason);
+                }
+            } else {
+                IUniversalTransfer(assets[i].addr).transferFrom(
+                    msg.sender,
+                    trade.owner,
+                    assets[i].amountOrIdOrCall
+                );
+            }
+            unchecked {
+                i++;
             }
         }
 
-        // transfer from this contract(trade creator's asset) to withdrawAddress
-        for (uint256 i = 0; i < trades[id].assetsToBid.erc20.length; i++) {
-            IERC20(trades[id].assetsToBid.erc20[i].addr).approve(
-                address(this),
-                trades[id].assetsToBid.erc20[i].amountOrId
-            );
-            IERC20(trades[id].assetsToBid.erc20[i].addr).transferFrom(
-                address(this),
-                withdrawAddress,
-                trades[id].assetsToBid.erc20[i].amountOrId
-            );
-        }
-        for (uint256 i = 0; i < trades[id].assetsToBid.erc721.length; i++) {
-            IERC721(trades[id].assetsToBid.erc721[i].addr).safeTransferFrom(
-                address(this),
-                withdrawAddress,
-                trades[id].assetsToBid.erc721[i].amountOrId
-            );
-        }
+        assets = trade.assets;
 
-        // delete the trade
-        delete trades[id];
+        for (uint256 i = 0; i < assets.length; ) {
+            if (assets[i].assetType == AssetType.FUNCTION_CALL) {
+                (bool success, bytes memory reason) = assets[i].addr.call(
+                    executions[bytes32(assets[i].amountOrIdOrCall)]
+                );
 
-        emit TradeAccepted(id, msg.sender, withdrawAddress);
-    }
-
-    // make a get function to make a ready Assets var returned from the trade proposal
-
-    /*
-     * @param - id - the trade id
-     * @dev - Cancels a trade.
-     */
-    function cancelTrade(uint256 _tradeId) external {
-        require(
-            trades[_tradeId].proposer == msg.sender,
-            "Only the proposer can cancel the trade"
-        );
-        delete trades[_tradeId];
-        // must send assets back hahaha
-        emit TradeCancelled(_tradeId, msg.sender);
-    }
-
-    /*
-     * @param - id - the trade id
-     * @dev - Gets a trade.
-     */
-    function getTrade(uint256 _tradeId) external view returns (Trade memory) {
-        return trades[_tradeId];
-    }
-
-    /*
-     * @param - id - the trade id
-     * @dev - Gets all trade references.
-     */
-    function getAllTradeReferences(
-        uint256 _tradeId
-    ) external view returns (uint256[] memory) {
-        return tradeReferences[_tradeId];
-    }
-
-    /*
-     * @param - id - the trade id
-     * @dev - Check if the address is allowed to accept the trade.
-     */
-    function checkAllowedAddress(
-        uint256 _tradeId,
-        uint256 index,
-        address addr
-    ) public view {
-        require(
-            trades[_tradeId].allowedAddresses[index] == addr,
-            "Trade not allowed for this address"
-        );
-    }
-
-    /*
-     * @param - id - the trade id
-     * @dev - Gets the index of the allowed address.
-     */
-    function getAllowedAddressIndex(
-        uint256 _tradeId,
-        address _address
-    ) public view returns (uint256) {
-        for (uint256 i = 0; i < trades[_tradeId].allowedAddresses.length; i++) {
-            if (trades[_tradeId].allowedAddresses[i] == _address) {
-                return i;
+                if (!success) {
+                    revert FunctionCallFailedWithReason(reason);
+                }
+            } else {
+                IUniversalTransfer(assets[i].addr).transferFrom(
+                    trade.owner,
+                    msg.sender,
+                    assets[i].amountOrIdOrCall
+                );
+            }
+            unchecked {
+                i++;
             }
         }
-        revert("Address not allowed to accept this trade");
+
+        trades[_tradeId].expiry = 0;
     }
 
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IERC721Receiver.onERC721Received.selector;
+    function cancelTrade(uint256 _tradeId) public {
+        Trade memory trade = trades[_tradeId];
+
+        if (trade.expiry < block.timestamp) {
+            revert TradeExpired(_tradeId);
+        }
+
+        if (trade.owner == msg.sender) {
+            revert OwnerMustBeMsgSender();
+        }
+
+        trades[_tradeId].expiry = 0;
+    }
+
+    function valid(address owner, uint256 expiry) internal view {
+        if (owner == address(0)) {
+            revert CannotBeZeroAddress();
+        }
+        if (owner != msg.sender) {
+            revert OwnerMustBeMsgSender();
+        }
+        // Required the expiration date to be at least 1 day in the future
+        if (expiry < 1 days) {
+            revert CannotBeLesserThanOneDay(expiry);
+        }
+    }
+
+    function valid(uint256 expiry) internal pure {
+        // Required the expiration date to be at least 1 day in the future
+        if (expiry < 1 days) {
+            revert CannotBeLesserThanOneDay(expiry);
+        }
+    }
+
+    function makeAsset(
+        address addr,
+        uint256 amountOrIdOrCall,
+        AssetType assetType
+    ) public pure returns (Asset memory) {
+        if (
+            assetType != AssetType.ERC20 &&
+            assetType != AssetType.ERC721 &&
+            assetType != AssetType.FUNCTION_CALL
+        ) {
+            revert InvalidAssetType(uint256(assetType));
+        }
+
+        if (
+            (assetType == AssetType.ERC20 && amountOrIdOrCall == 0) ||
+            (assetType == AssetType.FUNCTION_CALL && amountOrIdOrCall == 0)
+        ) {
+            revert CannotBeZeroForAmountOrCall();
+        }
+
+        return Asset(addr, amountOrIdOrCall, assetType);
+    }
+
+    function makeTrade(
+        address owner,
+        uint256 expiry,
+        Asset[] memory assets,
+        Asset[] memory asking
+    ) public pure returns (Trade memory) {
+        valid(expiry);
+
+        if (owner == address(0)) {
+            revert CannotBeZeroAddress();
+        }
+
+        if (assets.length == 0 || asking.length == 0) {
+            revert CannotBeEmptyAssets();
+        }
+
+        return Trade(owner, expiry, assets, asking);
+    }
+
+    function composeTrade(
+        address owner,
+        uint256 expiry,
+        address[] memory addrs,
+        uint256[] memory amountsOrIdsOrCalls,
+        AssetType[] memory assetTypes,
+        uint256 indexFlipToAsking
+    ) public pure returns (Trade memory) {
+        if (
+            addrs.length != amountsOrIdsOrCalls.length ||
+            addrs.length != assetTypes.length
+        ) {
+            revert LengthMismatchWhenComposing(
+                addrs.length,
+                amountsOrIdsOrCalls.length,
+                assetTypes.length
+            );
+        }
+
+        Asset[] memory assets = new Asset[](indexFlipToAsking);
+        for (uint256 i = 0; i < indexFlipToAsking; ) {
+            assets[i] = makeAsset(
+                addrs[i],
+                amountsOrIdsOrCalls[i],
+                assetTypes[i]
+            );
+            unchecked {
+                i++;
+            }
+        }
+
+        Asset[] memory asking = new Asset[](addrs.length - indexFlipToAsking);
+        for (uint256 i = indexFlipToAsking; i < addrs.length; ) {
+            asking[i - indexFlipToAsking] = makeAsset(
+                addrs[i],
+                amountsOrIdsOrCalls[i],
+                assetTypes[i]
+            );
+            unchecked {
+                i++;
+            }
+        }
+
+        return makeTrade(owner, expiry, assets, asking);
+    }
+
+    function getTrade(uint256 id) public view returns (Trade memory) {
+        return trades[id];
+    }
+
+    function getTradesBy(address addr) public view returns (uint256[] memory) {
+        return tradesOwned[addr];
+    }
+
+    function supportsInterface(
+        bytes4 interfaceID
+    ) external pure override(IERC165, ISwaplace) returns (bool) {
+        return
+            interfaceID == type(IERC165).interfaceId ||
+            interfaceID == type(ISwaplace).interfaceId;
     }
 }

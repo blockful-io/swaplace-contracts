@@ -1,10 +1,7 @@
 import { expect } from "chai";
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
-// import { interfaceIdFromABI } from "erc165";
 import { interfaceIdFromABI } from "./test-utils/erc165";
-import { keccak256 } from "js-sha3";
-import { splitSignature } from "ethers/lib/utils";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 import erc721abi from "../artifacts/contracts/mock/MockERC721.sol/MockERC721.json";
@@ -13,7 +10,7 @@ describe("Swaplace", async function () {
   let Swaplace: Contract;
   let MockERC20: Contract;
   let MockERC721: Contract;
-  // Naturally, the contract deployer is signed by the owner
+  // The contract deployer is signed by the owner
   let owner: string;
   let acceptee: SignerWithAddress;
 
@@ -24,7 +21,7 @@ describe("Swaplace", async function () {
     owner = signer.address;
     acceptee = accountOne;
 
-    const swaplaceFactory = await ethers.getContractFactory("SwaplaceV2", signer);
+    const swaplaceFactory = await ethers.getContractFactory("Swaplace", signer);
     const MockERC20Factory = await ethers.getContractFactory("MockERC20", signer);
     const mockERC721Factory = await ethers.getContractFactory("MockERC721", signer);
 
@@ -50,7 +47,7 @@ describe("Swaplace", async function () {
   });
 
   it("Should match interface from abi and erc165", async function () {
-    const abi = require("../artifacts/contracts/SwaplaceV2.sol/ISwaplaceV2.json");
+    const abi = require("../artifacts/contracts/Swaplace.sol/ISwaplace.json");
     const faceIdFromAbi = interfaceIdFromABI(abi.abi);
 
     const result = await Swaplace.supportsInterface(faceIdFromAbi);
