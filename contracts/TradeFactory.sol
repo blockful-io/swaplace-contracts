@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {ITrade} from "./interfaces/ITrade.sol";
+import {ITradeFactory} from "./interfaces/ITradeFactory.sol";
 
 error InvalidAssetType(uint256 assetType);
 error InvalidAddressForOwner(address caller);
@@ -14,7 +15,20 @@ error InvalidMismatchingLengths(
     uint256 assetType
 );
 
-abstract contract TradeFactory is ITrade {
+/**
+ *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
+ * |\   __  \ |\  \      |\   __  \ |\   ____\ |\  \|\  \  |\  _____\|\  \|\  \ |\  \
+ * \ \  \|\ /_\ \  \     \ \  \|\  \\ \  \___| \ \  \/  /|_\ \  \__/ \ \  \\\  \\ \  \
+ *  \ \   __  \\ \  \     \ \  \\\  \\ \  \     \ \   ___  \\ \   __\ \ \  \\\  \\ \  \
+ *   \ \  \|\  \\ \  \____ \ \  \\\  \\ \  \____ \ \  \\ \  \\ \  \_|  \ \  \\\  \\ \  \____
+ *    \ \_______\\ \_______\\ \_______\\ \_______\\ \__\\ \__\\ \__\    \ \_______\\ \_______\
+ *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
+ *
+ * @title Swaplace
+ * @author @dizzyaxis | @blockful_io
+ * @dev - Trade Factory is a factory for creating trades. It's a helper for the core Swaplace features.
+ */
+abstract contract TradeFactory is ITrade, ITradeFactory {
     function makeAsset(
         address addr,
         uint256 amountIdCall,
@@ -63,28 +77,24 @@ abstract contract TradeFactory is ITrade {
         address owner,
         uint256 expiry,
         address[] memory addrs,
-        uint256[] memory amountsOrIdsOrCalls,
+        uint256[] memory amountsIdsCalls,
         AssetType[] memory assetTypes,
         uint256 indexFlipToAsking
     ) public pure returns (Trade memory) {
         if (
-            addrs.length != amountsOrIdsOrCalls.length ||
+            addrs.length != amountsIdsCalls.length ||
             addrs.length != assetTypes.length
         ) {
             revert InvalidMismatchingLengths(
                 addrs.length,
-                amountsOrIdsOrCalls.length,
+                amountsIdsCalls.length,
                 assetTypes.length
             );
         }
 
         Asset[] memory assets = new Asset[](indexFlipToAsking);
         for (uint256 i = 0; i < indexFlipToAsking; ) {
-            assets[i] = makeAsset(
-                addrs[i],
-                amountsOrIdsOrCalls[i],
-                assetTypes[i]
-            );
+            assets[i] = makeAsset(addrs[i], amountsIdsCalls[i], assetTypes[i]);
             unchecked {
                 i++;
             }
@@ -94,7 +104,7 @@ abstract contract TradeFactory is ITrade {
         for (uint256 i = indexFlipToAsking; i < addrs.length; ) {
             asking[i - indexFlipToAsking] = makeAsset(
                 addrs[i],
-                amountsOrIdsOrCalls[i],
+                amountsIdsCalls[i],
                 assetTypes[i]
             );
             unchecked {

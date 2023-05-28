@@ -6,21 +6,14 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-error CannotBeEmptyAssets();
-error CannotBeLesserThanOneDay(uint256 timestamp);
-error CannotBeZeroAddress();
-error CannotBeZeroForAmountOrCall();
-error FunctionCallFailedWithReason(bytes reason);
-error InvalidAssetType(uint256 assetType);
-error LengthMismatchWhenComposing(
-    uint256 addr,
-    uint256 amountOrIdOrCall,
-    uint256 assetType
-);
-error OwnerMustBeMsgSender();
-error TradeExpired(uint256 id);
+import {TradeFactory} from "./TradeFactory.sol";
+import {ISwaplace} from "./interfaces/ISwaplace.sol";
+import {ITransfer} from "./interfaces/ITransfer.sol";
 
-/* v2.0.0
+error InvalidAddressForOwner(address caller);
+error InvalidExpiryDate(uint256 timestamp);
+
+/**
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
  * |\   __  \ |\  \      |\   __  \ |\   ____\ |\  \|\  \  |\  _____\|\  \|\  \ |\  \
  * \ \  \|\ /_\ \  \     \ \  \|\  \\ \  \___| \ \  \/  /|_\ \  \__/ \ \  \\\  \\ \  \
@@ -29,56 +22,24 @@ error TradeExpired(uint256 id);
  *    \ \_______\\ \_______\\ \_______\\ \_______\\ \__\\ \__\\ \__\    \ \_______\\ \_______\
  *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
  *
- * @author - Blockful.io
+ * @title Swaplace
+ * @author @dizzyaxis | @blockful_io
  * @dev - Swaplace is a decentralized exchange for ERC20 and ERC721 tokens.
- *        It allows users to propose trades and accept them.
- *        The contract will validate the trade, then transfer the assets.
+ *        It allows users to propose and accept trades.
+ *        It won't handle allowances, only transfers.
  */
-interface ISwaplace {
-    enum AssetType {
-        ERC20,
-        ERC721,
-        FUNCTION_CALL
-    }
-
-    struct Asset {
-        address addr;
-        uint256 amountOrIdOrCall;
-        AssetType assetType;
-    }
-
-    struct Trade {
-        address owner;
-        uint256 expiry;
-        Asset[] assets;
-        Asset[] asking;
-    }
-
-    function supportsInterface(bytes4 interfaceID) external pure returns (bool);
-}
-
-interface IUniversalTransfer {
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amountOrIdOrCall
-    ) external;
-}
-
-contract Swaplace is ISwaplace, IERC165, ReentrancyGuard {
+contract Swaplace is TradeFactory, ISwaplace, IERC165, ReentrancyGuard {
     uint256 public tradeId = 0;
 
     mapping(uint256 => Trade) private trades;
 
-    function createTrade(
-        Trade calldata trade
-    ) public nonReentrant returns (uint256) {
+    function createTrade(Trade calldata trade) public returns (uint256) {
         if (trade.owner == address(0) || trade.owner != msg.sender) {
-            revert CannotBeZeroAddress();
+            revert InvalidAddressForOwner(trade.owner);
         }
 
         if (trade.expiry < 1 days) {
-            revert CannotBeLesserThanOneDay(trade.expiry);
+            revert InvalidExpiryDate(trade.expiry);
         }
 
         unchecked {
@@ -94,54 +55,54 @@ contract Swaplace is ISwaplace, IERC165, ReentrancyGuard {
         return tradeId;
     }
 
-    function acceptTrade(uint256 _tradeId) public nonReentrant {
-        Trade memory trade = trades[_tradeId];
+    function acceptTrade(uint256 id) public nonReentrant {
+        Trade memory trade = trades[id];
 
         if (trade.expiry < block.timestamp) {
-            revert TradeExpired(_tradeId);
+            revert InvalidExpiryDate(id);
         }
 
         Asset[] memory assets = trade.asking;
 
         for (uint256 i = 0; i < assets.length; ) {
-            IUniversalTransfer(assets[i].addr).transferFrom(
+            ITransfer(assets[i].addr).transferFrom(
                 msg.sender,
                 trade.owner,
-                assets[i].amountOrIdOrCall
+                assets[i].amountIdCall
             );
             unchecked {
                 i++;
             }
         }
 
-        assets = trade.assets;
+        assets = trade.biding;
 
         for (uint256 i = 0; i < assets.length; ) {
-            IUniversalTransfer(assets[i].addr).transferFrom(
+            ITransfer(assets[i].addr).transferFrom(
                 trade.owner,
                 msg.sender,
-                assets[i].amountOrIdOrCall
+                assets[i].amountIdCall
             );
             unchecked {
                 i++;
             }
         }
 
-        trades[_tradeId].expiry = 0;
+        trades[id].expiry = 0;
     }
 
-    function cancelTrade(uint256 _tradeId) public {
-        Trade memory trade = trades[_tradeId];
+    function cancelTrade(uint256 id) public {
+        Trade memory trade = trades[id];
 
         if (trade.expiry < block.timestamp) {
-            revert TradeExpired(_tradeId);
+            revert InvalidExpiryDate(id);
         }
 
         if (trade.owner == msg.sender) {
-            revert OwnerMustBeMsgSender();
+            revert InvalidAddressForOwner(msg.sender);
         }
 
-        trades[_tradeId].expiry = 0;
+        trades[id].expiry = 0;
     }
 
     function getTrade(uint256 id) public view returns (Trade memory) {

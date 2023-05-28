@@ -11,11 +11,15 @@ export const interfaceIdFromABI = (abi: any): string => {
       .filter((e: any) => e.type === "function")
       .flatMap((e: any) => `${encodeSelector(prepareData(e))}`);
 
+    console.log(functionSelectors);
+
     // Xor the output values and convert to hex
-    const interfaceId = functionSelectors
-      .reduce((prev: any, cur: any) => BigInt(prev) ^ BigInt(cur))
-      .toString(16)
-      .padStart(8, "0"); // Make sure the result is always 8 characters long
+    const interfaceId =
+      "0x" +
+      functionSelectors
+        .reduce((prev: any, cur: any) => BigInt(prev) ^ BigInt(cur))
+        .toString(16)
+        .padStart(8, "0"); // Make sure the result is always 8 characters long
 
     return interfaceId;
   } catch (err) {
