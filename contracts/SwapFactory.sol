@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {ITrade} from "./interfaces/ITrade.sol";
-import {ITradeFactory} from "./interfaces/ITradeFactory.sol";
+import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 
 error InvalidAssetType(uint256 assetType);
 error InvalidAddressForOwner(address caller);
@@ -28,7 +28,7 @@ error InvalidMismatchingLengths(
  * @author @dizzyaxis | @blockful_io
  * @dev - Trade Factory is a factory for creating trades. It's a helper for the core Swaplace features.
  */
-abstract contract TradeFactory is ITrade, ITradeFactory {
+abstract contract SwapFactory is ISwapFactory, ITrade {
     function makeAsset(
         address addr,
         uint256 amountIdCall,

@@ -6,7 +6,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import {TradeFactory} from "./TradeFactory.sol";
+import {SwapFactory} from "./SwapFactory.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
 
@@ -28,7 +28,7 @@ error InvalidExpiryDate(uint256 timestamp);
  *        It allows users to propose and accept trades.
  *        It won't handle allowances, only transfers.
  */
-contract Swaplace is TradeFactory, ISwaplace, IERC165, ReentrancyGuard {
+contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
     uint256 public tradeId = 0;
 
     mapping(uint256 => Trade) private trades;

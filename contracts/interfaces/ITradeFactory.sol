@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import {ITrade} from "./ITrade.sol";
 
-interface ITradeFactory {
+interface ISwapFactory {
     function makeAsset(
         address addr,
         uint256 amountIdCall,
