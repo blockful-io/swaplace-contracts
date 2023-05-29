@@ -47,19 +47,20 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
         }
 
         swaps[swapId] = swap;
-
-        unchecked {
-            swaps[swapId].expiry += block.timestamp;
-        }
+        swaps[swapId].expiry = swap.expiry + block.timestamp; // this always returns 0
 
         return swapId;
+    }
+
+    function timsteamp() public view returns (uint256) {
+        return block.timestamp;
     }
 
     function acceptSwap(uint256 id) public nonReentrant {
         Swap memory swap = swaps[id];
 
         if (swap.expiry < block.timestamp) {
-            revert InvalidExpiryDate(id);
+            revert InvalidExpiryDate(swap.expiry);
         }
 
         Asset[] memory assets = swap.asking;
@@ -95,10 +96,10 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
         Swap memory swap = swaps[id];
 
         if (swap.expiry < block.timestamp) {
-            revert InvalidExpiryDate(id);
+            revert InvalidExpiryDate(swap.expiry);
         }
 
-        if (swap.owner == msg.sender) {
+        if (swap.owner != msg.sender) {
             revert InvalidAddressForOwner(msg.sender);
         }
 

@@ -71,7 +71,7 @@ describe("Swaplace", async function () {
     expect(await Swaplace.createSwap(swap)).to.be.ok;
   });
 
-  it("Should be able to create a swap and validate assets allowances", async function () {
+  it("Should be able to validate assets allowances", async function () {
     // Mint tokens for test execution
 
     await MockERC20.mintTo(owner.address, 1000);
@@ -86,8 +86,62 @@ describe("Swaplace", async function () {
     expect(await MockERC721.getApproved(1)).to.be.equal(Swaplace.address);
   });
 
-  it("Should be able to cancel swaps", async function () {});
-  it("Should not be able to cancel not owned swaps", async function () {});
+  it("Should be able to cancel swaps", async function () {
+    const expiry = day * 2;
+
+    const assetsContractAddrs = [MockERC20.address, MockERC721.address];
+    const assetsAmountsOrId = [1000, 1];
+    const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
+
+    const swap = await Swaplace.composeSwap(
+      owner.address,
+      expiry,
+      assetsContractAddrs,
+      assetsAmountsOrId,
+      assetTypes,
+      1
+    );
+
+    // Create the first swap
+    expect(await Swaplace.createSwap(swap)).to.be.ok;
+
+    // Cancel the first swap
+    expect(await Swaplace.cancelSwap(1)).to.be.ok;
+
+    const temp = await Swaplace.getSwap(1);
+    expect(temp.expiry).to.be.equal("0");
+  });
+
+  it("Should not be able to cancel not owned swaps", async function () {
+    const fucl = await Swaplace.timsteamp();
+
+    const expiry = day + fucl;
+
+    const assetsContractAddrs = [MockERC20.address, MockERC721.address];
+    const assetsAmountsOrId = [1000, 1];
+    const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
+
+    const swap = await Swaplace.composeSwap(
+      acceptee.address,
+      expiry,
+      assetsContractAddrs,
+      assetsAmountsOrId,
+      assetTypes,
+      1
+    );
+
+    // Create the first swap
+    expect(await Swaplace.connect(acceptee).createSwap(swap)).to.be.ok;
+
+    const test = await Swaplace.getSwap(1);
+    console.log(test.expiry);
+    console.log(swap.expiry);
+
+    // Cancel the first swap
+    console.log(owner.address);
+    expect(await Swaplace.cancelSwap(1)).to.be.reverted;
+  });
+
   it("Should not be able to cancel expired swaps", async function () {});
 
   it("Should revert when accepting swaps with expiration done", async function () {});
