@@ -25,49 +25,49 @@ error InvalidExpiryDate(uint256 timestamp);
  * @title Swaplace
  * @author @dizzyaxis | @blockful_io
  * @dev - Swaplace is a decentralized exchange for ERC20 and ERC721 tokens.
- *        It allows users to propose and accept trades.
+ *        It allows users to propose and accept swaps.
  *        It won't handle allowances, only transfers.
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
-    uint256 public tradeId = 0;
+    uint256 public swapId = 0;
 
-    mapping(uint256 => Trade) private trades;
+    mapping(uint256 => Swap) private swaps;
 
-    function createTrade(Trade calldata trade) public returns (uint256) {
-        if (trade.owner == address(0) || trade.owner != msg.sender) {
-            revert InvalidAddressForOwner(trade.owner);
+    function createSwap(Swap calldata swap) public returns (uint256) {
+        if (swap.owner == address(0) || swap.owner != msg.sender) {
+            revert InvalidAddressForOwner(swap.owner);
         }
 
-        if (trade.expiry < 1 days) {
-            revert InvalidExpiryDate(trade.expiry);
+        if (swap.expiry < 1 days) {
+            revert InvalidExpiryDate(swap.expiry);
         }
 
         unchecked {
-            tradeId++;
+            swapId++;
         }
 
-        trades[tradeId] = trade;
+        swaps[swapId] = swap;
 
         unchecked {
-            trades[tradeId].expiry += block.timestamp;
+            swaps[swapId].expiry += block.timestamp;
         }
 
-        return tradeId;
+        return swapId;
     }
 
-    function acceptTrade(uint256 id) public nonReentrant {
-        Trade memory trade = trades[id];
+    function acceptSwap(uint256 id) public nonReentrant {
+        Swap memory swap = swaps[id];
 
-        if (trade.expiry < block.timestamp) {
+        if (swap.expiry < block.timestamp) {
             revert InvalidExpiryDate(id);
         }
 
-        Asset[] memory assets = trade.asking;
+        Asset[] memory assets = swap.asking;
 
         for (uint256 i = 0; i < assets.length; ) {
             ITransfer(assets[i].addr).transferFrom(
                 msg.sender,
-                trade.owner,
+                swap.owner,
                 assets[i].amountIdCall
             );
             unchecked {
@@ -75,11 +75,11 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
             }
         }
 
-        assets = trade.biding;
+        assets = swap.biding;
 
         for (uint256 i = 0; i < assets.length; ) {
             ITransfer(assets[i].addr).transferFrom(
-                trade.owner,
+                swap.owner,
                 msg.sender,
                 assets[i].amountIdCall
             );
@@ -88,25 +88,25 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
             }
         }
 
-        trades[id].expiry = 0;
+        swaps[id].expiry = 0;
     }
 
-    function cancelTrade(uint256 id) public {
-        Trade memory trade = trades[id];
+    function cancelSwap(uint256 id) public {
+        Swap memory swap = swaps[id];
 
-        if (trade.expiry < block.timestamp) {
+        if (swap.expiry < block.timestamp) {
             revert InvalidExpiryDate(id);
         }
 
-        if (trade.owner == msg.sender) {
+        if (swap.owner == msg.sender) {
             revert InvalidAddressForOwner(msg.sender);
         }
 
-        trades[id].expiry = 0;
+        swaps[id].expiry = 0;
     }
 
-    function getTrade(uint256 id) public view returns (Trade memory) {
-        return trades[id];
+    function getSwap(uint256 id) public view returns (Swap memory) {
+        return swaps[id];
     }
 
     function supportsInterface(

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-interface ITrade {
+interface ISwap {
     enum AssetType {
         ERC20,
         ERC721,
@@ -14,7 +14,7 @@ interface ITrade {
         AssetType assetType;
     }
 
-    struct Trade {
+    struct Swap {
         address owner;
         uint256 expiry;
         Asset[] biding;

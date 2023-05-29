@@ -47,53 +47,48 @@ describe("Swaplace", async function () {
     expect(erc721[2].toString()).to.be.equals("1");
   });
 
-  it("Should be able to build trades with one item for both { ERC20, ERC721 }", async function () {
+  it("Should be able to build swaps with one item for both { ERC20, ERC721 }", async function () {
     const expiry = day * 2;
 
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
     const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
 
-    const ERC20Trade = await Swaplace.makeTrade(owner.address, expiry, [ERC20Asset], [ERC721Asset]);
-    const ERC721Trade = await Swaplace.makeTrade(
-      owner.address,
-      expiry,
-      [ERC721Asset],
-      [ERC20Asset]
-    );
+    const ERC20Swap = await Swaplace.makeSwap(owner.address, expiry, [ERC20Asset], [ERC721Asset]);
+    const ERC721Swap = await Swaplace.makeSwap(owner.address, expiry, [ERC721Asset], [ERC20Asset]);
 
-    expect(ERC20Trade[0]).to.be.equals(owner.address);
-    expect(ERC20Trade[1]).to.be.equals(expiry);
-    expect(ERC20Trade[2][0].toString()).to.be.equals(ERC20Asset.toString());
-    expect(ERC20Trade[3][0].toString()).to.be.equals(ERC721Asset.toString());
+    expect(ERC20Swap[0]).to.be.equals(owner.address);
+    expect(ERC20Swap[1]).to.be.equals(expiry);
+    expect(ERC20Swap[2][0].toString()).to.be.equals(ERC20Asset.toString());
+    expect(ERC20Swap[3][0].toString()).to.be.equals(ERC721Asset.toString());
 
-    expect(ERC721Trade[0]).to.be.equals(owner.address);
-    expect(ERC721Trade[1]).to.be.equals(expiry);
-    expect(ERC721Trade[2][0].toString()).to.be.equals(ERC721Asset.toString());
-    expect(ERC721Trade[3][0].toString()).to.be.equals(ERC20Asset.toString());
+    expect(ERC721Swap[0]).to.be.equals(owner.address);
+    expect(ERC721Swap[1]).to.be.equals(expiry);
+    expect(ERC721Swap[2][0].toString()).to.be.equals(ERC721Asset.toString());
+    expect(ERC721Swap[3][0].toString()).to.be.equals(ERC20Asset.toString());
   });
 
-  it("Should be able to build composed trade containing both { ERC20, ERC721 }", async function () {
+  it("Should be able to build composed swap containing both { ERC20, ERC721 }", async function () {
     const expiry = day * 2;
 
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
     const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
 
-    const trade = await Swaplace.makeTrade(
+    const swap = await Swaplace.makeSwap(
       owner.address,
       expiry,
       [ERC20Asset, ERC721Asset],
       [ERC20Asset, ERC721Asset]
     );
 
-    expect(trade[0]).to.be.equals(owner.address);
-    expect(trade[1]).to.be.equals(expiry);
-    expect(trade[2][0].toString()).to.be.equals(ERC20Asset.toString());
-    expect(trade[2][1].toString()).to.be.equals(ERC721Asset.toString());
-    expect(trade[3][0].toString()).to.be.equals(ERC20Asset.toString());
-    expect(trade[3][1].toString()).to.be.equals(ERC721Asset.toString());
+    expect(swap[0]).to.be.equals(owner.address);
+    expect(swap[1]).to.be.equals(expiry);
+    expect(swap[2][0].toString()).to.be.equals(ERC20Asset.toString());
+    expect(swap[2][1].toString()).to.be.equals(ERC721Asset.toString());
+    expect(swap[3][0].toString()).to.be.equals(ERC20Asset.toString());
+    expect(swap[3][1].toString()).to.be.equals(ERC721Asset.toString());
   });
 
-  it("Should be able to compose a trade in a single function for both { ERC20, ERC721 }", async function () {
+  it("Should be able to compose a swap in a single function for both { ERC20, ERC721 }", async function () {
     const expiry = day * 2;
 
     // The point in the asset index that we'll flip from bid to ask
@@ -103,7 +98,7 @@ describe("Swaplace", async function () {
     const assetsAmountsOrId = [1000, 1, 2];
     const assetTypes = [0, 1, 1]; // 0 = ERC20, 1 = ERC721
 
-    const trade = await Swaplace.composeTrade(
+    const swap = await Swaplace.composeSwap(
       owner.address,
       expiry,
       assetsContractAddrs,
@@ -112,8 +107,8 @@ describe("Swaplace", async function () {
       indexFlipSide
     );
 
-    expect(trade[0]).to.be.equals(owner.address);
-    expect(trade[1]).to.be.equals(expiry);
+    expect(swap[0]).to.be.equals(owner.address);
+    expect(swap[1]).to.be.equals(expiry);
 
     const firstBid = await Swaplace.makeAsset(
       assetsContractAddrs[0],
@@ -133,9 +128,9 @@ describe("Swaplace", async function () {
       assetTypes[2]
     );
 
-    expect(trade[2][0].toString()).to.be.equals(firstBid.toString());
-    expect(trade[2][1].toString()).to.be.equals(secondBid.toString());
-    expect(trade[3][0].toString()).to.be.equals(askingAsset.toString());
+    expect(swap[2][0].toString()).to.be.equals(firstBid.toString());
+    expect(swap[2][1].toString()).to.be.equals(secondBid.toString());
+    expect(swap[3][0].toString()).to.be.equals(askingAsset.toString());
   });
 
   it("Should revert while building asset with invalid asset type", async function () {
@@ -152,17 +147,17 @@ describe("Swaplace", async function () {
     await expect(Swaplace.makeAsset(MockERC721.address, 0, 1)).to.not.be.reverted;
   });
 
-  it("Should revert while building trade without minimum expiry period", async function () {
+  it("Should revert while building swap without minimum expiry period", async function () {
     const expiry = day / 2;
 
     const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
 
     await expect(
-      Swaplace.makeTrade(owner.address, expiry, [ERC20Asset], [ERC20Asset])
+      Swaplace.makeSwap(owner.address, expiry, [ERC20Asset], [ERC20Asset])
     ).to.be.revertedWithCustomError(Swaplace, "InvalidExpiryDate");
   });
 
-  it("Should revert while building trade with 'owner' as address zero", async function () {
+  it("Should revert while building swap with 'owner' as address zero", async function () {
     const expiry = day * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
@@ -170,7 +165,7 @@ describe("Swaplace", async function () {
     const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
     await expect(
-      Swaplace.composeTrade(
+      Swaplace.composeSwap(
         ethers.constants.AddressZero,
         expiry,
         assetsContractAddrs,
@@ -181,14 +176,14 @@ describe("Swaplace", async function () {
     ).to.be.revertedWithCustomError(Swaplace, "InvalidAddressForOwner");
   });
 
-  it("Should revert while creating trades not belonging to msg.sender", async function () {
+  it("Should revert while creating swaps not belonging to msg.sender", async function () {
     const expiry = day * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
     const assetsAmountsOrId = [1000, 1];
     const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
-    const trade = await Swaplace.composeTrade(
+    const swap = await Swaplace.composeSwap(
       acceptee.address,
       expiry,
       assetsContractAddrs,
@@ -197,13 +192,13 @@ describe("Swaplace", async function () {
       1
     );
 
-    await expect(Swaplace.createTrade(trade)).to.be.revertedWithCustomError(
+    await expect(Swaplace.createSwap(swap)).to.be.revertedWithCustomError(
       Swaplace,
       "InvalidAddressForOwner"
     );
   });
 
-  it("Should revert while creating trade with empty assets", async function () {
+  it("Should revert while creating swap with empty assets", async function () {
     const expiry = day * 2;
 
     // The point in the asset index that we'll flip from bid to ask
@@ -214,7 +209,7 @@ describe("Swaplace", async function () {
     const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
     await expect(
-      Swaplace.composeTrade(
+      Swaplace.composeSwap(
         owner.address,
         expiry,
         assetsContractAddrs,
@@ -227,7 +222,7 @@ describe("Swaplace", async function () {
     indexFlipSide = 2;
 
     await expect(
-      Swaplace.composeTrade(
+      Swaplace.composeSwap(
         owner.address,
         expiry,
         assetsContractAddrs,
@@ -238,7 +233,7 @@ describe("Swaplace", async function () {
     ).to.be.revertedWithCustomError(Swaplace, "InvalidAssetsLength");
   });
 
-  it("Should revert while composing trade with mismatching inputs length", async function () {
+  it("Should revert while composing swap with mismatching inputs length", async function () {
     const expiry = day * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
@@ -246,7 +241,7 @@ describe("Swaplace", async function () {
     const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
     await expect(
-      Swaplace.composeTrade(
+      Swaplace.composeSwap(
         owner.address,
         expiry,
         assetsContractAddrs,

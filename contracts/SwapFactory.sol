@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {ITrade} from "./interfaces/ITrade.sol";
+import {ISwap} from "./interfaces/ISwap.sol";
 import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 
 error InvalidAssetType(uint256 assetType);
@@ -26,9 +26,9 @@ error InvalidMismatchingLengths(
  *
  * @title Swaplace
  * @author @dizzyaxis | @blockful_io
- * @dev - Trade Factory is a factory for creating trades. It's a helper for the core Swaplace features.
+ * @dev - Swap Factory is a factory for creating swaps. It's a helper for the core Swaplace features.
  */
-abstract contract SwapFactory is ISwapFactory, ITrade {
+abstract contract SwapFactory is ISwapFactory, ISwap {
     function makeAsset(
         address addr,
         uint256 amountIdCall,
@@ -52,12 +52,12 @@ abstract contract SwapFactory is ISwapFactory, ITrade {
         return Asset(addr, amountIdCall, assetType);
     }
 
-    function makeTrade(
+    function makeSwap(
         address owner,
         uint256 expiry,
         Asset[] memory assets,
         Asset[] memory asking
-    ) public pure returns (Trade memory) {
+    ) public pure returns (Swap memory) {
         if (expiry < 1 days) {
             revert InvalidExpiryDate(expiry);
         }
@@ -70,17 +70,17 @@ abstract contract SwapFactory is ISwapFactory, ITrade {
             revert InvalidAssetsLength();
         }
 
-        return Trade(owner, expiry, assets, asking);
+        return Swap(owner, expiry, assets, asking);
     }
 
-    function composeTrade(
+    function composeSwap(
         address owner,
         uint256 expiry,
         address[] memory addrs,
         uint256[] memory amountsIdsCalls,
         AssetType[] memory assetTypes,
         uint256 indexFlipToAsking
-    ) public pure returns (Trade memory) {
+    ) public pure returns (Swap memory) {
         if (
             addrs.length != amountsIdsCalls.length ||
             addrs.length != assetTypes.length
@@ -112,6 +112,6 @@ abstract contract SwapFactory is ISwapFactory, ITrade {
             }
         }
 
-        return makeTrade(owner, expiry, assets, asking);
+        return makeSwap(owner, expiry, assets, asking);
     }
 }

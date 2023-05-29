@@ -43,14 +43,14 @@ describe("Swaplace", async function () {
     expect(await MockERC721.balanceOf(owner.address)).to.be.equals(1);
   });
 
-  it("Should be able to create a trade", async function () {
+  it("Should be able to create a swap", async function () {
     const expiry = day * 2;
 
     const assetsContractAddrs = [MockERC20.address, MockERC721.address];
     const assetsAmountsOrId = [1000, 1];
     const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
-    const trade = await Swaplace.composeTrade(
+    const swap = await Swaplace.composeSwap(
       owner.address,
       expiry,
       assetsContractAddrs,
@@ -59,19 +59,19 @@ describe("Swaplace", async function () {
       1
     );
 
-    // Create the first trade
-    expect(await Swaplace.createTrade(trade)).to.be.ok;
+    // Create the first swap
+    expect(await Swaplace.createSwap(swap)).to.be.ok;
 
-    // Return the first trade and expect timestamp to be greater
-    const tradeResult = await Swaplace.getTrade(1);
-    expect(tradeResult[1]).to.be.greaterThan(trade[1]);
-    expect(tradeResult.toString()).to.be.not.equal(trade.toString());
+    // Return the first swap and expect timestamp to be greater
+    const swapResult = await Swaplace.getSwap(1);
+    expect(swapResult[1]).to.be.greaterThan(swap[1]);
+    expect(swapResult.toString()).to.be.not.equal(swap.toString());
 
-    // Create a second trade
-    expect(await Swaplace.createTrade(trade)).to.be.ok;
+    // Create a second swap
+    expect(await Swaplace.createSwap(swap)).to.be.ok;
   });
 
-  it("Should be able to create a trade and validate assets allowances", async function () {
+  it("Should be able to create a swap and validate assets allowances", async function () {
     // Mint tokens for test execution
 
     await MockERC20.mintTo(owner.address, 1000);
@@ -86,20 +86,20 @@ describe("Swaplace", async function () {
     expect(await MockERC721.getApproved(1)).to.be.equal(Swaplace.address);
   });
 
-  it("Should be able to cancel trades", async function () {});
-  it("Should not be able to cancel not owned trades", async function () {});
-  it("Should not be able to cancel expired trades", async function () {});
+  it("Should be able to cancel swaps", async function () {});
+  it("Should not be able to cancel not owned swaps", async function () {});
+  it("Should not be able to cancel expired swaps", async function () {});
 
-  it("Should revert when accepting trades with expiration done", async function () {});
-  it("Should revert when accepting trades with trades that were already accepted", async function () {});
-  it("Should revert when accepting trades with lacking allowance { ERC20 }", async function () {});
-  it("Should revert when accepting trades with lacking allowance { ERC721 }", async function () {});
+  it("Should revert when accepting swaps with expiration done", async function () {});
+  it("Should revert when accepting swaps with swaps that were already accepted", async function () {});
+  it("Should revert when accepting swaps with lacking allowance { ERC20 }", async function () {});
+  it("Should revert when accepting swaps with lacking allowance { ERC721 }", async function () {});
 
-  it("Should be able to accept a trade with only { ERC20 }", async function () {});
-  it("Should be able to accept a trade with only { ERC721 }", async function () {});
+  it("Should be able to accept a swap with only { ERC20 }", async function () {});
+  it("Should be able to accept a swap with only { ERC721 }", async function () {});
 
-  it("Should be able to accept a trade 1-1", async function () {});
-  it("Should be able to accept a trade 1-N", async function () {});
-  it("Should be able to accept a trade N-1", async function () {});
-  it("Should be able to accept a trade N-N", async function () {});
+  it("Should be able to accept a swap 1-1", async function () {});
+  it("Should be able to accept a swap 1-N", async function () {});
+  it("Should be able to accept a swap N-1", async function () {});
+  it("Should be able to accept a swap N-N", async function () {});
 });

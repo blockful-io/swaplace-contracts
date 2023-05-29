@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {ITrade} from "./ITrade.sol";
+import {ISwap} from "./ISwap.sol";
 
 interface ISwaplace {
-    function createTrade(
-        ITrade.Trade calldata trade
-    ) external returns (uint256);
+    function createSwap(ISwap.Swap calldata swap) external returns (uint256);
 
-    function acceptTrade(uint256 id) external;
+    function acceptSwap(uint256 id) external;
 
-    function cancelTrade(uint256 id) external;
+    function cancelSwap(uint256 id) external;
 
-    function getTrade(uint256 id) external view returns (ITrade.Trade memory);
+    function getSwap(uint256 id) external view returns (ISwap.Swap memory);
 
     function supportsInterface(bytes4 interfaceID) external pure returns (bool);
 }
