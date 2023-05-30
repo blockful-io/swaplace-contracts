@@ -25,9 +25,8 @@ error InvalidExpiryDate(uint256 timestamp);
  *
  * @title Swaplace
  * @author @dizzyaxis | @blockful_io
- * @dev - Swaplace is a decentralized exchange for ERC20 and ERC721 tokens.
- *        It allows users to propose and accept swaps.
- *        It won't handle allowances, only transfers.
+ * @dev - Swaplace is a decentralized Feeless DEX for ERC20 and ERC721 tokens.
+ * It allows users to propose and accept swaps. It won't handle allowances, only transfers.
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
     uint256 public swapId = 0;
