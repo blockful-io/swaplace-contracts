@@ -4,13 +4,12 @@ pragma solidity ^0.8.17;
 interface ISwap {
     enum AssetType {
         ERC20,
-        ERC721,
-        FUNCTION_CALL
+        ERC721
     }
 
     struct Asset {
         address addr;
-        uint256 amountIdCall;
+        uint256 amountOrId;
         AssetType assetType;
     }
 

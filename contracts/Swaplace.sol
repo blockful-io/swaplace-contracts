@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import {SwapFactory} from "./SwapFactory.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
@@ -47,13 +47,9 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
         }
 
         swaps[swapId] = swap;
-        swaps[swapId].expiry = swap.expiry + block.timestamp; // this always returns 0
+        swaps[swapId].expiry = swap.expiry + block.timestamp;
 
         return swapId;
-    }
-
-    function timsteamp() public view returns (uint256) {
-        return block.timestamp;
     }
 
     function acceptSwap(uint256 id) public nonReentrant {
@@ -69,7 +65,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
             ITransfer(assets[i].addr).transferFrom(
                 msg.sender,
                 swap.owner,
-                assets[i].amountIdCall
+                assets[i].amountOrId
             );
             unchecked {
                 i++;
@@ -82,7 +78,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
             ITransfer(assets[i].addr).transferFrom(
                 swap.owner,
                 msg.sender,
-                assets[i].amountIdCall
+                assets[i].amountOrId
             );
             unchecked {
                 i++;

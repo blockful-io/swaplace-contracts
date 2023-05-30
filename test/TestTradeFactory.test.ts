@@ -29,10 +29,6 @@ describe("Swaplace", async function () {
     Swaplace = await swaplaceContract.deployed();
     MockERC20 = await MockERC20Contract.deployed();
     MockERC721 = await mockERC721Contract.deployed();
-
-    console.log("Swaplace address: ", Swaplace.address);
-    console.log("MockERC20 address: ", MockERC20.address);
-    console.log("MockERC721 address: ", MockERC721.address);
   });
 
   it("Should be able to build assets for { ERC20, ERC721 }", async function () {
@@ -141,7 +137,7 @@ describe("Swaplace", async function () {
   it("Should revert while building asset with zero amount as type ERC20, but not for ERC721", async function () {
     await expect(Swaplace.makeAsset(MockERC20.address, 0, 0)).to.be.revertedWithCustomError(
       Swaplace,
-      "InvalidAmountOrCallId"
+      "InvalidAmount"
     );
 
     await expect(Swaplace.makeAsset(MockERC721.address, 0, 1)).to.not.be.reverted;
