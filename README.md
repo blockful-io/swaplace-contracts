@@ -12,7 +12,7 @@ B) Users accept available Swaps.
 
 Detailed:
 
-A) User call public pure function `composeSwap`.
+A) User calls public pure function `composeSwap`.
 
 B) User provides allowances for the biding assets.
 
@@ -83,7 +83,7 @@ The usage is on-chain focused, but when working with off-chain, the Swap struct 
 
 Similar to `makeSwap`, compose Swap will build the entire Swap in a single function and return the Swap struct. Different from the make Swap function, which requires pre-built assets, `composeSwap` will receive as parameters all the data from the assets involved in the Swap in three arrays of data, corresponding to the Asset struct requirement.
 
-To avoid having six arrays as parameters for both assets bided or asked, both of them should be placed in the same array and then specify the `uint256` integer representing the place at the index where the assets bided will turn assets asked. The variable `indexFlipToAsking` is the length of bided assets and also the beginning index of the assets being asked to fulfill the Swap.
+To avoid having six arrays as parameters for both assets bid or asked, both of them should be placed in the same array and then specify the `uint256` integer representing the place at the index where the assets bid will flip assets asked. The variable `indexFlipToAsking` is the length of bid assets and also the beginning index of the assets being asked to fulfill the Swap.
 
 ```solidity
 function composeSwap(
