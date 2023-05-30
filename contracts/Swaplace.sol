@@ -11,6 +11,7 @@ import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
 
 error InvalidAddressForOwner(address caller);
+error InvalidAssetsLength();
 error InvalidExpiryDate(uint256 timestamp);
 
 /**
@@ -40,6 +41,10 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
 
         if (swap.expiry < 1 days) {
             revert InvalidExpiryDate(swap.expiry);
+        }
+
+        if (swap.biding.length == 0 || swap.asking.length == 0) {
+            revert InvalidAssetsLength();
         }
 
         unchecked {
