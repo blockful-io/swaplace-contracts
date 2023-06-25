@@ -17,20 +17,20 @@ const config: HardhatUserConfig = {
   // gasReporter: {
   //   enabled: true,
   // },
-  etherscan: {
-    apiKey: `${POLYSCAN}`,
-  },
+  // etherscan: {
+  //   apiKey: `${POLYSCAN}`,
+  // },
   networks: {
-    hardhat: {
-      forking: {
-        url: `${ETH}`,
-        blockNumber: 16031313,
-      },
-    },
-    goerli: {
-      url: `${GOERLI}`,
-      accounts: [`${PRIVATE_KEY}`, `${PRIVATE_KEY_USER}`],
-    },
+    // hardhat: {
+    //   forking: {
+    //     url: `${ETH}`,
+    //     blockNumber: 16031313,
+    //   },
+    // },
+    // goerli: {
+    //   url: `${GOERLI}`,
+    //   accounts: [`${PRIVATE_KEY}`, `${PRIVATE_KEY_USER}`],
+    // },
   },
 };
 
