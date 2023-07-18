@@ -13,6 +13,7 @@ import {ITransfer} from "./interfaces/ITransfer.sol";
 error InvalidAddressForOwner(address caller);
 error InvalidAssetsLength();
 error InvalidExpiryDate(uint256 timestamp);
+error InvalidFunctionCall(bytes reason);
 
 /**
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -24,7 +25,7 @@ error InvalidExpiryDate(uint256 timestamp);
  *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
  *
  * @title Swaplace
- * @author @dizzyaxis | @blockful_io
+ * @author @0xneves | @blockful_io
  * @dev - Swaplace is a decentralized Feeless DEX for ERC20 and ERC721 tokens.
  * It allows users to propose and accept swaps. It won't handle allowances, only transfers.
  */
@@ -56,7 +57,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
         return swapId;
     }
 
-    function acceptSwap(uint256 id) public nonReentrant {
+    function acceptTokenSwap(uint256 id) public nonReentrant {
         Swap memory swap = swaps[id];
 
         if (swap.expiry < block.timestamp) {
@@ -91,6 +92,43 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
 
         swaps[id].expiry = 0;
     }
+
+    // function acceptCallSwap(uint256 id) public nonReentrant {
+    //     Swap memory swap = swaps[id];
+
+    //     if (swap.expiry < block.timestamp) {
+    //         revert InvalidExpiryDate(swap.expiry);
+    //     }
+
+    //     Asset[] memory assets = swap.asking;
+
+    //     for (uint256 i = 0; i < assets.length; ) {
+    //         (bool success, bytes memory reason) = assets[i].addr.call(
+    //             executions[bytes32(assets[i].amountOrIdOrCall)]
+    //         );
+
+    //         if (!success) {
+    //             revert FunctionCallFailedWithReason(reason);
+    //         }
+    //         unchecked {
+    //             i++;
+    //         }
+    //     }
+
+    //     assets = swap.biding;
+
+    //     for (uint256 i = 0; i < assets.length; ) {
+    //         (bool success, bytes memory reason) = assets[i].addr.call(
+    //             executions[bytes32(assets[i].amountOrIdOrCall)]
+    //         );
+
+    //         if (!success) {
+    //             revert FunctionCallFailedWithReason(reason);
+    //         }
+    //     }
+
+    //     swaps[id].expiry = 0;
+    // }
 
     function cancelSwap(uint256 id) public {
         Swap memory swap = swaps[id];
