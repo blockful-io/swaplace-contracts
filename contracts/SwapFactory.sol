@@ -73,7 +73,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         address[] memory addrs,
         uint256[] memory amountOrId,
         AssetType[] memory assetTypes,
-        uint256 indexFlipToAsking
+        uint256 bidFlipAsk
     ) public pure returns (Swap memory) {
         if (
             addrs.length != amountOrId.length ||
@@ -86,17 +86,17 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
             );
         }
 
-        Asset[] memory biding = new Asset[](indexFlipToAsking);
-        for (uint256 i = 0; i < indexFlipToAsking; ) {
+        Asset[] memory biding = new Asset[](bidFlipAsk);
+        for (uint256 i = 0; i < bidFlipAsk; ) {
             biding[i] = makeAsset(addrs[i], amountOrId[i], assetTypes[i]);
             unchecked {
                 i++;
             }
         }
 
-        Asset[] memory asking = new Asset[](addrs.length - indexFlipToAsking);
-        for (uint256 i = indexFlipToAsking; i < addrs.length; ) {
-            asking[i - indexFlipToAsking] = makeAsset(
+        Asset[] memory asking = new Asset[](addrs.length - bidFlipAsk);
+        for (uint256 i = bidFlipAsk; i < addrs.length; ) {
+            asking[i - bidFlipAsk] = makeAsset(
                 addrs[i],
                 amountOrId[i],
                 assetTypes[i]
