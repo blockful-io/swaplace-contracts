@@ -49,7 +49,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
     function makeSwap(
         address owner,
         uint256 expiry,
-        Asset[] memory assets,
+        Asset[] memory biding,
         Asset[] memory asking
     ) public pure returns (Swap memory) {
         if (expiry < 1 days) {
@@ -60,11 +60,11 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
             revert InvalidAddressForOwner(address(0));
         }
 
-        if (assets.length == 0 || asking.length == 0) {
+        if (biding.length == 0 || asking.length == 0) {
             revert InvalidAssetsLength();
         }
 
-        return Swap(owner, expiry, assets, asking);
+        return Swap(owner, expiry, biding, asking);
     }
 
     function composeSwap(
