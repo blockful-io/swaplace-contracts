@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {ISwap} from "./interfaces/ISwap.sol";
+import {ISwap} from "./interfaces/swaps/ISwap.sol";
 
 /**
  * @title SwapFactory
  * @author 0xneves | @blockful_io
  * @notice Factory contract to assist when creating swaps.
  */
-abstract contract SwapFactory is ISwap {
+contract SwapFactory is ISwap {
     /**
      * @notice Create a new asset.
      * @param addr - The address of the asset.
@@ -75,5 +75,84 @@ abstract contract SwapFactory is ISwap {
         Asset[] memory asking
     ) public pure returns (TimedPvtSwap memory) {
         return TimedPvtSwap(allowed, expiry, biding, asking);
+    }
+
+    function composeBaseSwap(
+        address[] memory addrs,
+        uint256[] memory amountOrId,
+        uint256 bidLength
+    ) public pure returns (BaseSwap memory) {
+        (Asset[] memory biding, Asset[] memory asking) = composeAsset(
+            addrs,
+            amountOrId,
+            bidLength
+        );
+        return makeBaseSwap(biding, asking);
+    }
+
+    function composePvtSwap(
+        address allowed,
+        address[] memory addrs,
+        uint256[] memory amountOrId,
+        uint256 bidLength
+    ) public pure returns (PvtSwap memory) {
+        (Asset[] memory biding, Asset[] memory asking) = composeAsset(
+            addrs,
+            amountOrId,
+            bidLength
+        );
+        return makePvtSwap(allowed, biding, asking);
+    }
+
+    function composeTimedSwap(
+        uint256 expiry,
+        address[] memory addrs,
+        uint256[] memory amountOrId,
+        uint256 bidLength
+    ) public pure returns (TimedSwap memory) {
+        (Asset[] memory biding, Asset[] memory asking) = composeAsset(
+            addrs,
+            amountOrId,
+            bidLength
+        );
+        return makeTimedSwap(expiry, biding, asking);
+    }
+
+    function composeTimedPvtSwap(
+        address allowed,
+        uint256 expiry,
+        address[] memory addrs,
+        uint256[] memory amountOrId,
+        uint256 bidLength
+    ) public pure returns (TimedPvtSwap memory) {
+        (Asset[] memory biding, Asset[] memory asking) = composeAsset(
+            addrs,
+            amountOrId,
+            bidLength
+        );
+        return makeTimedPvtSwap(allowed, expiry, biding, asking);
+    }
+
+    function composeAsset(
+        address[] memory addrs,
+        uint256[] memory amountOrId,
+        uint256 bidLength
+    ) public pure returns (Asset[] memory, Asset[] memory) {
+        Asset[] memory biding = new Asset[](bidLength);
+        for (uint256 i = 0; i < bidLength; ) {
+            biding[i] = makeAsset(addrs[i], amountOrId[i]);
+            unchecked {
+                i++;
+            }
+        }
+
+        Asset[] memory asking = new Asset[](addrs.length - bidLength);
+        for (uint256 i = bidLength; i < addrs.length; ) {
+            asking[i - bidLength] = makeAsset(addrs[i], amountOrId[i]);
+            unchecked {
+                i++;
+            }
+        }
+        return (biding, asking);
     }
 }

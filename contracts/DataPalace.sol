@@ -13,7 +13,7 @@ import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
  *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
  *
  * @title Data Palace
- * @author @dizzyaxis | @blockful_io
+ * @author @0xneves | @blockful_io
  * @dev - This contract is a little bit odd. It's a contract that calls itself to execute anything
  * for anyones that codes for it. Its an shared/personal public allowance place for function calls.
  *
@@ -28,11 +28,11 @@ import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
  * This contract has no owner and cannot be upgraded or altered in any way.
  */
 
-abstract contract DataPalace is Multicall {
-    // The id of the call. It will be incremented on every new call.
-    uint256 public id = 0;
+contract DataPalace is Multicall {
+    /// The id of the call. It will be incremented on every new call.
+    uint256 public callId;
 
-    // The mapping holding all possible calldata combinations.
+    /// The mapping holding all possible calldata combinations.
     mapping(uint256 => bytes) private datas;
 
     /**
@@ -49,13 +49,13 @@ abstract contract DataPalace is Multicall {
      */
     function save(bytes calldata _data) external returns (uint256) {
         unchecked {
-            id++;
+            callId++;
         }
 
-        datas[id] = _data;
-        emit Saved(id, msg.sender);
+        datas[callId] = _data;
+        emit Saved(callId, msg.sender);
 
-        return id;
+        return callId;
     }
 
     /**
@@ -63,7 +63,7 @@ abstract contract DataPalace is Multicall {
      * @param _id - The id of the saved calldata.
      * @return - The calldata for the specific call.
      */
-    function data(uint256 _id) public view returns (bytes memory) {
+    function data(uint256 _id) external view returns (bytes memory) {
         return datas[_id];
     }
 }
