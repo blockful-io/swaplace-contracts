@@ -6,7 +6,7 @@ import {ISwap} from "./ISwap.sol";
 interface ISwapFactory {
     function makeAsset(
         address addr,
-        uint256 amountOrId,
+        uint256 amountOrCallOrId,
         ISwap.AssetType assetType
     ) external pure returns (ISwap.Asset memory);
 
@@ -21,7 +21,7 @@ interface ISwapFactory {
         address owner,
         uint256 expiry,
         address[] memory addrs,
-        uint256[] memory amountOrId,
+        uint256[] memory amountOrCallOrId,
         ISwap.AssetType[] memory assetTypes,
         uint256 indexFlipToAsking
     ) external pure returns (ISwap.Swap memory);

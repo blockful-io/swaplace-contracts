@@ -5,6 +5,6 @@ interface ITransfer {
     function transferFrom(
         address from,
         address to,
-        uint256 amountOrId
+        uint256 amountOrCallOrId
     ) external;
 }

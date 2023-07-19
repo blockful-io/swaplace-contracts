@@ -4,7 +4,6 @@ pragma solidity ^0.8.17;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import {SwapFactory} from "./SwapFactory.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
@@ -13,7 +12,7 @@ import {ITransfer} from "./interfaces/ITransfer.sol";
 error InvalidAddressForOwner(address caller);
 error InvalidAssetsLength();
 error InvalidExpiryDate(uint256 timestamp);
-error InvalidFunctionCall(bytes reason);
+error InvalidFunctionCall(bytes reason)
 
 /**
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -25,21 +24,22 @@ error InvalidFunctionCall(bytes reason);
  *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
  *
  * @title Swaplace
- * @author @0xneves | @blockful_io
+ * @author @dizzyaxis | @blockful_io
  * @dev - Swaplace is a decentralized Feeless DEX for ERC20 and ERC721 tokens.
  * It allows users to propose and accept swaps. It won't handle allowances, only transfers.
  */
-contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
+contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     uint256 public swapId = 0;
 
     mapping(uint256 => Swap) private swaps;
+    mapping(uint256 => Swap) private pv;
 
     function createSwap(Swap calldata swap) public returns (uint256) {
         if (swap.owner == address(0) || swap.owner != msg.sender) {
             revert InvalidAddressForOwner(swap.owner);
         }
 
-        if (swap.expiry < 1 days) {
+        if (swap.expiry < 1) {
             revert InvalidExpiryDate(swap.expiry);
         }
 
@@ -57,12 +57,42 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
         return swapId;
     }
 
-    function acceptTokenSwap(uint256 id) public nonReentrant {
+    function createSwap(
+        address owner,
+        uint256 expiry,
+        Asset[] calldata biding,
+        Asset[] calldata asking
+    ) public returns (uint256) {
+        if (owner == address(0) || owner != msg.sender) {
+            revert InvalidAddressForOwner(owner);
+        }
+
+        if (expiry < 0) {
+            revert InvalidExpiryDate(expiry);
+        }
+
+        if (biding.length == 0 || asking.length == 0) {
+            revert InvalidAssetsLength();
+        }
+
+        unchecked {
+            swapId++;
+        }
+
+        swaps[swapId] = Swap(owner, expiry, biding, asking);
+        swaps[swapId].expiry = expiry + block.timestamp;
+
+        return swapId;
+    }
+
+    function acceptSwap(uint256 id) public {
         Swap memory swap = swaps[id];
 
         if (swap.expiry < block.timestamp) {
             revert InvalidExpiryDate(swap.expiry);
         }
+
+        swaps[id].expiry = 0;
 
         Asset[] memory assets = swap.asking;
 
@@ -70,7 +100,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
             ITransfer(assets[i].addr).transferFrom(
                 msg.sender,
                 swap.owner,
-                assets[i].amountOrId
+                assets[i].amountOrCallOrId
             );
             unchecked {
                 i++;
@@ -83,52 +113,13 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
             ITransfer(assets[i].addr).transferFrom(
                 swap.owner,
                 msg.sender,
-                assets[i].amountOrId
+                assets[i].amountOrCallOrId
             );
             unchecked {
                 i++;
             }
         }
-
-        swaps[id].expiry = 0;
     }
-
-    // function acceptCallSwap(uint256 id) public nonReentrant {
-    //     Swap memory swap = swaps[id];
-
-    //     if (swap.expiry < block.timestamp) {
-    //         revert InvalidExpiryDate(swap.expiry);
-    //     }
-
-    //     Asset[] memory assets = swap.asking;
-
-    //     for (uint256 i = 0; i < assets.length; ) {
-    //         (bool success, bytes memory reason) = assets[i].addr.call(
-    //             executions[bytes32(assets[i].amountOrIdOrCall)]
-    //         );
-
-    //         if (!success) {
-    //             revert FunctionCallFailedWithReason(reason);
-    //         }
-    //         unchecked {
-    //             i++;
-    //         }
-    //     }
-
-    //     assets = swap.biding;
-
-    //     for (uint256 i = 0; i < assets.length; ) {
-    //         (bool success, bytes memory reason) = assets[i].addr.call(
-    //             executions[bytes32(assets[i].amountOrIdOrCall)]
-    //         );
-
-    //         if (!success) {
-    //             revert FunctionCallFailedWithReason(reason);
-    //         }
-    //     }
-
-    //     swaps[id].expiry = 0;
-    // }
 
     function cancelSwap(uint256 id) public {
         Swap memory swap = swaps[id];
@@ -142,6 +133,43 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165, ReentrancyGuard {
         }
 
         swaps[id].expiry = 0;
+    }
+
+    function acceptCallSwap(uint256 id) public {
+        Swap memory swap = swaps[id];
+
+        if (swap.expiry < block.timestamp) {
+            revert InvalidExpiryDate(swap.expiry);
+        }
+
+        swaps[id].expiry = 0;
+
+        Asset[] memory assets = swap.asking;
+
+        for (uint256 i = 0; i < assets.length; ) {
+            (bool success, bytes memory reason) = assets[i].addr.call(
+                assets[i].amountOrCallOrId
+            );
+
+            if (!success) {
+                revert InvalidFunctionCall(reason);
+            }
+            unchecked {
+                i++;
+            }
+        }
+
+        assets = swap.biding;
+
+        for (uint256 i = 0; i < assets.length; ) {
+            (bool success, bytes memory reason) = assets[i].addr.call(
+                assets[i].amountOrCallOrId
+            );
+
+            if (!success) {
+                revert InvalidFunctionCall(reason);
+            }
+        }
     }
 
     function getSwap(uint256 id) public view returns (Swap memory) {
