@@ -7,8 +7,24 @@ interface ISwap {
         uint256 amountOrCallOrId;
     }
 
-    struct Swap {
-        address owner;
+    struct BaseSwap {
+        Asset[] biding;
+        Asset[] asking;
+    }
+
+    struct PvtSwap {
+        address allowed;
+        Asset[] biding;
+        Asset[] asking;
+    }
+
+    struct TimedSwap {
+        uint256 expiry;
+        Asset[] biding;
+        Asset[] asking;
+    }
+
+    struct TimedPvtSwap {
         address allowed;
         uint256 expiry;
         Asset[] biding;
