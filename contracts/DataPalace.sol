@@ -28,9 +28,9 @@ import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
  * This contract has no owner and cannot be upgraded or altered in any way.
  */
 
-contract DataPalace is Multicall {
-    /// The id of the call. It will be incremented on every new call.
-    uint256 public callId;
+abstract contract DataPalace is Multicall {
+    // The id of the call It will be incremented on every new call.
+    uint256 public callId = 0;
 
     /// The mapping holding all possible calldata combinations.
     mapping(uint256 => bytes) private datas;
