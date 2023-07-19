@@ -9,29 +9,33 @@ import "hardhat-gas-reporter";
 import dotenv from "dotenv";
 dotenv.config();
 
-const { GOERLI, ETH, PRIVATE_KEY, PRIVATE_KEY_USER, POLYSCAN } = process.env;
+const { MUMBAI, SEPOLIA, PKEY_DEPLOYER, POLYSCAN } = process.env;
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
-  defaultNetwork: "hardhat",
-  // gasReporter: {
-  //   enabled: true,
-  // },
-  // etherscan: {
-  //   apiKey: `${POLYSCAN}`,
-  // },
-  networks: {
-    // hardhat: {
-    //   forking: {
-    //     url: `${ETH}`,
-    //     blockNumber: 16031313,
-    //   },
-    // },
-    // goerli: {
-    //   url: `${GOERLI}`,
-    //   accounts: [`${PRIVATE_KEY}`, `${PRIVATE_KEY_USER}`],
-    // },
-  },
+	solidity: "0.8.17",
+	defaultNetwork: "hardhat",
+	// gasReporter: {
+	//   enabled: true,
+	// },
+	etherscan: {
+		apiKey: `${POLYSCAN}`,
+	},
+	networks: {
+		// hardhat: {
+		//   forking: {
+		//     url: `${ETH}`,
+		//     blockNumber: 16031313,
+		//   },
+		// },
+		mumbai: {
+			url: `${MUMBAI}`,
+			accounts: [`${PKEY_DEPLOYER}`],
+		},
+		sepolia: {
+			url: `${SEPOLIA}`,
+			accounts: [`${PKEY_DEPLOYER}`],
+		},
+	},
 };
 
 export default config;
