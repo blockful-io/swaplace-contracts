@@ -97,44 +97,6 @@ contract Swaplace is SwapFactory, DataPalace, ISwaplace, IERC165 {
         }
     }
 
-    function acceptCallSwap(uint256 id) public {
-        Swap memory swap = swaps[id];
-
-        if (swap.expiry < block.timestamp) {
-            revert InvalidExpiryDate(swap.expiry);
-        }
-
-        swaps[id].expiry = 0;
-
-        Asset[] memory assets = swap.asking;
-
-        for (uint256 i = 0; i < assets.length; ) {
-            (bool success, bytes memory reason) = assets[i].addr.call(
-                data(assets[i].amountOrCallOrId)
-            );
-            if (!success) {
-                revert InvalidFunctionCall(reason);
-            }
-            unchecked {
-                i++;
-            }
-        }
-
-        assets = swap.biding;
-
-        for (uint256 i = 0; i < assets.length; ) {
-            (bool success, bytes memory reason) = assets[i].addr.call(
-                data(assets[i].amountOrCallOrId)
-            );
-            if (!success) {
-                revert InvalidFunctionCall(reason);
-            }
-            unchecked {
-                i++;
-            }
-        }
-    }
-
     function cancelSwap(uint256 id) public {
         Swap memory swap = swaps[id];
 

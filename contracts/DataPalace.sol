@@ -29,8 +29,8 @@ import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
  */
 
 abstract contract DataPalace is Multicall {
-    // The id of the call. It will be incremented on every new call.
-    uint256 public id = 0;
+    // The id of the call It will be incremented on every new call.
+    uint256 public callId = 0;
 
     // The mapping holding all possible calldata combinations.
     mapping(uint256 => bytes) private datas;
@@ -49,13 +49,13 @@ abstract contract DataPalace is Multicall {
      */
     function save(bytes calldata _data) external returns (uint256) {
         unchecked {
-            id++;
+            callId++;
         }
 
-        datas[id] = _data;
-        emit Saved(id, msg.sender);
+        datas[callId] = _data;
+        emit Saved(callId, msg.sender);
 
-        return id;
+        return callId;
     }
 
     /**
