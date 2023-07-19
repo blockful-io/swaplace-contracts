@@ -12,6 +12,7 @@ interface ISwapFactory {
 
     function makeSwap(
         address owner,
+        address allowed,
         uint256 expiry,
         ISwap.Asset[] memory assets,
         ISwap.Asset[] memory asking
@@ -19,6 +20,7 @@ interface ISwapFactory {
 
     function composeSwap(
         address owner,
+        address allowed,
         uint256 expiry,
         address[] memory addrs,
         uint256[] memory amountOrCallOrId,

@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import {ISwap} from "./interfaces/ISwap.sol";
 import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 
-error InvalidAddressForOwner(address caller);
+error InvalidAddress(address caller);
 error InvalidAmount(uint256 amount);
 error InvalidAssetsLength();
 error InvalidAssetType(uint256 assetType);
@@ -35,7 +35,11 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         uint256 amountOrCallOrId,
         AssetType assetType
     ) public pure returns (Asset memory) {
-        if (assetType != AssetType.ERC20 && assetType != AssetType.ERC721) {
+        if (
+            assetType != AssetType.ERC20 &&
+            assetType != AssetType.ERC721 &&
+            assetType != AssetType.CALL
+        ) {
             revert InvalidAssetType(uint256(assetType));
         }
 
@@ -48,15 +52,16 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
 
     function makeSwap(
         address owner,
+        address allowed,
         uint256 expiry,
         Asset[] memory biding,
         Asset[] memory asking
     ) public pure returns (Swap memory) {
         if (owner == address(0)) {
-            revert InvalidAddressForOwner(address(0));
+            revert InvalidAddress(address(0));
         }
 
-        if (expiry < 0) {
+        if (expiry == 0) {
             revert InvalidExpiryDate(expiry);
         }
 
@@ -64,11 +69,12 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
             revert InvalidAssetsLength();
         }
 
-        return Swap(owner, expiry, biding, asking);
+        return Swap(owner, allowed, expiry, biding, asking);
     }
 
     function composeSwap(
         address owner,
+        address allowed,
         uint256 expiry,
         address[] memory addrs,
         uint256[] memory amountOrCallOrId,
@@ -106,6 +112,6 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
             }
         }
 
-        return makeSwap(owner, expiry, biding, asking);
+        return makeSwap(owner, allowed, expiry, biding, asking);
     }
 }

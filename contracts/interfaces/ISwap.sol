@@ -16,6 +16,7 @@ interface ISwap {
 
     struct Swap {
         address owner;
+        address allowed;
         uint256 expiry;
         Asset[] biding;
         Asset[] asking;
