@@ -42,22 +42,20 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to build assets for { ERC20, ERC721 }", async function () {
-		const erc20 = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
+		const erc20 = await Swaplace.makeAsset(MockERC20.address, 1000);
 		expect(erc20[0].toString()).to.be.equals(MockERC20.address);
 		expect(erc20[1].toString()).to.be.equals("1000");
-		expect(erc20[2].toString()).to.be.equals("0");
 
-		const erc721 = await Swaplace.makeAsset(MockERC721.address, 1, 1);
+		const erc721 = await Swaplace.makeAsset(MockERC721.address, 1);
 		expect(erc721[0].toString()).to.be.equals(MockERC721.address);
 		expect(erc721[1].toString()).to.be.equals("1");
-		expect(erc721[2].toString()).to.be.equals("1");
 	});
 
 	it("Should be able to build swaps with one item for both { ERC20, ERC721 }", async function () {
 		const expiry = day * 2;
 
-		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
-		const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
+		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000);
+		const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1);
 
 		const ERC20Swap = await Swaplace.makeSwap(
 			owner.address,
@@ -88,8 +86,8 @@ describe("Swaplace", async function () {
 	it("Should be able to build composed swap containing both { ERC20, ERC721 }", async function () {
 		const expiry = day * 2;
 
-		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
-		const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1, 0);
+		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000);
+		const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1);
 
 		const swap = await Swaplace.makeSwap(
 			owner.address,
@@ -152,25 +150,10 @@ describe("Swaplace", async function () {
 		expect(swap[4][0].toString()).to.be.equals(askingAsset.toString());
 	});
 
-	it("Should revert while building asset with invalid asset type", async function () {
-		const invalidAssetType = 3;
-		await expect(Swaplace.makeAsset(MockERC20.address, 1000, invalidAssetType))
-			.to.be.reverted;
-	});
-
-	it("Should revert while building asset with zero amount as type ERC20, but not for ERC721", async function () {
-		await expect(
-			Swaplace.makeAsset(MockERC20.address, 0, 0)
-		).to.be.revertedWithCustomError(Swaplace, "InvalidAmount");
-
-		await expect(Swaplace.makeAsset(MockERC721.address, 0, 1)).to.not.be
-			.reverted;
-	});
-
 	it("Should revert while building swap without minimum expiry period", async function () {
 		const expiry = 0;
 
-		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000, 0);
+		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000);
 
 		await expect(
 			Swaplace.makeSwap(
