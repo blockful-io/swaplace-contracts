@@ -69,7 +69,6 @@ Easily create and return the Asset type to use in your Swap by calling this func
 struct Asset {
     address addr;
     uint256 amountOrCallOrId;
-    AssetType assetType;
 }
 ```
 
@@ -91,7 +90,6 @@ function composeSwap(
     uint256 expiry,
     address[] memory addrs,
     uint256[] memory amountsOrIdsOrCalls,
-    AssetType[] memory assetTypes,
     uint256 indexFlipToAsking
 ) public pure returns (Swap memory)
 ```

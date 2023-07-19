@@ -7,13 +7,8 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 error InvalidAddress(address caller);
 error InvalidAmount(uint256 amount);
 error InvalidAssetsLength();
-error InvalidAssetType(uint256 assetType);
 error InvalidExpiryDate(uint256 timestamp);
-error InvalidMismatchingLengths(
-    uint256 addr,
-    uint256 amountOrCallOrId,
-    uint256 assetType
-);
+error InvalidMismatchingLengths(uint256 addr, uint256 amountOrCallOrId);
 
 /**
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -32,22 +27,9 @@ error InvalidMismatchingLengths(
 abstract contract SwapFactory is ISwapFactory, ISwap {
     function makeAsset(
         address addr,
-        uint256 amountOrCallOrId,
-        AssetType assetType
+        uint256 amountOrCallOrId
     ) public pure returns (Asset memory) {
-        if (
-            assetType != AssetType.ERC20 &&
-            assetType != AssetType.ERC721 &&
-            assetType != AssetType.CALL
-        ) {
-            revert InvalidAssetType(uint256(assetType));
-        }
-
-        if (assetType == AssetType.ERC20 && amountOrCallOrId == 0) {
-            revert InvalidAmount(amountOrCallOrId);
-        }
-
-        return Asset(addr, amountOrCallOrId, assetType);
+        return Asset(addr, amountOrCallOrId);
     }
 
     function makeSwap(
@@ -78,23 +60,18 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         uint256 expiry,
         address[] memory addrs,
         uint256[] memory amountOrCallOrId,
-        AssetType[] memory assetTypes,
         uint256 bidFlipAsk
     ) public pure returns (Swap memory) {
-        if (
-            addrs.length != amountOrCallOrId.length ||
-            addrs.length != assetTypes.length
-        ) {
+        if (addrs.length != amountOrCallOrId.length) {
             revert InvalidMismatchingLengths(
                 addrs.length,
-                amountOrCallOrId.length,
-                assetTypes.length
+                amountOrCallOrId.length
             );
         }
 
         Asset[] memory biding = new Asset[](bidFlipAsk);
         for (uint256 i = 0; i < bidFlipAsk; ) {
-            biding[i] = makeAsset(addrs[i], amountOrCallOrId[i], assetTypes[i]);
+            biding[i] = makeAsset(addrs[i], amountOrCallOrId[i]);
             unchecked {
                 i++;
             }
@@ -102,11 +79,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
 
         Asset[] memory asking = new Asset[](addrs.length - bidFlipAsk);
         for (uint256 i = bidFlipAsk; i < addrs.length; ) {
-            asking[i - bidFlipAsk] = makeAsset(
-                addrs[i],
-                amountOrCallOrId[i],
-                assetTypes[i]
-            );
+            asking[i - bidFlipAsk] = makeAsset(addrs[i], amountOrCallOrId[i]);
             unchecked {
                 i++;
             }

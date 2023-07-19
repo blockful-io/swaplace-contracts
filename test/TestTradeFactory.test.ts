@@ -119,7 +119,6 @@ describe("Swaplace", async function () {
 			MockERC721.address,
 		];
 		const assetsAmountsOrId = [1000, 1, 2];
-		const assetTypes = [0, 1, 1]; // 0 = ERC20, 1 = ERC721
 
 		const swap = await Swaplace.composeSwap(
 			owner.address,
@@ -127,7 +126,6 @@ describe("Swaplace", async function () {
 			expiry,
 			assetsContractAddrs,
 			assetsAmountsOrId,
-			assetTypes,
 			indexFlipSide
 		);
 
@@ -136,20 +134,17 @@ describe("Swaplace", async function () {
 
 		const firstBid = await Swaplace.makeAsset(
 			assetsContractAddrs[0],
-			assetsAmountsOrId[0],
-			assetTypes[0]
+			assetsAmountsOrId[0]
 		);
 
 		const secondBid = await Swaplace.makeAsset(
 			assetsContractAddrs[1],
-			assetsAmountsOrId[1],
-			assetTypes[1]
+			assetsAmountsOrId[1]
 		);
 
 		const askingAsset = await Swaplace.makeAsset(
 			assetsContractAddrs[2],
-			assetsAmountsOrId[2],
-			assetTypes[2]
+			assetsAmountsOrId[2]
 		);
 
 		expect(swap[3][0].toString()).to.be.equals(firstBid.toString());
@@ -193,7 +188,6 @@ describe("Swaplace", async function () {
 
 		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
 		const assetsAmountsOrId = [1000, 1];
-		const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
 		await expect(
 			Swaplace.composeSwap(
@@ -202,7 +196,6 @@ describe("Swaplace", async function () {
 				expiry,
 				assetsContractAddrs,
 				assetsAmountsOrId,
-				assetTypes,
 				1
 			)
 		).to.be.revertedWithCustomError(Swaplace, "InvalidAddress");
@@ -213,7 +206,6 @@ describe("Swaplace", async function () {
 
 		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
 		const assetsAmountsOrId = [1000, 1];
-		const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
 		const swap = await Swaplace.composeSwap(
 			acceptee.address,
@@ -221,7 +213,6 @@ describe("Swaplace", async function () {
 			expiry,
 			assetsContractAddrs,
 			assetsAmountsOrId,
-			assetTypes,
 			1
 		);
 
@@ -239,7 +230,6 @@ describe("Swaplace", async function () {
 
 		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
 		const assetsAmountsOrId = [1000, 1];
-		const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
 		await expect(
 			Swaplace.composeSwap(
@@ -248,7 +238,6 @@ describe("Swaplace", async function () {
 				expiry,
 				assetsContractAddrs,
 				assetsAmountsOrId,
-				assetTypes,
 				indexFlipSide
 			)
 		).to.be.revertedWithCustomError(Swaplace, "InvalidAssetsLength");
@@ -262,7 +251,6 @@ describe("Swaplace", async function () {
 				expiry,
 				assetsContractAddrs,
 				assetsAmountsOrId,
-				assetTypes,
 				indexFlipSide
 			)
 		).to.be.revertedWithCustomError(Swaplace, "InvalidAssetsLength");
@@ -273,7 +261,6 @@ describe("Swaplace", async function () {
 
 		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
 		const assetsAmountsOrId = [1000, 1, 999];
-		const assetTypes = [0, 1]; // 0 = ERC20, 1 = ERC721
 
 		await expect(
 			Swaplace.composeSwap(
@@ -282,7 +269,6 @@ describe("Swaplace", async function () {
 				expiry,
 				assetsContractAddrs,
 				assetsAmountsOrId,
-				assetTypes,
 				1
 			)
 		).to.be.revertedWithCustomError(Swaplace, "InvalidMismatchingLengths");

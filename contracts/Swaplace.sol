@@ -30,7 +30,7 @@ error InvalidFunctionCall(bytes reason);
  * It allows users to propose and accept swaps. It won't handle allowances, only transfers.
  */
 contract Swaplace is SwapFactory, DataPalace, ISwaplace, IERC165 {
-    uint256 public swapId = 0;
+    uint256 public swapId;
 
     mapping(uint256 => Swap) private swaps;
 
