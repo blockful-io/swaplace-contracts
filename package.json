@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-etherscan": "^3.1.5",
     "@nomiclabs/hardhat-solhint": "^3.0.0",
@@ -20,7 +21,6 @@
     "@types/mocha": "^10.0.1",
     "chai": "^4.3.4",
     "dotenv": "^16.0.3",
-    "erc165": "https://github.com/blockful-io/erc165",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.6.1",
     "hardhat-gas-reporter": "^1.0.9",
