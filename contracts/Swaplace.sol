@@ -15,19 +15,16 @@ error InvalidAssetsLength();
 error InvalidExpiryDate(uint256 timestamp);
 error InvalidFunctionCall(bytes reason);
 
-/**
- *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
- * |\   __  \ |\  \      |\   __  \ |\   ____\ |\  \|\  \  |\  _____\|\  \|\  \ |\  \
- * \ \  \|\ /_\ \  \     \ \  \|\  \\ \  \___| \ \  \/  /|_\ \  \__/ \ \  \\\  \\ \  \
- *  \ \   __  \\ \  \     \ \  \\\  \\ \  \     \ \   ___  \\ \   __\ \ \  \\\  \\ \  \
- *   \ \  \|\  \\ \  \____ \ \  \\\  \\ \  \____ \ \  \\ \  \\ \  \_|  \ \  \\\  \\ \  \____
- *    \ \_______\\ \_______\\ \_______\\ \_______\\ \__\\ \__\\ \__\    \ \_______\\ \_______\
- *     \|_______| \|_______| \|_______| \|_______| \|__| \|__| \|__|     \|_______| \|_______|
- *
+/**  ___ _    ___   ___ _  _____ _   _ _
+ *  | _ ) |  / _ \ / __| |/ / __| | | | |
+ *  | _ \ |_| (_) | (__| ' <| _|| |_| | |__
+ *  |___/____\___/ \___|_|\_\_|  \___/|____|
  * @title Swaplace
- * @author @dizzyaxis | @blockful_io
- * @dev - Swaplace is a decentralized Feeless DEX for ERC20 and ERC721 tokens.
- * It allows users to propose and accept swaps. It won't handle allowances, only transfers.
+ * @author @0xneves | @blockful_io
+ * @dev - Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stoped.
+ * Its core idea is to facilitate swaps between virtual assets following the ERC standard.
+ * Users can propose or accept swaps by allowing Swaplace to move their assets using the
+ * `approve` function of the Token standard or `permit` if available.
  */
 contract Swaplace is SwapFactory, DataPalace, ISwaplace, IERC165 {
     uint256 public swapId;
