@@ -76,7 +76,7 @@ contract Swaplace is SwapFactory, DataPalace, ISwaplace, IERC165 {
             ITransfer(assets[i].addr).transferFrom(
                 msg.sender,
                 swap.owner,
-                assets[i].amountOrCallOrId
+                assets[i].amountOrId
             );
             unchecked {
                 i++;
@@ -89,7 +89,7 @@ contract Swaplace is SwapFactory, DataPalace, ISwaplace, IERC165 {
             ITransfer(assets[i].addr).transferFrom(
                 swap.owner,
                 msg.sender,
-                assets[i].amountOrCallOrId
+                assets[i].amountOrId
             );
             unchecked {
                 i++;

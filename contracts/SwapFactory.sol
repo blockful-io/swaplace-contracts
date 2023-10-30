@@ -8,7 +8,7 @@ error InvalidAddress(address caller);
 error InvalidAmount(uint256 amount);
 error InvalidAssetsLength();
 error InvalidExpiryDate(uint256 timestamp);
-error InvalidMismatchingLengths(uint256 addr, uint256 amountOrCallOrId);
+error InvalidMismatchingLengths(uint256 addr, uint256 amountOrId);
 
 /**
  *  ________   ___        ________   ________   ___  __     ________  ___  ___   ___
@@ -27,9 +27,9 @@ error InvalidMismatchingLengths(uint256 addr, uint256 amountOrCallOrId);
 abstract contract SwapFactory is ISwapFactory, ISwap {
     function makeAsset(
         address addr,
-        uint256 amountOrCallOrId
+        uint256 amountOrId
     ) public pure returns (Asset memory) {
-        return Asset(addr, amountOrCallOrId);
+        return Asset(addr, amountOrId);
     }
 
     function makeSwap(
@@ -59,19 +59,16 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         address allowed,
         uint256 expiry,
         address[] memory addrs,
-        uint256[] memory amountOrCallOrId,
+        uint256[] memory amountOrId,
         uint256 bidFlipAsk
     ) public pure returns (Swap memory) {
-        if (addrs.length != amountOrCallOrId.length) {
-            revert InvalidMismatchingLengths(
-                addrs.length,
-                amountOrCallOrId.length
-            );
+        if (addrs.length != amountOrId.length) {
+            revert InvalidMismatchingLengths(addrs.length, amountOrId.length);
         }
 
         Asset[] memory biding = new Asset[](bidFlipAsk);
         for (uint256 i = 0; i < bidFlipAsk; ) {
-            biding[i] = makeAsset(addrs[i], amountOrCallOrId[i]);
+            biding[i] = makeAsset(addrs[i], amountOrId[i]);
             unchecked {
                 i++;
             }
@@ -79,7 +76,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
 
         Asset[] memory asking = new Asset[](addrs.length - bidFlipAsk);
         for (uint256 i = bidFlipAsk; i < addrs.length; ) {
-            asking[i - bidFlipAsk] = makeAsset(addrs[i], amountOrCallOrId[i]);
+            asking[i - bidFlipAsk] = makeAsset(addrs[i], amountOrId[i]);
             unchecked {
                 i++;
             }

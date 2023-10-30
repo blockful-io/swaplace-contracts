@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 interface ISwap {
     struct Asset {
         address addr;
-        uint256 amountOrCallOrId;
+        uint256 amountOrId;
     }
 
     struct Swap {
