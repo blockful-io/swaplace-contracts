@@ -68,7 +68,7 @@ Easily create and return the Asset type to use in your Swap by calling this func
 ```solidity
 struct Asset {
     address addr;
-    uint256 amountOrCallOrId;
+    uint256 amountOrId;
 }
 ```
 
