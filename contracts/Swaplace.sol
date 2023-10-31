@@ -5,15 +5,12 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import {DataPalace} from "./DataPalace.sol";
-import {SwapFactory} from "./SwapFactory.sol";
+import {IErrors} from "./interfaces/IErrors.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
 
-error InvalidAddress(address caller);
-error InvalidAssetsLength();
-error InvalidExpiryDate(uint256 timestamp);
-error InvalidFunctionCall(bytes reason);
+import {DataPalace} from "./DataPalace.sol";
+import {SwapFactory} from "./SwapFactory.sol";
 
 /**  ___ _    ___   ___ _  _____ _   _ _
  *  | _ ) |  / _ \ / __| |/ / __| | | | |
@@ -25,7 +22,7 @@ error InvalidFunctionCall(bytes reason);
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
  * `approve` function of the Token standard or `permit` if available.
  */
-contract Swaplace is SwapFactory, DataPalace, ISwaplace, IERC165 {
+contract Swaplace is SwapFactory, DataPalace, ISwaplace, IErrors, IERC165 {
     uint256 public swapId;
 
     mapping(uint256 => Swap) private swaps;
