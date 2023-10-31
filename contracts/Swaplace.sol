@@ -31,7 +31,7 @@ contract Swaplace is SwapFactory, DataPalace, ISwaplace, IERC165 {
     mapping(uint256 => Swap) private swaps;
 
     function createSwap(Swap calldata swap) public returns (uint256) {
-        if (swap.owner == address(0) || swap.owner != msg.sender) {
+        if (swap.owner != msg.sender) {
             revert InvalidAddress(swap.owner);
         }
 
