@@ -38,12 +38,12 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         uint256 expiry,
         Asset[] memory biding,
         Asset[] memory asking
-    ) public pure returns (Swap memory) {
+    ) public view returns (Swap memory) {
         if (owner == address(0)) {
             revert InvalidAddress(address(0));
         }
 
-        if (expiry == 0) {
+        if (expiry < block.timestamp) {
             revert InvalidExpiryDate(expiry);
         }
 
@@ -61,7 +61,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         address[] memory addrs,
         uint256[] memory amountOrId,
         uint256 bidFlipAsk
-    ) public pure returns (Swap memory) {
+    ) public view returns (Swap memory) {
         if (addrs.length != amountOrId.length) {
             revert InvalidMismatchingLengths(addrs.length, amountOrId.length);
         }

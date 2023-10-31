@@ -52,7 +52,8 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to build swaps with one item for both { ERC20, ERC721 }", async function () {
-		const expiry = day * 2;
+		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
+		const expiry = timestamp + day * 2;
 
 		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000);
 		const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1);
@@ -84,7 +85,8 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to build composed swap containing both { ERC20, ERC721 }", async function () {
-		const expiry = day * 2;
+		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
+		const expiry = timestamp + day * 2;
 
 		const ERC20Asset = await Swaplace.makeAsset(MockERC20.address, 1000);
 		const ERC721Asset = await Swaplace.makeAsset(MockERC721.address, 1);
@@ -106,7 +108,8 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to compose a swap in a single function for both { ERC20, ERC721 }", async function () {
-		const expiry = day * 2;
+		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
+		const expiry = timestamp + day * 2;
 
 		// The point in the asset index that we'll flip from bid to ask
 		const indexFlipSide = 2;
@@ -167,7 +170,8 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while building swap with 'owner' as address zero", async function () {
-		const expiry = day * 2;
+		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
+		const expiry = timestamp + day * 2;
 
 		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
 		const assetsAmountsOrId = [1000, 1];
@@ -185,7 +189,8 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while creating swaps not belonging to msg.sender", async function () {
-		const expiry = day * 2;
+		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
+		const expiry = timestamp + day * 2;
 
 		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
 		const assetsAmountsOrId = [1000, 1];
@@ -206,7 +211,8 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while creating swap with empty assets", async function () {
-		const expiry = day * 2;
+		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
+		const expiry = timestamp + day * 2;
 
 		// The point in the asset index that we'll flip from bid to ask
 		let indexFlipSide = 0;
@@ -240,7 +246,8 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while composing swap with mismatching inputs length", async function () {
-		const expiry = day * 2;
+		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
+		const expiry = timestamp + day * 2;
 
 		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
 		const assetsAmountsOrId = [1000, 1, 999];
