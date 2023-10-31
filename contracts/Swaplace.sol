@@ -29,7 +29,7 @@ contract Swaplace is SwapFactory, DataPalace, ISwaplace, IErrors, IERC165 {
 
     function createSwap(Swap calldata swap) public returns (uint256) {
         if (swap.owner != msg.sender) {
-            revert InvalidAddress(swap.owner);
+            revert InvalidAddress(msg.sender);
         }
 
         if (swap.expiry < block.timestamp) {
