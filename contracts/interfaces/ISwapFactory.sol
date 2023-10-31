@@ -15,7 +15,7 @@ interface ISwapFactory {
         uint256 expiry,
         ISwap.Asset[] memory assets,
         ISwap.Asset[] memory asking
-    ) external pure returns (ISwap.Swap memory);
+    ) external view returns (ISwap.Swap memory);
 
     function composeSwap(
         address owner,
@@ -24,5 +24,5 @@ interface ISwapFactory {
         address[] memory addrs,
         uint256[] memory amountOrId,
         uint256 indexFlipToAsking
-    ) external pure returns (ISwap.Swap memory);
+    ) external view returns (ISwap.Swap memory);
 }

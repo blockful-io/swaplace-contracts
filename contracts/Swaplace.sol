@@ -32,7 +32,7 @@ contract Swaplace is SwapFactory, DataPalace, ISwaplace, IErrors, IERC165 {
             revert InvalidAddress(swap.owner);
         }
 
-        if (swap.expiry == 0) {
+        if (swap.expiry < block.timestamp) {
             revert InvalidExpiryDate(swap.expiry);
         }
 
@@ -45,7 +45,6 @@ contract Swaplace is SwapFactory, DataPalace, ISwaplace, IErrors, IERC165 {
         }
 
         swaps[swapId] = swap;
-        swaps[swapId].expiry = swap.expiry + block.timestamp;
 
         return swapId;
     }
