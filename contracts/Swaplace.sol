@@ -9,7 +9,6 @@ import {IErrors} from "./interfaces/IErrors.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
 
-import {DataPalace} from "./DataPalace.sol";
 import {SwapFactory} from "./SwapFactory.sol";
 
 /**  ___ _    ___   ___ _  _____ _   _ _
@@ -22,7 +21,7 @@ import {SwapFactory} from "./SwapFactory.sol";
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
  * `approve` function of the Token standard or `permit` if available.
  */
-contract Swaplace is SwapFactory, DataPalace, ISwaplace, IErrors, IERC165 {
+contract Swaplace is SwapFactory, ISwaplace, IErrors, IERC165 {
     uint256 public swapId;
 
     mapping(uint256 => Swap) private swaps;
