@@ -26,19 +26,18 @@ error InvalidMismatchingLengths(uint256 addr, uint256 amountOrId);
 abstract contract SwapFactory is ISwapFactory, ISwap {
 
     /**
-     * @dev Constructs an asset struct to ERC20 or ERC721.
-     * This function is a utility to easily create `Asset` struct instances without manually structuring them.
+     * @dev Constructs an asset struct that works for ERC20 or ERC721.
+     * This function is a utility to easily create an `Asset` struct on memory or off-chain.
      */
     function makeAsset(
         address addr,
         uint256 amountOrId
-    ) public pure returns (Asset memory) {
+    ) public pure virtual returns (Asset memory) {
         return Asset(addr, amountOrId);
     }
 
     /**
-     *  @dev Constructs a swap struct. 
-     * It sets the expiry of the swap to zero to avoid reutilization.
+     *  @dev Build a swap struct to use in the {Swaplace-createSwap} function.
      * 
      * Requirements: 
      * 
@@ -52,7 +51,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         uint256 expiry,
         Asset[] memory biding,
         Asset[] memory asking
-    ) public view returns (Swap memory) {
+    ) public view virtual returns (Swap memory) {
         if (owner == address(0)) {
             revert InvalidAddress(address(0));
         }
@@ -66,45 +65,5 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         }
 
         return Swap(owner, allowed, expiry, biding, asking);
-    }
-
-
-    /**
-     * @dev Modifing `biding` and `asking` during high volatity market. 
-     * `bidFlipAsk` serves as an index to change `addrs` and `amountOrId`.
-     * 
-     * Requirements: 
-     * - `addrs` and `amountOrId` must have the same length.
-     * 
-     */
-    function composeSwap(
-        address owner,
-        address allowed,
-        uint256 expiry,
-        address[] memory addrs,
-        uint256[] memory amountOrId,
-        uint256 bidFlipAsk
-    ) public view returns (Swap memory) {
-        if (addrs.length != amountOrId.length) {
-            revert InvalidMismatchingLengths(addrs.length, amountOrId.length);
-        }
-
-        Asset[] memory biding = new Asset[](bidFlipAsk);
-        for (uint256 i = 0; i < bidFlipAsk; ) {
-            biding[i] = makeAsset(addrs[i], amountOrId[i]);
-            unchecked {
-                i++;
-            }
-        }
-
-        Asset[] memory asking = new Asset[](addrs.length - bidFlipAsk);
-        for (uint256 i = bidFlipAsk; i < addrs.length; ) {
-            asking[i - bidFlipAsk] = makeAsset(addrs[i], amountOrId[i]);
-            unchecked {
-                i++;
-            }
-        }
-
-        return makeSwap(owner, allowed, expiry, biding, asking);
     }
 }
