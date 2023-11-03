@@ -70,11 +70,6 @@ export async function makeSwap(
 	biding: Asset[],
 	asking: Asset[]
 ) {
-	// owner cannot be the zero address, it will always be the `msg.sender`
-	if (owner == ethers.constants.AddressZero) {
-		throw new Error("InvalidOwnerAddress");
-	}
-
 	// check for the current `block.timestamp` because `expiry` cannot be in the past
 	const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 	if (expiry < timestamp) {
