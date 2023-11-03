@@ -4,7 +4,6 @@ pragma solidity ^0.8.17;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-import {IErrors} from "./interfaces/IErrors.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
 
@@ -20,7 +19,7 @@ import {SwapFactory} from "./SwapFactory.sol";
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
  * `approve` function of the Token standard or `permit` if available.
  */
-contract Swaplace is SwapFactory, ISwaplace, IErrors, IERC165 {
+contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     uint256 public swapId;
 
     mapping(uint256 => Swap) private swaps;
