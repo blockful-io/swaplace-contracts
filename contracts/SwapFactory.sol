@@ -1,14 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import {IErrors} from "./interfaces/IErrors.sol";
 import {ISwap} from "./interfaces/ISwap.sol";
 import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
-
-error InvalidAddress(address caller);
-error InvalidAmount(uint256 amount);
-error InvalidAssetsLength();
-error InvalidExpiryDate(uint256 timestamp);
-error InvalidMismatchingLengths(uint256 addr, uint256 amountOrId);
 
 /**
  * @dev - SwapFactory is a helper for creating swaps and making asset structs.
@@ -38,7 +33,7 @@ error InvalidMismatchingLengths(uint256 addr, uint256 amountOrId);
  * in an a trusted contract and swap as an ERC721. But you don't have to stop there,
  * by delegating ownership over a contract, you can tokenize any on-chain execution.
  */
-abstract contract SwapFactory is ISwapFactory, ISwap {
+abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
     /**
      * @dev Constructs an asset struct that works for ERC20 or ERC721.
      * This function is a utility to easily create an `Asset` struct on memory or off-chain.
