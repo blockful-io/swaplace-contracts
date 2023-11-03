@@ -2,6 +2,13 @@ import { expect } from "chai";
 import { Contract } from "ethers";
 import { ethers, network } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import {
+	Swap,
+	Asset,
+	makeAsset,
+	makeSwap,
+	composeSwap,
+} from "./utils/SwapFactory";
 
 describe("Swaplace", async function () {
 	let Swaplace: Contract;
@@ -11,8 +18,8 @@ describe("Swaplace", async function () {
 	let owner: SignerWithAddress;
 	let acceptee: SignerWithAddress;
 
-	const day = 86400;
 	const zeroAddress = ethers.constants.AddressZero;
+	const day = 86400;
 
 	before(async () => {
 		const [signer, accountOne] = await ethers.getSigners();
@@ -54,16 +61,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [1000, 1];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [1];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap
@@ -71,7 +82,7 @@ describe("Swaplace", async function () {
 
 		// Return the first swap and expect timestamp to be the same
 		const swapResult = await Swaplace.getSwap(1);
-		expect(swapResult[2]).to.be.equal(swap[2]);
+		expect(swapResult.expiry).to.be.equal(swap.expiry);
 
 		// Create a second swap
 		expect(await Swaplace.createSwap(swap)).to.be.ok;
@@ -98,16 +109,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [1000, 1];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [1];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap
@@ -124,16 +139,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [1000, 1];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [1];
+
+		const swap = await composeSwap(
 			acceptee.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap
@@ -141,10 +160,6 @@ describe("Swaplace", async function () {
 
 		// Get last swap id
 		const lastSwap = await Swaplace.swapId();
-
-		// Return the first swap and expect timestamp to be greater
-		const swapResult = await Swaplace.getSwap(Number(lastSwap));
-		expect(swapResult[2]).to.be.equal(swap[2]);
 
 		// Try to cancel the swap as owner
 		await expect(
@@ -156,16 +171,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [1000, 1];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [1];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap
@@ -187,16 +206,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [1000, 1];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [1];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap
@@ -226,16 +249,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [1000, tokenId];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [tokenId];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap by owner
@@ -275,16 +302,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [10000, tokenId];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [tokenId];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap by owner
@@ -315,16 +346,20 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC721.address];
-		const assetsAmountsOrId = [1000, tokenId];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [tokenId];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap by owner
@@ -348,22 +383,26 @@ describe("Swaplace", async function () {
 	it("Should be able to accept a swap with only { ERC20 }", async function () {
 		// Mint tokens
 		await MockERC20.mintTo(owner.address, 1000);
-		await MockERC20.mintTo(acceptee.address, 10000);
+		await MockERC20.mintTo(acceptee.address, 2000);
 
 		// Build the Swap
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC20.address, MockERC20.address];
-		const assetsAmountsOrId = [1000, 10000];
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC20.address];
+		const askingAmountOrId = [2000];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap by owner
@@ -400,21 +439,21 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [MockERC721.address, MockERC721.address];
-		const assetsAmountsOrId = [tokenId - 1, tokenId];
+		const bidingAddr = [MockERC721.address];
+		const bidingAmountOrId = [tokenId - 1];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC721.address];
+		const askingAmountOrId = [tokenId];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
-
-		// estimate gas
-		const gas = await Swaplace.estimateGas.createSwap(swap);
-		console.log(gas);
 
 		// Create the first swap by owner
 		expect(await Swaplace.createSwap(swap)).to.be.ok;
@@ -430,12 +469,6 @@ describe("Swaplace", async function () {
 
 		// Get last swap id
 		const lastSwap = await Swaplace.swapId();
-
-		// estimate gas
-		const gas2 = await Swaplace.connect(acceptee).estimateGas.acceptSwap(
-			Number(lastSwap)
-		);
-		console.log(gas2);
 
 		// Accept swap as acceptee
 		expect(await Swaplace.connect(acceptee).acceptSwap(Number(lastSwap))).to.be
@@ -462,21 +495,24 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [
-			MockERC20.address,
+		const bidingAddr = [MockERC20.address];
+		const bidingAmountOrId = [1000];
+
+		const askingAddr = [
 			MockERC721.address,
 			MockERC721.address,
 			MockERC721.address,
 		];
-		const assetsAmountsOrId = [1000, tokenId - 2, tokenId - 1, tokenId];
+		const askingAmountOrId = [tokenId - 2, tokenId - 1, tokenId];
 
-		const swap = await Swaplace.composeSwap(
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			1
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
 
 		// Create the first swap by owner
@@ -524,26 +560,21 @@ describe("Swaplace", async function () {
 		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 		const expiry = timestamp + day * 2;
 
-		const assetsContractAddrs = [
-			MockERC20.address,
-			MockERC721.address,
-			MockERC20.address,
-			MockERC721.address,
-		];
-		const assetsAmountsOrId = [1000, tokenId - 1, 1000, tokenId];
+		const bidingAddr = [MockERC20.address, MockERC721.address];
+		const bidingAmountOrId = [1000, tokenId - 1];
 
-		const swap = await Swaplace.composeSwap(
+		const askingAddr = [MockERC20.address, MockERC721.address];
+		const askingAmountOrId = [1000, tokenId];
+
+		const swap = await composeSwap(
 			owner.address,
 			zeroAddress,
 			expiry,
-			assetsContractAddrs,
-			assetsAmountsOrId,
-			2
+			bidingAddr,
+			bidingAmountOrId,
+			askingAddr,
+			askingAmountOrId
 		);
-
-		// estimate gas
-		const gas = await Swaplace.estimateGas.createSwap(swap);
-		console.log(gas);
 
 		// Create the first swap by owner
 		expect(await Swaplace.createSwap(swap)).to.be.ok;
@@ -561,12 +592,6 @@ describe("Swaplace", async function () {
 		const balanceBeforeOwner = await MockERC20.balanceOf(owner.address);
 		const balanceBefore = await MockERC20.balanceOf(acceptee.address);
 
-		// estimate gas
-		const gas2 = await Swaplace.connect(acceptee).estimateGas.acceptSwap(
-			Number(lastSwap)
-		);
-
-		console.log(gas2);
 		// accept swap as acceptee
 		expect(await Swaplace.connect(acceptee).acceptSwap(Number(lastSwap))).to.be
 			.ok;
