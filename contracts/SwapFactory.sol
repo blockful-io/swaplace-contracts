@@ -22,9 +22,13 @@ error InvalidMismatchingLengths(uint256 addr, uint256 amountOrId);
  * @title Swaplace
  * @author @0xneves | @blockful_io
  * @dev - Swap Factory is a factory for creating swaps. It's a helper for the core Swaplace features.
- *
  */
 abstract contract SwapFactory is ISwapFactory, ISwap {
+
+    /**
+     * @dev Constructs an asset struct to ERC20 or ERC721.
+     * This function is a utility to easily create `Asset` struct instances without manually structuring them.
+     */
     function makeAsset(
         address addr,
         uint256 amountOrId
@@ -32,6 +36,16 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         return Asset(addr, amountOrId);
     }
 
+    /**
+     *  @dev Constructs a swap struct. 
+     * It sets the expiry of the swap to zero to avoid reutilization.
+     * 
+     * Requirements: 
+     * 
+     * - `owner`must be different than zero address.
+     * - `expiry` must be bigger than timestamp.
+     * - `biding` and `asking` arrays must contain at least one asset.
+     */
     function makeSwap(
         address owner,
         address allowed,
@@ -54,6 +68,15 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         return Swap(owner, allowed, expiry, biding, asking);
     }
 
+
+    /**
+     * @dev Modifing `biding` and `asking` during high volatity market. 
+     * `bidFlipAsk` serves as an index to change `addrs` and `amountOrId`.
+     * 
+     * Requirements: 
+     * - `addrs` and `amountOrId` must have the same length.
+     * 
+     */
     function composeSwap(
         address owner,
         address allowed,
