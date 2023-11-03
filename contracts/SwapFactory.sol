@@ -28,7 +28,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
     function makeAsset(
         address addr,
         uint256 amountOrId
-    ) public pure returns (Asset memory) {
+    ) public pure virtual returns (Asset memory) {
         return Asset(addr, amountOrId);
     }
 
@@ -38,7 +38,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         uint256 expiry,
         Asset[] memory biding,
         Asset[] memory asking
-    ) public view returns (Swap memory) {
+    ) public view virtual returns (Swap memory) {
         if (owner == address(0)) {
             revert InvalidAddress(address(0));
         }
@@ -52,36 +52,5 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         }
 
         return Swap(owner, allowed, expiry, biding, asking);
-    }
-
-    function composeSwap(
-        address owner,
-        address allowed,
-        uint256 expiry,
-        address[] memory addrs,
-        uint256[] memory amountOrId,
-        uint256 bidFlipAsk
-    ) public view returns (Swap memory) {
-        if (addrs.length != amountOrId.length) {
-            revert InvalidMismatchingLengths(addrs.length, amountOrId.length);
-        }
-
-        Asset[] memory biding = new Asset[](bidFlipAsk);
-        for (uint256 i = 0; i < bidFlipAsk; ) {
-            biding[i] = makeAsset(addrs[i], amountOrId[i]);
-            unchecked {
-                i++;
-            }
-        }
-
-        Asset[] memory asking = new Asset[](addrs.length - bidFlipAsk);
-        for (uint256 i = bidFlipAsk; i < addrs.length; ) {
-            asking[i - bidFlipAsk] = makeAsset(addrs[i], amountOrId[i]);
-            unchecked {
-                i++;
-            }
-        }
-
-        return makeSwap(owner, allowed, expiry, biding, asking);
     }
 }
