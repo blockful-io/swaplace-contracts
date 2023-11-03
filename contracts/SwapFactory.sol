@@ -55,7 +55,6 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
      *
      * Requirements:
      *
-     * - `owner` cannot be the zero address.
      * - `expiry` cannot be in the past timestamp.
      * - `biding` and `asking` cannot be empty.
      */
@@ -66,10 +65,6 @@ abstract contract SwapFactory is ISwapFactory, ISwap {
         Asset[] memory biding,
         Asset[] memory asking
     ) public view virtual returns (Swap memory) {
-        if (owner == address(0)) {
-            revert InvalidAddress(address(0));
-        }
-
         if (expiry < block.timestamp) {
             revert InvalidExpiryDate(expiry);
         }
