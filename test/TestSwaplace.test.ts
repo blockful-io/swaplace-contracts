@@ -9,6 +9,7 @@ import {
 	makeSwap,
 	composeSwap,
 } from "./utils/SwapFactory";
+import { blocktimestamp } from "./utils/utils";
 
 describe("Swaplace", async function () {
 	let Swaplace: Contract;
@@ -57,9 +58,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to create a swap", async function () {
-		// get current block timestamp
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -106,8 +105,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to cancel swaps", async function () {
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -136,8 +134,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should not be able to cancel not owned swaps", async function () {
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -168,8 +165,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should not be able to cancel expired swaps", async function () {
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -203,8 +199,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert when accepting swaps with expiration done", async function () {
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -246,8 +241,8 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -299,8 +294,8 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -343,8 +338,8 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -386,8 +381,8 @@ describe("Swaplace", async function () {
 		await MockERC20.mintTo(acceptee.address, 2000);
 
 		// Build the Swap
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -436,8 +431,8 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC721.address];
 		const bidingAmountOrId = [tokenId - 1];
@@ -492,8 +487,8 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -557,8 +552,8 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-		const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-		const expiry = timestamp + day * 2;
+
+		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address, MockERC721.address];
 		const bidingAmountOrId = [1000, tokenId - 1];
