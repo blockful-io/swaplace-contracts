@@ -25,7 +25,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     mapping(uint256 => Swap) private swaps;
 
     /**
-     * @dev Allow users to create a swap.
+     * @dev Allow users to create a swap using struct {ISwap-Swap}.
      * Each new task increments its id by one.
      *
      * Requirements:
@@ -57,7 +57,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     }
 
     /**
-     * @dev Accepts a swap.
+     * @dev Accepts a swap using {ISwap-Swap} struct.
      * Once the swap is accepted, the expiry is set to zero to avoid reutilization.
      *
      * NOTE: If the swap is expired, it will revert. This prevents reentrancy attacks.
@@ -109,7 +109,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     }
 
     /**
-     * @dev Cancels an active swap.
+     * @dev Cancels an active swap using the struct {ISwap-Swap}.
      * On successful cancellation, it sets the expiry of the swap to zero to avoid reutilization.
      *
      * Requirements:

@@ -3,10 +3,13 @@ pragma solidity ^0.8.17;
 
 import {ISwap} from "./ISwap.sol";
 
+/**
+ * @dev Interface to easily make new assets and swaps.
+ */
 interface ISwapFactory {
 
     /**
-     * @dev Creates a new asset in the swaplace system given its ID.
+     * @dev Emits a event to change `addr` and `amountOrId` in {ISwap-Asset} memory.
      */
     function makeAsset(
         address addr,
@@ -15,7 +18,7 @@ interface ISwapFactory {
 
 
     /**
-     * @dev Creates a new swap in the swaplace system given its ID.
+     * @dev Emits a event to include `assets` and `asking` in {ISwap-Swap}. 
      */
     function makeSwap(
         address owner,

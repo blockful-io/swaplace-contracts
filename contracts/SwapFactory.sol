@@ -36,7 +36,7 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
     /**
      * @dev Constructs an asset struct that works for ERC20 or ERC721.
-     * This function is a utility to easily create an `Asset` struct on memory or off-chain.
+     * Uses the struct interface {ISwap-Asset} to easily create an new asset.
      */
     function makeAsset(
         address addr,
