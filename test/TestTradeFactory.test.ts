@@ -160,7 +160,7 @@ describe("Swaplace", async function () {
 				askingAmountOrId
 			);
 		} catch (error: any) {
-			expect(error.message).to.be.equals("InvalidExpiryDate");
+			expect(error.message).to.be.equals("InvalidExpiry");
 		}
 	});
 

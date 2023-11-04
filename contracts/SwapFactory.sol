@@ -61,7 +61,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
         Asset[] memory asking
     ) public view virtual returns (Swap memory) {
         if (expiry < block.timestamp) {
-            revert InvalidExpiryDate(expiry);
+            revert InvalidExpiry(expiry);
         }
 
         if (biding.length == 0 || asking.length == 0) {

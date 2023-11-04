@@ -40,7 +40,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         }
 
         if (swap.expiry < block.timestamp) {
-            revert InvalidExpiryDate(swap.expiry);
+            revert InvalidExpiry(swap.expiry);
         }
 
         if (swap.biding.length == 0 || swap.asking.length == 0) {
@@ -76,7 +76,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         }
 
         if (swap.expiry < block.timestamp) {
-            revert InvalidExpiryDate(swap.expiry);
+            revert InvalidExpiry(swap.expiry);
         }
 
         swaps[id].expiry = 0;
@@ -121,7 +121,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         Swap memory swap = swaps[id];
 
         if (swap.expiry < block.timestamp) {
-            revert InvalidExpiryDate(swap.expiry);
+            revert InvalidExpiry(swap.expiry);
         }
 
         if (swap.owner != msg.sender) {
