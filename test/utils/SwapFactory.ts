@@ -73,7 +73,7 @@ export async function makeSwap(
 	// check for the current `block.timestamp` because `expiry` cannot be in the past
 	const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
 	if (expiry < timestamp) {
-		throw new Error("InvalidExpiryDate");
+		throw new Error("InvalidExpiry");
 	}
 
 	/**

@@ -199,7 +199,7 @@ describe("Swaplace", async function () {
 		// Create a second swap
 		await expect(
 			Swaplace.cancelSwap(Number(lastSwap))
-		).to.be.revertedWithCustomError(Swaplace, `InvalidExpiryDate`);
+		).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
 	});
 
 	it("Should revert when accepting swaps with expiration done", async function () {
@@ -234,7 +234,7 @@ describe("Swaplace", async function () {
 		// Create a second swap
 		await expect(
 			Swaplace.connect(acceptee).acceptSwap(Number(lastSwap))
-		).to.be.revertedWithCustomError(Swaplace, `InvalidExpiryDate`);
+		).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
 	});
 
 	it("Should revert when accepting swaps that were already accepted", async function () {
@@ -287,7 +287,7 @@ describe("Swaplace", async function () {
 		// Trying to accept for a second time
 		await expect(
 			Swaplace.connect(acceptee).acceptSwap(Number(lastSwap))
-		).to.be.revertedWithCustomError(Swaplace, `InvalidExpiryDate`);
+		).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
 	});
 
 	it("Should revert when accepting swaps with lacking allowance { ERC20 }", async function () {

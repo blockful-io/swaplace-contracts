@@ -20,5 +20,5 @@ interface IErrors {
     /**
      * @dev Displayed when the `expiry` date is in the past.
      */
-    error InvalidExpiryDate(uint256 timestamp);
+    error InvalidExpiry(uint256 timestamp);
 }
