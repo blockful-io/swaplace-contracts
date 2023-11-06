@@ -11,6 +11,12 @@ dotenv.config();
 
 // const { MUMBAI, SEPOLIA, PKEY_DEPLOYER, POLYSCAN } = process.env;
 
+const { 
+	DEPLOYER_PRIVATE_KEY, 
+	TRADE_CREATOR_PRIVATE_KEY, 
+	TRADE_ACCEPTEE_PRIVATE_KEY, 
+	} = process.env;
+
 const config: HardhatUserConfig = {
 	solidity: "0.8.17",
 	defaultNetwork: "hardhat",
