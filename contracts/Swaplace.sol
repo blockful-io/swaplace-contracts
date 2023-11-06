@@ -25,14 +25,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     mapping(uint256 => Swap) private swaps;
 
     /**
-     * @dev Allow users to create a swap.
-     * Each new task increments its id by one.
-     *
-     * Requirements:
-     *
-     * - `owner` of the swap must be the caller of this function.
-     * - `expiry` of the swap should be bigger than timestamp.
-     * - `biding` and `asking` must not be empty.
+     * @dev See {ISwaplace-createSwap}.
      */
     function createSwap(Swap calldata swap) public returns (uint256) {
         if (swap.owner != msg.sender) {
@@ -57,16 +50,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     }
 
     /**
-     * @dev Accepts a swap.
-     * Once the swap is accepted, the expiry is set to zero to avoid reutilization.
-     *
-     * NOTE: If the swap is expired, it will revert. This prevents reentrancy attacks.
-     *
-     * Requirements:
-     *
-     * - `allowed` must be the zero address or match the caller address
-     * - `expiry` must be bigger than timestamp.
-     *
+     * @dev See {ISwaplace-acceptSwap}.
      */
     function acceptSwap(uint256 id) public {
         Swap memory swap = swaps[id];
@@ -109,13 +93,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     }
 
     /**
-     * @dev Cancels an active swap.
-     * On successful cancellation, it sets the expiry of the swap to zero to avoid reutilization.
-     *
-     * Requirements:
-     *
-     * - `expiry` must be bigger than timestamp
-     * - `owner` must be the caller adress
+     * @dev See {ISwaplace-cancelSwap}.
      */
     function cancelSwap(uint256 id) public {
         Swap memory swap = swaps[id];
@@ -132,9 +110,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     }
 
     /**
-     * @dev Retrieves the details of a swap from a mapping based on its `id`.
-     *
-     * NOTE: If the swaps doesn't exist, the values will be defaulted.
+     * @dev See {ISwaplace-getSwap}.
      */
     function getSwap(uint256 id) public view returns (Swap memory) {
         return swaps[id];
