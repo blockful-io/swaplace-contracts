@@ -9,7 +9,11 @@ import "hardhat-gas-reporter";
 import dotenv from "dotenv";
 dotenv.config();
 
-// const { MUMBAI, SEPOLIA, PKEY_DEPLOYER, POLYSCAN } = process.env;
+const {
+	DEPLOYER_PRIVATE_KEY,
+	SWAP_CREATOR_PRIVATE_KEY,
+	SWAP_ACCEPTEE_PRIVATE_KEY,
+} = process.env;
 
 const config: HardhatUserConfig = {
 	solidity: "0.8.17",
