@@ -3,19 +3,26 @@ pragma solidity ^0.8.17;
 
 import {ISwap} from "./ISwap.sol";
 
+/**
+ * @dev Interface of the Swaplace implementation.
+ */
 interface ISwapFactory {
-
     /**
-     * @dev Creates a new asset in the swaplace system given its ID.
+     * @dev Constructs an asset struct that works for ERC20 or ERC721.
+     * This function is a utility to easily create an `Asset` struct on-chain or off-chain.
      */
     function makeAsset(
         address addr,
         uint256 amountOrId
     ) external pure returns (ISwap.Asset memory);
 
-
     /**
-     * @dev Creates a new swap in the swaplace system given its ID.
+     *  @dev Build a swap struct to use in the {Swaplace-createSwap} function.
+     *
+     * Requirements:
+     *
+     * - `expiry` cannot be in the past timestamp.
+     * - `biding` and `asking` cannot be empty.
      */
     function makeSwap(
         address owner,

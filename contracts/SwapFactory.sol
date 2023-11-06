@@ -35,8 +35,7 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
  */
 abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
     /**
-     * @dev Constructs an asset struct that works for ERC20 or ERC721.
-     * This function is a utility to easily create an `Asset` struct on memory or off-chain.
+     * @dev See {ISwapFactory-makeAsset}.
      */
     function makeAsset(
         address addr,
@@ -46,12 +45,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
     }
 
     /**
-     *  @dev Build a swap struct to use in the {Swaplace-createSwap} function.
-     *
-     * Requirements:
-     *
-     * - `expiry` cannot be in the past timestamp.
-     * - `biding` and `asking` cannot be empty.
+     *  @dev See {ISwapFactory-makeSwap}.
      */
     function makeSwap(
         address owner,
