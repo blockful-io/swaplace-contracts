@@ -3,6 +3,9 @@ pragma solidity ^0.8.17;
 
 import {ISwap} from "./ISwap.sol";
 
+/**
+ * @dev Interface of the {Swaplace} implementation.
+ */
 interface ISwaplace {
     /**
      * @dev Allow users to create a swap.
