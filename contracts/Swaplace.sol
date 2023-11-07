@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
-
 import {SwapFactory} from "./SwapFactory.sol";
 
 /**  ___ _    ___   ___ _  _____ _   _ _
@@ -121,7 +118,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
      */
     function supportsInterface(
         bytes4 interfaceID
-    ) external pure override(IERC165, ISwaplace) returns (bool) {
+    ) external pure override(IERC165) returns (bool) {
         return
             interfaceID == type(IERC165).interfaceId ||
             interfaceID == type(ISwaplace).interfaceId;
