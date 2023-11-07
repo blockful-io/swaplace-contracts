@@ -3,9 +3,6 @@ import { isValidAddr } from "./utils";
 
 /**
  * @dev See {ISwapFactory-Asset}.
- *
- * @param addr The address of the target contract.
- * @param amountOrId The amount of ERC20 tokens or the id of ERC721.
  */
 export interface Asset {
 	addr: string;
@@ -14,12 +11,6 @@ export interface Asset {
 
 /**
  * @dev See {ISwap-Swap}.
- *
- * @param owner The owner of the swap.
- * @param allowed The address that is allowed to execute the swap.
- * @param expiry The expiry date of the swap.
- * @param biding The assets that are being bided by the owner.
- * @param asking The assets that are being asked by the owner.
  */
 export interface Swap {
 	owner: string;
