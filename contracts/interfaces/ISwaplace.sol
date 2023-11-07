@@ -8,6 +8,21 @@ import {ISwap} from "./ISwap.sol";
  */
 interface ISwaplace {
     /**
+     * @dev Emitted when a new swap is created.
+     */
+    event SwapCreated(uint256 indexed id, address indexed creator);
+
+    /**
+     * @dev Emitted when a swap is accepted.
+     */
+    event SwapAccepted(uint256 indexed id, address indexed accepter);
+
+    /**
+     * @dev Emitted when a swap is cancelled.
+     */
+    event SwapCanceled(uint256 indexed id, address indexed canceler);
+
+    /**
      * @dev Allow users to create a swap.
      * Each new task increments its id by one.
      *
