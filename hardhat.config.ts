@@ -39,6 +39,36 @@ const config: HardhatUserConfig = {
 		// 	url: `${SEPOLIA}`,
 		// 	accounts: [`${PKEY_DEPLOYER}`],
 		// },
+
+		BNB: {
+			url: process.env.BNB,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+
+		MATIC: {
+			url: process.env.MATIC,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+
+		ETH: {
+			url: process.env.ETH,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+
+		AVAX: {
+			url: process.env.AVAX,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+
+		FTM: {
+			url: process.env.FTM,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+
+		ASTR: {
+			url: process.env.ASTR,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
 	},
 };
 
