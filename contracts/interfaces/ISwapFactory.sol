@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import {ISwap} from "./ISwap.sol";
 
 /**
- * @dev Interface of the {SwaplaceFactory} implementation.
+ * @dev Interface of the {SwapFactory} implementation.
  */
 interface ISwapFactory {
     /**
