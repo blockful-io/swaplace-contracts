@@ -21,9 +21,9 @@ const config: HardhatUserConfig = {
 	// gasReporter: {
 	//   enabled: true,
 	// },
-	// etherscan: {
-	// 	apiKey: `${POLYSCAN}`,
-	// },
+	etherscan: {
+		apiKey: `${process.env.ETHERSCAN_API_KEY}`,
+	},
 	networks: {
 		/**
 		 * @dev Testnets
