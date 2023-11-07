@@ -17,8 +17,10 @@ import {SwapFactory} from "./SwapFactory.sol";
  * `approve` function of the Token standard or `permit` if available.
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165 {
+    /// @dev Swap Identificator counter.
     uint256 public swapId;
 
+    /// @dev Mapping of `swapId` to Swap struct. See {ISwap-Swap}.
     mapping(uint256 => Swap) private swaps;
 
     /**

@@ -48,7 +48,9 @@ interface ISwaplace {
     /**
      * @dev Retrieves the details of a swap from a mapping based on its `id`.
      *
-     * NOTE: If the swaps doesn't exist, the values will be defaulted.
+     * NOTE: If the swaps doesn't exist, the values will be defaulted to 0.
+     * You can check if a swap exists by checking if the `owner` is the zero address.
+     * If the `owner` is the zero address, then the swap doesn't exist.
      */
     function getSwap(uint256 id) external view returns (ISwap.Swap memory);
 }
