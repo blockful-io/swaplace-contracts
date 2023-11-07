@@ -53,7 +53,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     /**
      * @dev See {ISwaplace-acceptSwap}.
      */
-    function acceptSwap(uint256 id) public {
+    function acceptSwap(uint256 id) public returns (bool) {
         Swap memory swap = swaps[id];
 
         if (swap.allowed != address(0) && swap.allowed != msg.sender) {
@@ -93,6 +93,8 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         }
 
         emit SwapAccepted(id, msg.sender);
+
+        return true;
     }
 
     /**
