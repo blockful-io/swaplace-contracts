@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+/**
+ * @dev Generalized Interface for {IERC20} and {IERC721} `transferFrom` function.
+ */
 interface ITransfer {
-    
     /**
-     * @dev Moves a `amountOrId` ERC20 or ERC721 from `from` to `to` using the allowance mechanism.
+     * @dev See {IERC20-transferFrom} or {IERC721-transferFrom}.
+     *
+     * Moves an `amount` for ERC20 or `tokenId` for ERC721 from `from` to `to`.
      *
      * Emits a {Transfer} event.
      */
