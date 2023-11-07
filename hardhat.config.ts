@@ -25,20 +25,48 @@ const config: HardhatUserConfig = {
 	// 	apiKey: `${POLYSCAN}`,
 	// },
 	networks: {
-		// hardhat: {
-		//   forking: {
-		//     url: `${ETH}`,
-		//     blockNumber: 16031313,
-		//   },
-		// },
-		// mumbai: {
-		// 	url: `${MUMBAI}`,
-		// 	accounts: [`${PKEY_DEPLOYER}`],
-		// },
-		// sepolia: {
-		// 	url: `${SEPOLIA}`,
-		// 	accounts: [`${PKEY_DEPLOYER}`],
-		// },
+		/**
+		 * @dev Testnets
+		 */
+		sepolia: {
+			url: `${process.env.SEPOLIA_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		goerli: {
+			url: `${process.env.SEPOLIA_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		mumbai: {
+			url: `${process.env.MUMBAI_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		fuji: {
+			url: `${process.env.FUJI_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		bnbtestnet: {
+			url: `${process.env.BNB_TESTNET_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		/**
+		 * @dev Mainnets
+		 */
+		ethereum: {
+			url: `${process.env.ETH_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		polygon: {
+			url: `${process.env.MATIC_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		avalanche: {
+			url: `${process.env.AVAX_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
+		binance: {
+			url: `${process.env.BNB_RPC_URL}`,
+			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+		},
 	},
 };
 
