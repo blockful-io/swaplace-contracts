@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 /**
- * @dev Errors only. Interface for the {Swaplace} implementations.
+ * @dev Errors only interface for the {Swaplace} implementations.
  */
 interface IErrors {
     /**
