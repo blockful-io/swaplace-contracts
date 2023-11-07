@@ -45,9 +45,8 @@ interface ISwaplace {
      *
      * - `allowed` must be the zero address or match the caller address
      * - `expiry` must be bigger than timestamp.
-     *
      */
-    function acceptSwap(uint256 id) external;
+    function acceptSwap(uint256 id) external returns (bool);
 
     /**
      * @dev Cancels an active swap.
