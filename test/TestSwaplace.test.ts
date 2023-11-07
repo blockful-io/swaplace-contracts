@@ -16,6 +16,7 @@ describe("Swaplace", async function () {
 	let MockERC20: Contract;
 	let MockERC721: Contract;
 
+	let deployer: SignerWithAddress;
 	let owner: SignerWithAddress;
 	let acceptee: SignerWithAddress;
 
@@ -23,18 +24,19 @@ describe("Swaplace", async function () {
 	const day = 86400;
 
 	before(async () => {
-		const [signer, accountOne] = await ethers.getSigners();
-		owner = signer;
-		acceptee = accountOne;
+		[deployer, owner, acceptee] = await ethers.getSigners();
 
-		const swaplaceFactory = await ethers.getContractFactory("Swaplace", signer);
+		const swaplaceFactory = await ethers.getContractFactory(
+			"Swaplace",
+			deployer
+		);
 		const MockERC20Factory = await ethers.getContractFactory(
 			"MockERC20",
-			signer
+			deployer
 		);
 		const mockERC721Factory = await ethers.getContractFactory(
 			"MockERC721",
-			signer
+			deployer
 		);
 
 		const swaplaceContract = await swaplaceFactory.deploy();
@@ -77,29 +79,24 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Return the first swap and expect timestamp to be the same
 		const swapResult = await Swaplace.getSwap(1);
 		expect(swapResult.expiry).to.be.equal(swap.expiry);
-
-		// Create a second swap
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
 	});
 
 	it("Should be able to validate assets allowances", async function () {
 		// Mint tokens for test execution
-
 		await MockERC20.mintTo(owner.address, 1000);
 		await MockERC721.mintTo(owner.address);
 
 		// Ask user to approve for future token transfers
-
-		await MockERC20.approve(Swaplace.address, 1000);
-		await MockERC721.approve(Swaplace.address, 1);
+		await MockERC20.connect(owner).approve(Swaplace.address, 1000);
+		await MockERC721.connect(owner).approve(Swaplace.address, 1);
 
 		expect(
-			await MockERC20.allowance(owner.address, Swaplace.address)
+			await MockERC20.connect(owner).allowance(owner.address, Swaplace.address)
 		).to.be.equal("1000");
 		expect(await MockERC721.getApproved(1)).to.be.equal(Swaplace.address);
 	});
@@ -124,10 +121,10 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Cancel the first swap
-		expect(await Swaplace.cancelSwap(1)).to.be.ok;
+		expect(await Swaplace.connect(owner).cancelSwap(1)).to.be.ok;
 
 		const temp = await Swaplace.getSwap(1);
 		expect(temp.expiry).to.be.equal("0");
@@ -184,7 +181,7 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Get last swap id
 		const lastSwap = await Swaplace.swapId();
@@ -194,7 +191,7 @@ describe("Swaplace", async function () {
 
 		// Create a second swap
 		await expect(
-			Swaplace.cancelSwap(Number(lastSwap))
+			Swaplace.connect(owner).cancelSwap(Number(lastSwap))
 		).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
 	});
 
@@ -218,7 +215,7 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Get last swap id
 		const lastSwap = await Swaplace.swapId();
@@ -241,7 +238,6 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-
 		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
@@ -261,10 +257,10 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap by owner
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Call allowances
-		await MockERC20.approve(Swaplace.address, 1000);
+		await MockERC20.connect(owner).approve(Swaplace.address, 1000);
 		await MockERC721.connect(acceptee).approve(Swaplace.address, tokenId);
 
 		expect(
@@ -294,7 +290,6 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-
 		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
@@ -314,7 +309,7 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap by owner
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Call allowances - but not for erc20
 		await MockERC721.connect(acceptee).approve(Swaplace.address, tokenId);
@@ -338,7 +333,6 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-
 		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
@@ -358,10 +352,10 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap by owner
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Call allowances - but not for erc20
-		await MockERC20.approve(Swaplace.address, 1000);
+		await MockERC20.connect(owner).approve(Swaplace.address, 1000);
 		expect(
 			await MockERC20.allowance(owner.address, Swaplace.address)
 		).to.be.equal("1000");
@@ -381,7 +375,6 @@ describe("Swaplace", async function () {
 		await MockERC20.mintTo(acceptee.address, 2000);
 
 		// Build the Swap
-
 		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address];
@@ -401,10 +394,10 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap by owner
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Call allowances
-		await MockERC20.approve(Swaplace.address, 1000);
+		await MockERC20.connect(owner).approve(Swaplace.address, 1000);
 		await MockERC20.connect(acceptee).approve(Swaplace.address, 10000);
 
 		expect(
@@ -431,7 +424,6 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-
 		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC721.address];
@@ -451,10 +443,10 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap by owner
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Call allowances
-		await MockERC721.approve(Swaplace.address, tokenId - 1);
+		await MockERC721.connect(owner).approve(Swaplace.address, tokenId - 1);
 		await MockERC721.connect(acceptee).approve(Swaplace.address, tokenId);
 
 		expect(await MockERC721.getApproved(tokenId - 1)).to.be.equal(
@@ -511,10 +503,10 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap by owner
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Call allowances
-		await MockERC20.approve(Swaplace.address, 1000);
+		await MockERC20.connect(owner).approve(Swaplace.address, 1000);
 		await MockERC721.connect(acceptee).approve(Swaplace.address, tokenId - 2);
 		await MockERC721.connect(acceptee).approve(Swaplace.address, tokenId - 1);
 		await MockERC721.connect(acceptee).approve(Swaplace.address, tokenId);
@@ -552,7 +544,6 @@ describe("Swaplace", async function () {
 		const tokenId = await MockERC721.totalSupply();
 
 		// Build the Swap
-
 		const expiry = (await blocktimestamp()) + day * 2;
 
 		const bidingAddr = [MockERC20.address, MockERC721.address];
@@ -572,12 +563,12 @@ describe("Swaplace", async function () {
 		);
 
 		// Create the first swap by owner
-		expect(await Swaplace.createSwap(swap)).to.be.ok;
+		expect(await Swaplace.connect(owner).createSwap(swap)).to.be.ok;
 
 		// Call allowances
-		await MockERC20.approve(Swaplace.address, 1000);
+		await MockERC20.connect(owner).approve(Swaplace.address, 1000);
 		await MockERC20.connect(acceptee).approve(Swaplace.address, 1000);
-		await MockERC721.approve(Swaplace.address, tokenId - 1);
+		await MockERC721.connect(owner).approve(Swaplace.address, tokenId - 1);
 		await MockERC721.connect(acceptee).approve(Swaplace.address, tokenId);
 
 		// Get last swap id
