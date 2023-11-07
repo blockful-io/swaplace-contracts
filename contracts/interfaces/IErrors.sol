@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+/**
+ * @dev Errors only. Interface for the {Swaplace} implementations.
+ */
 interface IErrors {
     /**
      * @dev Displayed when the caller is not the owner of the swap.
