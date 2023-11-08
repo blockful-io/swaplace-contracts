@@ -11,7 +11,7 @@ import {
 } from "./utils/SwapFactory";
 import { blocktimestamp } from "./utils/utils";
 
-describe("Swaplace", async function () {
+describe("Swaplace Factory", async function () {
 	let Swaplace: Contract;
 	let MockERC20: Contract;
 	let MockERC721: Contract;
@@ -60,7 +60,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to build swaps with one item for both { ERC20, ERC721 }", async function () {
-		const expiry = (await blocktimestamp()) + day * 2;
+		const expiry = (await blocktimestamp()) * 2;
 
 		const ERC20Asset: Asset = await makeAsset(MockERC20.address, 1000);
 		const ERC721Asset: Asset = await makeAsset(MockERC721.address, 1);
@@ -94,7 +94,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to build composed swap containing both { ERC20, ERC721 }", async function () {
-		const expiry = (await blocktimestamp()) + day * 2;
+		const expiry = (await blocktimestamp()) * 2;
 
 		const ERC20Asset = await makeAsset(MockERC20.address, 1000);
 		const ERC721Asset = await makeAsset(MockERC721.address, 1);
@@ -116,7 +116,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should be able to compose a swap in a single function for both { ERC20, ERC721 }", async function () {
-		const expiry = (await blocktimestamp()) + day * 2;
+		const expiry = (await blocktimestamp()) * 2;
 
 		const bidingAddr = [MockERC20.address, MockERC721.address];
 		const bidingAmountOrId = [1000, 1];
@@ -163,7 +163,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while building swap with 'owner' as address zero", async function () {
-		const expiry = (await blocktimestamp()) + day * 2;
+		const expiry = (await blocktimestamp()) * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -187,7 +187,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while creating swaps not belonging to msg.sender", async function () {
-		const expiry = (await blocktimestamp()) + day * 2;
+		const expiry = (await blocktimestamp()) * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -212,7 +212,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while creating swap with empty assets", async function () {
-		const expiry = (await blocktimestamp()) + day * 2;
+		const expiry = (await blocktimestamp()) * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];
@@ -236,7 +236,7 @@ describe("Swaplace", async function () {
 	});
 
 	it("Should revert while composing swap with mismatching inputs length", async function () {
-		const expiry = (await blocktimestamp()) + day * 2;
+		const expiry = (await blocktimestamp()) * 2;
 
 		const bidingAddr = [MockERC20.address];
 		const bidingAmountOrId = [1000];

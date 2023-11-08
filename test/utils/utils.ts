@@ -14,7 +14,7 @@ export function isValidAddr(addr: string): boolean {
  * Use `-- network localhost` to run the tests in a local network.
  * Networks should be in `hardhat.config.ts` file or via command line.
  */
-export async function blocktimestamp(): Promise<number> {
+export async function blocktimestamp(): Promise<any> {
 	return (await ethers.provider.getBlock("latest")).timestamp;
 }
 
