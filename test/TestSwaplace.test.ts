@@ -2,20 +2,16 @@ import { expect } from "chai";
 import { Contract } from "ethers";
 import { ethers, network } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import {
-	Swap,
-	Asset,
-	makeAsset,
-	makeSwap,
-	composeSwap,
-} from "./utils/SwapFactory";
-import { blocktimestamp } from "./utils/utils";
+import { composeSwap } from "./utils/SwapFactory";
+import { blocktimestamp, deploy } from "./utils/utils";
 
 describe("Swaplace", async function () {
+	// The deployed contracts
 	let Swaplace: Contract;
 	let MockERC20: Contract;
 	let MockERC721: Contract;
 
+	// The signers of the test
 	let deployer: SignerWithAddress;
 	let owner: SignerWithAddress;
 	let acceptee: SignerWithAddress;
@@ -24,30 +20,9 @@ describe("Swaplace", async function () {
 
 	before(async () => {
 		[deployer, owner, acceptee] = await ethers.getSigners();
-
-		const swaplaceFactory = await ethers.getContractFactory(
-			"Swaplace",
-			deployer
-		);
-		const MockERC20Factory = await ethers.getContractFactory(
-			"MockERC20",
-			deployer
-		);
-		const mockERC721Factory = await ethers.getContractFactory(
-			"MockERC721",
-			deployer
-		);
-
-		const swaplaceContract = await swaplaceFactory.deploy();
-		const MockERC20Contract = await MockERC20Factory.deploy("MockERC20", "20");
-		const mockERC721Contract = await mockERC721Factory.deploy(
-			"MockERC721",
-			"721"
-		);
-
-		Swaplace = await swaplaceContract.deployed();
-		MockERC20 = await MockERC20Contract.deployed();
-		MockERC721 = await mockERC721Contract.deployed();
+		Swaplace = await deploy("Swaplace", deployer);
+		MockERC20 = await deploy("MockERC20", deployer);
+		MockERC721 = await deploy("MockERC721", deployer);
 	});
 
 	it("Should test mock contracts", async function () {
