@@ -18,7 +18,6 @@ export async function blocktimestamp(): Promise<any> {
  * @param signer The signer to use.
  */
 export async function deploy(contractName: any, signer: any) {
-	console.log("test");
 	// Get Contract Factory for contractName
 	const ContractFactory = await ethers.getContractFactory(contractName, signer);
 
