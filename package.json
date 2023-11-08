@@ -27,7 +27,7 @@
 	"scripts": {
 		"clean": "npx hardhat clean",
 		"compile": "npx hardhat compile",
-		"test": "npx hardhat test --network localhost",
+		"test": "npx hardhat test",
 		"-t": "npx hardhat test --network $1",
 		"deploy": "npx hardhat run scripts/deploy.ts --network $1"
 	}
