@@ -1,13 +1,6 @@
 import { ethers } from "hardhat";
 
 /**
- * @dev Validates if the address is a valid ethereum address.
- */
-export function isValidAddr(addr: string): boolean {
-	return !/^0x[a-fA-F0-9]{40}$/gm.test(addr);
-}
-
-/**
  * @dev Get the current `block.timestamp` in seconds from the current
  * selected network.
  *
@@ -24,7 +17,8 @@ export async function blocktimestamp(): Promise<any> {
  * @param contractName The contract name to deploy.
  * @param signer The signer to use.
  */
-export async function deploy(contractName: string, signer?: any) {
+export async function deploy(contractName: any, signer: any) {
+	console.log("test");
 	// Get Contract Factory for contractName
 	const ContractFactory = await ethers.getContractFactory(contractName, signer);
 
@@ -46,6 +40,6 @@ export async function deploy(contractName: string, signer?: any) {
 }
 
 module.exports = {
-	isValidAddr,
 	blocktimestamp,
+	deploy,
 };
