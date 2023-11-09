@@ -14,7 +14,7 @@ export interface Asset {
 export interface Swap {
 	owner: string;
 	allowed: string;
-	expiry: bigint;
+	expiry: number;
 	biding: Asset[];
 	asking: Asset[];
 }
