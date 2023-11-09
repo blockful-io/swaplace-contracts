@@ -26,7 +26,7 @@ describe("Swaplace", async function () {
 		expect(await MockERC20.balanceOf(owner.address)).to.be.equals(1000);
 
 		// Testing the mint of ERC721
-		await MockERC721.mintTo(owner.address);
+		await MockERC721.mintTo(owner.address, 1);
 		expect(await MockERC721.balanceOf(owner.address)).to.be.equals(1);
 	});
 
