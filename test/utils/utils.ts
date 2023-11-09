@@ -25,15 +25,7 @@ export async function deploy(contractName: any, signer: any) {
 	const Contract = await ContractFactory.deploy();
 
 	// Wait for Contract to be deployed
-	const Instance = await Contract.deployed();
-
-	// Log Contract address, the Tx then return the Contract instance
-	console.log(
-		"\nContract %s \nDeployed to %s \nAt Tx %s",
-		contractName,
-		Contract.address,
-		Instance.deployTransaction.hash
-	);
+	await Contract.deployed();
 
 	return Contract;
 }
