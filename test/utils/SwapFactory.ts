@@ -1,5 +1,4 @@
 import { ethers } from "hardhat";
-import { isValidAddr } from "./utils";
 
 /**
  * @dev See {ISwapFactory-Asset}.
@@ -15,7 +14,7 @@ export interface Asset {
 export interface Swap {
 	owner: string;
 	allowed: string;
-	expiry: bigint;
+	expiry: number;
 	biding: Asset[];
 	asking: Asset[];
 }
@@ -28,7 +27,7 @@ export async function makeAsset(
 	amountOrId: number | bigint
 ): Promise<Asset> {
 	// validate if its an ethereum address
-	if (isValidAddr(addr)) {
+	if (!ethers.utils.isAddress(addr)) {
 		throw new Error("InvalidAddressFormat");
 	}
 

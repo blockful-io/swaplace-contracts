@@ -45,7 +45,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
         swaps[swapId] = swap;
 
-        emit SwapCreated(swapId, msg.sender);
+        emit SwapCreated(swapId, msg.sender, swap.expiry);
 
         return swapId;
     }
@@ -103,12 +103,12 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     function cancelSwap(uint256 id) public {
         Swap memory swap = swaps[id];
 
-        if (swap.expiry < block.timestamp) {
-            revert InvalidExpiry(swap.expiry);
-        }
-
         if (swap.owner != msg.sender) {
             revert InvalidAddress(msg.sender);
+        }
+
+        if (swap.expiry < block.timestamp) {
+            revert InvalidExpiry(swap.expiry);
         }
 
         swaps[id].expiry = 0;
