@@ -6,32 +6,31 @@ import {ISwap} from "./interfaces/ISwap.sol";
 import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 
 /**
- * @dev - SwapFactory is a helper for creating swaps and making asset structs.
+ * @dev - SwapFactory is a helper for creating Swaps and making asset structs.
  *
- * This helper can be used off-chain to easily create a swap struct and use it
- * in the {Swaplace-createSwap} function or any other implementation. But it also
- * can be used to create a swap struct on-chain.
+ * This helper can be used on and off-chain to easily create a Swap struct to be
+ * used in the {Swaplace-createSwap} function.
  *
- * Swaplace uses a {ISwap-Swap} struct to represent a swap. This struct is
+ * Swaplace uses a {ISwap-Swap} struct to represent a Swap. This struct is
  * composed of:
  *
- * - The owner of the swap is the address that created the swap.
- * - The allowed address is the address that can accept the swap. If the allowed
- *   address is the zero address, then anyone can accept the swap.
- * - The expiry date is the timestamp that the swap will be available to accept.
- * - The biding assets are the assets that the owner is offering.
- * - The asking assets are the assets that the owner wants in exchange.
+ * - The `owner` of the Swap is the address that created the Swap.
+ * - The `allowed` address is the address that can accept the Swap. If the allowed
+ *   address is the zero address, then anyone can accept the Swap.
+ * - The `expiry` date is the timestamp that the Swap will be available to accept.
+ * - The `biding` are the assets that the owner is offering.
+ * - The `asking` are the assets that the owner wants in exchange.
  *
- * The Swap struct uses an {Asset} struct to represent an asset. This struct is
+ * The Swap struct uses an {Asset} struct to represent the asset. This struct is
  * composed of:
  *
- * - The address of the asset. This address can be an ERC20 or ERC721 contract.
- * - The amount or id of the asset. This amount can be the amount of ERC20 tokens
+ * - The `address` of the asset. This address can be from an ERC20 or ERC721 contract.
+ * - The `amount` or `id` of the asset. This amount can be the amount of ERC20 tokens
  *  or the id of an ERC721 token.
  *
  * To use other standards, like ERC1155, you can wrap the ownership of the asset
- * in an a trusted contract and swap as an ERC721. But you don't have to stop there,
- * by delegating ownership over a contract, you can tokenize any on-chain execution.
+ * in an a trusted contract and Swap as an ERC721. This way, you can tokenize any
+ * on-chain execution and trade on Swaplace.
  */
 abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
     /**

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 /**
- * @dev Generalized Interface for {IERC20} and {IERC721} `transferFrom` function.
+ * @dev Generalized Interface for {IERC20} and {IERC721} `transferFrom` functions.
  */
 interface ITransfer {
     /**
