@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
-import { blocktimestamp } from "./utils/utils";
-import { Swap, composeSwap } from "./utils/SwapFactory";
+import { blocktimestamp } from "../test/utils/utils";
+import { Swap, composeSwap } from "../test/utils/SwapFactory";
 import abi from "../artifacts/contracts/Swaplace.sol/Swaplace.json";
 
 export async function main() {
@@ -16,7 +16,7 @@ export async function main() {
 	// Fill the Swap struct
 	const owner = signer.address;
 	const allowed = ethers.constants.AddressZero;
-	const expiry = await blocktimestamp();
+	const expiry = (await blocktimestamp()* 2);
 
 	// Build the biding assets
 	const bidingAddr = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]; // USDC
