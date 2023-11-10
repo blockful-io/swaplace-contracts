@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { deploy } from "./utils/utils";
+import { deploy } from "../test/utils/utils";
 
 async function main() {
 	// Get the first account from the list of accounts
