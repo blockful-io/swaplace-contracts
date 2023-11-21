@@ -43,11 +43,14 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
             swapId++;
         }
 
-        swaps[swapId] = swap;
+        //l_ indicating it's a local variable
+        uint256 l_swapId=swapId;
 
-        emit SwapCreated(swapId, msg.sender, swap.expiry);
+        swaps[l_swapId] = swap;
 
-        return swapId;
+        emit SwapCreated(l_swapId, msg.sender, swap.expiry);
+
+        return l_swapId;
     }
 
     /**
