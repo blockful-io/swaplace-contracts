@@ -39,8 +39,12 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
             revert InvalidAssetsLength();
         }
 
-        unchecked {
-            swapId++;
+        unchecked 
+        {
+            assembly 
+            {
+                sstore(swapId.slot, add(sload(swapId.slot), 1))
+            }
         }
 
         //l_ indicating it's a local variable
