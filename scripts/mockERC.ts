@@ -53,7 +53,7 @@ export async function main() {
     await approve.wait();
 
     //log the allowance of the spender
-    console.log("\nALLOWANCE\nAllowance of the contract:"+MockERC20.address+" allowed by the signer:"+await MockERC20.allowance(signer.address,MockERC20.address));
+    console.log("\nALLOWANCE:\nAllowance of the contract:"+MockERC20.address+" allowed by the signer:"+await MockERC20.allowance(signer.address,MockERC20.address));
 
     //approve token ID 1 to spender
     approve=await MockERC721.approve(MockERC721.address,tokenId);
