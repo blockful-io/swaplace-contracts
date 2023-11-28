@@ -2,13 +2,10 @@
 
 ## Swaplace
 
-```
 ___ _    ___   ___ _  _____ _   _ _
  | _ ) |  / _ \ / __| |/ / __| | | | |
  | _ \ |_| (_) | (__| ' <| _|| |_| | |__
  |___/____\___/ \___|_|\_\_|  \___/|____|
-
-```
 
 _- Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stoped.
 Its core idea is to facilitate swaps between virtual assets following the ERC standard.
@@ -62,3 +59,4 @@ function supportsInterface(bytes4 interfaceID) external pure returns (bool)
 ```
 
 _See {IERC165-supportsInterface}._
+
