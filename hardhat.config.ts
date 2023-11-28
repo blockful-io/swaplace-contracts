@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import 'solidity-docgen';
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -62,6 +63,11 @@ const config: HardhatUserConfig = {
 			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
 		},
 	},
+	docgen: {
+		outputDir: 'docs',
+		pages: "files",
+
+	}
 };
 
 export default config;

@@ -1,14 +1,15 @@
 {
 	"name": "swaplace",
 	"dependencies": {
-		"hardhat": "^2.12.7"
+		"hardhat": "^2.12.7",
+		"solidity-docgen": "^0.6.0-beta.36"
 	},
 	"devDependencies": {
 		"@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
 		"@nomicfoundation/hardhat-network-helpers": "^1.0.8",
 		"@nomicfoundation/hardhat-toolbox": "^2.0.1",
-		"@nomiclabs/hardhat-etherscan": "^3.1.5",
 		"@nomiclabs/hardhat-ethers": "^2.2.2",
+		"@nomiclabs/hardhat-etherscan": "^3.1.5",
 		"@nomiclabs/hardhat-solhint": "^3.0.0",
 		"@openzeppelin/contracts": "^4.8.1",
 		"@typechain/ethers-v5": "^10.2.0",
