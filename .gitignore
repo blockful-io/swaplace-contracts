@@ -12,3 +12,6 @@
 
 # Typechains assists with type safety when interacting with contracts.
 /typechain-types
+
+# Build output of crytic-compile when using echidna.
+/crytic-export

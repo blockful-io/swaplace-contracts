@@ -28,7 +28,9 @@
 		"clean": "npx hardhat clean",
 		"compile": "npx hardhat compile",
 		"test": "npx hardhat test",
-		"-t": "npx hardhat test --network $1",
-		"deploy": "npx hardhat run scripts/deploy.ts --network $1"
+		"deploy": "npx hardhat run scripts/deploy.ts --network $1",
+		"compile-echidna": "crytic-compile . && slither . --print echidna",
+		"fuzz-p": "echidna . --contract TestSwaplace --test-mode property --config echidna_config.yaml",
+		"fuzz-a": "echidna . --contract TestSwaplace --test-mode assertion --config echidna_config.yaml"
 	}
 }
