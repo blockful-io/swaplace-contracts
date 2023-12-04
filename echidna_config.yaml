@@ -1,0 +1,6 @@
+seqLen: 50
+testLimit: 20000
+deployer: "0x41414141"
+psender: "0x42424242"
+dashboard: false
+quiet: true
