@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import 'solidity-docgen';
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,10 +12,6 @@ const {
 
 const config: HardhatUserConfig = {
 	solidity: "0.8.17",
-	defaultNetwork: "hardhat",
-	gasReporter: {
-		enabled: true,
-	},
 	etherscan: {
 		apiKey: `${process.env.ETHERSCAN_API_KEY}`,
 	},
@@ -62,6 +59,15 @@ const config: HardhatUserConfig = {
 			accounts: [`${DEPLOYER_PRIVATE_KEY}`],
 		},
 	},
+	defaultNetwork: "hardhat",
+	docgen: {
+		outputDir: 'docs',
+		pages: "files",
+
+	},
+	gasReporter: {
+		enabled: true,
+	}
 };
 
 export default config;

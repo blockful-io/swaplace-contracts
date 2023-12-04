@@ -1,36 +1,36 @@
 {
-	"name": "swaplace",
-	"dependencies": {
-		"hardhat": "^2.12.7"
-	},
-	"devDependencies": {
-		"@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
-		"@nomicfoundation/hardhat-network-helpers": "^1.0.8",
-		"@nomicfoundation/hardhat-toolbox": "^2.0.1",
-		"@nomiclabs/hardhat-etherscan": "^3.1.5",
-		"@nomiclabs/hardhat-ethers": "^2.2.2",
-		"@nomiclabs/hardhat-solhint": "^3.0.0",
-		"@openzeppelin/contracts": "^4.8.1",
-		"@typechain/ethers-v5": "^10.2.0",
-		"@typechain/hardhat": "^6.1.5",
-		"@types/chai": "^4.3.4",
-		"@types/mocha": "^10.0.1",
-		"chai": "^4.3.4",
-		"dotenv": "^16.0.3",
-		"ethers": "^5.6.1",
-		"hardhat-gas-reporter": "^1.0.9",
-		"solidity-coverage": "^0.8.2",
-		"ts-node": "^10.9.1",
-		"typechain": "^8.1.1",
-		"typescript": "^4.9.5"
-	},
-	"scripts": {
-		"clean": "npx hardhat clean",
-		"compile": "npx hardhat compile",
-		"test": "npx hardhat test",
-		"deploy": "npx hardhat run scripts/deploy.ts --network $1",
-		"compile-echidna": "crytic-compile . && slither . --print echidna",
-		"fuzz-p": "echidna . --contract TestSwaplace --test-mode property --config echidna_config.yaml",
-		"fuzz-a": "echidna . --contract TestSwaplace --test-mode assertion --config echidna_config.yaml"
-	}
+  "name": "swaplace",
+  "dependencies": {
+    "hardhat": "^2.12.7"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.1",
+    "@nomiclabs/hardhat-etherscan": "^3.1.5",
+    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-solhint": "^3.0.0",
+    "@openzeppelin/contracts": "^4.8.1",
+    "@typechain/ethers-v5": "^10.2.0",
+    "@typechain/hardhat": "^6.1.5",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
+    "chai": "^4.3.4",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.6.1",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.2",
+    "solidity-docgen": "^0.6.0-beta.36",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.1.1",
+    "typescript": "^4.9.5"
+  },
+  "scripts": {
+    "clean": "npx hardhat clean",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "docs": "npx hardhat docgen",
+    "-t": "npx hardhat test --network $1",
+    "deploy": "npx hardhat run scripts/deploy.ts --network $1"
+  }
 }
