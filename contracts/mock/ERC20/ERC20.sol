@@ -41,13 +41,13 @@ abstract contract ERC20 is IERC20, IERC20Permit, IERC20Errors {
     /**
      * @dev Map accounts to spender to the allowed transfereable value.
      */
-    mapping(address account => mapping(address spender => uint256))
+    mapping(address  => mapping(address  => uint256))
         private _allowance;
 
     /**
      * @dev Map accounts to balance of Tokens.
      */
-    mapping(address account => uint256 balance) private _balances;
+    mapping(address  => uint256 ) private _balances;
 
     /**
      * @dev Map accounts to its current nonce.
