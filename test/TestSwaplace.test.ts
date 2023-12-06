@@ -72,7 +72,7 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 			});
 
 			it("Should be able to create a 1-N swap with ERC20", async function () {
@@ -98,7 +98,7 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 			});
 
 			it("Should be able to create a N-N swap with ERC20", async function () {
@@ -128,7 +128,7 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 			});
 
 			it("Should be able to create a 1-1 swap with ERC721", async function () {
@@ -150,7 +150,7 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 			});
 
 			it("Should be able to create a 1-N swap with ERC721", async function () {
@@ -176,7 +176,7 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 			});
 
 			it("Should be able to create a N-N swap with ERC721", async function () {
@@ -206,7 +206,7 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 			});
 		});
 
@@ -273,10 +273,10 @@ describe("Swaplace", async function () {
 			it("Should be able to {acceptSwap} as 1-1 Swap", async function () {
 				await Swaplace.connect(owner).createSwap(swap);
 				await expect(
-					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.swapId())
+					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps())
 				)
 					.to.emit(Swaplace, "SwapAccepted")
-					.withArgs(await Swaplace.swapId(), acceptee.address);
+					.withArgs(await Swaplace.totalSwaps(), acceptee.address);
 			});
 
 			it("Should be able to {acceptSwap} as N-N Swap", async function () {
@@ -300,13 +300,13 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 
 				await expect(
-					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.swapId())
+					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps())
 				)
 					.to.emit(Swaplace, "SwapAccepted")
-					.withArgs(await Swaplace.swapId(), acceptee.address);
+					.withArgs(await Swaplace.totalSwaps(), acceptee.address);
 			});
 
 			it("Should be able to {acceptSwap} as P2P Swap", async function () {
@@ -321,13 +321,13 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 
 				await expect(
-					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.swapId())
+					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps())
 				)
 					.to.emit(Swaplace, "SwapAccepted")
-					.withArgs(await Swaplace.swapId(), acceptee.address);
+					.withArgs(await Swaplace.totalSwaps(), acceptee.address);
 			});
 		});
 
@@ -336,13 +336,13 @@ describe("Swaplace", async function () {
 				await Swaplace.connect(owner).createSwap(swap);
 
 				await expect(
-					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.swapId())
+					await Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps())
 				)
 					.to.emit(Swaplace, "SwapAccepted")
-					.withArgs(await Swaplace.swapId(), acceptee.address);
+					.withArgs(await Swaplace.totalSwaps(), acceptee.address);
 
 				await expect(
-					Swaplace.connect(acceptee).acceptSwap(await Swaplace.swapId())
+					Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps())
 				)
 					.to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
 					.withArgs(0);
@@ -354,7 +354,7 @@ describe("Swaplace", async function () {
 				await network.provider.send("evm_increaseTime", [swap.expiry * 2]);
 
 				await expect(
-					Swaplace.connect(owner).acceptSwap(await Swaplace.swapId())
+					Swaplace.connect(owner).acceptSwap(await Swaplace.totalSwaps())
 				)
 					.to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
 					.withArgs(swap.expiry);
@@ -366,7 +366,7 @@ describe("Swaplace", async function () {
 				await Swaplace.connect(owner).createSwap(swap);
 
 				await expect(
-					Swaplace.connect(acceptee).acceptSwap(await Swaplace.swapId())
+					Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps())
 				).to.be.revertedWith(`ERC721: caller is not token owner or approved`);
 			});
 
@@ -382,10 +382,10 @@ describe("Swaplace", async function () {
 
 				await expect(await Swaplace.connect(owner).createSwap(swap))
 					.to.emit(Swaplace, "SwapCreated")
-					.withArgs(await Swaplace.swapId(), owner.address, swap.expiry);
+					.withArgs(await Swaplace.totalSwaps(), owner.address, swap.expiry);
 
 				await expect(
-					Swaplace.connect(acceptee).acceptSwap(await Swaplace.swapId())
+					Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps())
 				)
 					.to.be.revertedWithCustomError(Swaplace, "InvalidAddress")
 					.withArgs(acceptee.address);
@@ -402,14 +402,14 @@ describe("Swaplace", async function () {
 			});
 
 			it("Should be able to {cancelSwap} a Swap", async function () {
-				const lastSwap = await Swaplace.swapId();
+				const lastSwap = await Swaplace.totalSwaps();
 				expect(await Swaplace.connect(owner).cancelSwap(lastSwap))
 					.to.emit(Swaplace, "SwapCanceled")
 					.withArgs(lastSwap, swap.owner);
 			});
 
 			it("Should not be able to {acceptSwap} a canceled a Swap", async function () {
-				const lastSwap = await Swaplace.swapId();
+				const lastSwap = await Swaplace.totalSwaps();
 				await expect(Swaplace.connect(owner).acceptSwap(lastSwap))
 					.to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
 					.withArgs(0);
@@ -424,7 +424,7 @@ describe("Swaplace", async function () {
 			});
 
 			it("Should revert when {owner} is not {msg.sender}", async function () {
-				const lastSwap = await Swaplace.swapId();
+				const lastSwap = await Swaplace.totalSwaps();
 				await expect(Swaplace.connect(acceptee).cancelSwap(lastSwap))
 					.to.be.revertedWithCustomError(Swaplace, `InvalidAddress`)
 					.withArgs(acceptee.address);
@@ -433,7 +433,7 @@ describe("Swaplace", async function () {
 			it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
 				await network.provider.send("evm_increaseTime", [swap.expiry * 2]);
 
-				const lastSwap = await Swaplace.swapId();
+				const lastSwap = await Swaplace.totalSwaps();
 				await expect(Swaplace.connect(owner).cancelSwap(lastSwap))
 					.to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
 					.withArgs(swap.expiry);
@@ -470,7 +470,7 @@ describe("Swaplace", async function () {
 		});
 
 		it("Should be able to {getSwap}", async function () {
-			const lastSwap = await Swaplace.swapId();
+			const lastSwap = await Swaplace.totalSwaps();
 			const fetchedSwap = await Swaplace.getSwap(lastSwap);
 
 			expect(fetchedSwap.owner).not.to.be.equals(zeroAddress);
