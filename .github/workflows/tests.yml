@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
 
+env:
+  DEPLOYER_PRIVATE_KEY: 0x0e8ed714e9bf995344fce756e0d93d208ce345bf5ea181a08ee4fe8e4dcf5176
+
 jobs:
   unit-tests:
     name: Unit Tests
@@ -19,7 +22,7 @@ jobs:
 
       - name: Show repo env secret
         run: |
-          echo ${{ secrets.DEPLOYER_PRIVATE_KEYYYY }}
+          echo ${{ env.DEPLOYER_PRIVATE_KEY }}
 
       - name: Install dependencies
         run: yarn install
