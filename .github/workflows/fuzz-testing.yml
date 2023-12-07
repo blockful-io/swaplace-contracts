@@ -50,5 +50,8 @@ jobs:
           sudo tar -xf /tmp/echidna-test.tar.gz -C /usr/bin
           sudo chmod +x /usr/bin/echidna-test
 
-      - name: Run ${{ matrix.testName }}
-        run: echidna-test . --contract ${{ matrix.testName }} --config echidna.config.yml
+      - name: Run ${{ matrix.testName }} as properties
+        run: echidna-test . --contract ${{ matrix.testName }} --test-mode property --config echidna.config.yml
+
+      - name: Run ${{ matrix.testName }} as assertion
+        run: echidna-test . --contract ${{ matrix.testName }} --test-mode assertion --config echidna.config.yml
