@@ -1,59 +1,58 @@
 name: Fuzz Testing
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+    push:
+        branches:
+            - main
+    pull_request:
 
 jobs:
-  echidna:
-    name: Echidna
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        testName:
-          - TestFactory
-          - TestSwaplace
+    echidna:
+        name: Echidna
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                testName:
+                    - TestFactory
+                    - TestSwaplace
 
-    env:
-      DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+        env:
+            DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
 
-    steps:
-      - uses: actions/checkout@v2
+        steps:
+            - uses: actions/checkout@v2
 
-      - name: Set up node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 18.16.0
+            - name: Set up node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 18.16.0
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+            - name: Set up Python 3.8
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.8
 
-      - name: Install node dependencies
-        run: yarn install
+            - name: Install node dependencies
+              run: yarn install
 
-      - name: Install pip3
-        run: |
-          python -m pip install --upgrade pip
+            - name: Install pip3
+              run: |
+                  python -m pip install --upgrade pip
 
-      - name: Install slither
-        run: |
-          pip3 install slither-analyzer
+            - name: Install slither
+              run: |
+                  pip3 install slither-analyzer
 
-      - name: Install echidna
-        run: |
-          sudo wget -O /tmp/echidna-2.2.1-Linux.zip https://github.com/crytic/echidna/releases/download/v2.2.1/echidna-2.2.1-Linux.zip
-          sudo unzip /tmp/echidna-2.2.1-Linux.zip -d /usr/bin
-          cd /usr/bin
-          ls -a
-          sudo chmod +x /usr/bin/echidna
+            - name: Install echidna
+              run: |
+                  sudo wget -O /tmp/echidna-2.2.1-Linux.zip https://github.com/crytic/echidna/releases/download/v2.2.1/echidna-2.2.1-Linux.zip
+                  sudo unzip /tmp/echidna-2.2.1-Linux.zip -d /usr/bin
+                  sudo tar -xf /usr/bin/echidna.tar.gz -C /usr/bin
+                  sudo chmod +x /usr/bin/echidna
 
-      - name: Run ${{ matrix.testName }} as properties
-        run: echidna . --contract ${{ matrix.testName }} --test-mode property --config echidna.config.yml
+            - name: Run ${{ matrix.testName }} as properties
+              run: echidna . --contract ${{ matrix.testName }} --test-mode property --config echidna.config.yml
 
-      - name: Run ${{ matrix.testName }} as assertion
-        run: echidna . --contract ${{ matrix.testName }} --test-mode assertion --config echidna.config.yml
+            - name: Run ${{ matrix.testName }} as assertion
+              run: echidna . --contract ${{ matrix.testName }} --test-mode assertion --config echidna.config.yml
