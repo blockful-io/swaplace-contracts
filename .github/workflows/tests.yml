@@ -19,7 +19,7 @@ jobs:
 
       - name: Show repo env secret
         run: |
-          echo ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          echo ${{ secrets.DEPLOYER_PRIVATE_KEYYYY }}
 
       - name: Install dependencies
         run: yarn install
