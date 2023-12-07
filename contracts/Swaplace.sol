@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {IERC165} from './interfaces/IERC165.sol';
-import {ISwaplace} from './interfaces/ISwaplace.sol';
-import {ITransfer} from './interfaces/ITransfer.sol';
-import {SwapFactory} from './SwapFactory.sol';
+import {IERC165} from "./interfaces/IERC165.sol";
+import {ISwaplace} from "./interfaces/ISwaplace.sol";
+import {ITransfer} from "./interfaces/ITransfer.sol";
+import {SwapFactory} from "./SwapFactory.sol";
 
 /**  ___ _    ___   ___ _  _____ _   _ _
  *  | _ ) |  / _ \ / __| |/ / __| | | | |
