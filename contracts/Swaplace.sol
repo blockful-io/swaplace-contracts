@@ -18,7 +18,7 @@ import {SwapFactory} from "./SwapFactory.sol";
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     /// @dev Swap Identifier counter.
-    uint256 public swapId;
+    uint256 private _totalSwaps;
 
     /// @dev Mapping of `swapId` to Swap struct. See {ISwap-Swap}.
     mapping(uint256 => Swap) private swaps;
@@ -39,16 +39,14 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
             revert InvalidAssetsLength();
         }
 
-        unchecked 
-        {
-            assembly 
-            {
-                sstore(swapId.slot, add(sload(swapId.slot), 1))
+        unchecked {
+            assembly {
+                sstore(_totalSwaps.slot, add(sload(_totalSwaps.slot), 1))
             }
         }
 
         //l_ indicating it's a local variable
-        uint256 l_swapId=swapId;
+        uint256 l_swapId = _totalSwaps;
 
         swaps[l_swapId] = swap;
 
@@ -139,5 +137,12 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         return
             interfaceID == type(IERC165).interfaceId ||
             interfaceID == type(ISwaplace).interfaceId;
+    }
+
+    /**
+     * @dev Getter function for _totalSwaps.
+     */
+    function totalSwaps() public view returns (uint256) {
+        return _totalSwaps;
     }
 }
