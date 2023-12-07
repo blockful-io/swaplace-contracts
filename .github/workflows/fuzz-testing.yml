@@ -17,6 +17,9 @@ jobs:
           - TestSwapFactory
           - TestSwaplace
 
+    env:
+      DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+
     steps:
       - uses: actions/checkout@v2
 
