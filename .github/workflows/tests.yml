@@ -6,13 +6,13 @@ on:
       - main
   pull_request:
 
-env:
-  DEPLOYER_PRIVATE_KEY: 0x0e8ed714e9bf995344fce756e0d93d208ce345bf5ea181a08ee4fe8e4dcf5176
-
 jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    
+    env:
+      DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
 
     steps:
       - uses: actions/checkout@v1
