@@ -48,9 +48,7 @@ jobs:
               run: |
                   sudo wget -O /tmp/echidna-2.2.1-Linux.zip https://github.com/crytic/echidna/releases/download/v2.2.1/echidna-2.2.1-Linux.zip
                   sudo unzip /tmp/echidna-2.2.1-Linux.zip -d /usr/bin
-                  sudo tar -xf /usr/bin/echidna.tar.gz
-                  cd /usr/bin
-                  ls -a
+                  sudo tar -xf /usr/bin/echidna.tar.gz -C /usr/bin
                   sudo chmod +x /usr/bin/echidna
 
             - name: Run ${{ matrix.testName }} as properties
