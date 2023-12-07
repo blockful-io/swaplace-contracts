@@ -46,12 +46,12 @@ jobs:
 
       - name: Install echidna
         run: |
-          sudo wget -O /tmp/echidna-test.tar.gz https://github.com/crytic/echidna/releases/download/v1.6.0/echidna-test-v1.6.0-Ubuntu-18.04.tar.gz
-          sudo tar -xf /tmp/echidna-test.tar.gz -C /usr/bin
-          sudo chmod +x /usr/bin/echidna-test
+          sudo wget -O /tmp/echidna-2.2.1.tar.gz https://github.com/crytic/echidna/archive/refs/tags/v2.2.1.tar.gz
+          sudo tar -xf /tmp/echidna-2.2.1.tar.gz -C /usr/bin
+          sudo chmod +x /usr/bin/echidna
 
       - name: Run ${{ matrix.testName }} as properties
-        run: echidna-test . --contract ${{ matrix.testName }} --test-mode property --config echidna.config.yml
+        run: echidna . --contract ${{ matrix.testName }} --test-mode property --config echidna.config.yml
 
       - name: Run ${{ matrix.testName }} as assertion
-        run: echidna-test . --contract ${{ matrix.testName }} --test-mode assertion --config echidna.config.yml
+        run: echidna . --contract ${{ matrix.testName }} --test-mode assertion --config echidna.config.yml
