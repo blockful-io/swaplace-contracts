@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            DEPLOYER_PRIVATE_KEY: ${{ env.DEPLOYER_PRIVATE_KEY }}
+            DEPLOYER_PRIVATE_KEY: ${{ vars.DEPLOYER_PRIVATE_KEY }}
 
         steps:
             - uses: actions/checkout@v1
