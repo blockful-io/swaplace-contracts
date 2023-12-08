@@ -20,8 +20,8 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     /// @dev Swap Identifier counter.
     uint256 private _totalSwaps;
 
-    /// @dev Mapping of `swapId` to Swap struct. See {ISwap-Swap}.
-    mapping(uint256 => Swap) private swaps;
+    /// @dev Mapping of Swap ID to Swap struct. See {ISwap-Swap}.
+    mapping(uint256 => Swap) private _swaps;
 
     /**
      * @dev See {ISwaplace-createSwap}.
@@ -45,21 +45,20 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
             }
         }
 
-        //l_ indicating it's a local variable
-        uint256 l_swapId = _totalSwaps;
+        uint256 swapId = _totalSwaps;
 
-        swaps[l_swapId] = swap;
+        _swaps[swapId] = swap;
 
-        emit SwapCreated(l_swapId, msg.sender, swap.expiry);
+        emit SwapCreated(swapId, msg.sender, swap.expiry);
 
-        return l_swapId;
+        return swapId;
     }
 
     /**
      * @dev See {ISwaplace-acceptSwap}.
      */
     function acceptSwap(uint256 id) public returns (bool) {
-        Swap memory swap = swaps[id];
+        Swap memory swap = _swaps[id];
 
         if (swap.allowed != address(0) && swap.allowed != msg.sender) {
             revert InvalidAddress(msg.sender);
@@ -69,7 +68,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
             revert InvalidExpiry(swap.expiry);
         }
 
-        swaps[id].expiry = 0;
+        _swaps[id].expiry = 0;
 
         Asset[] memory assets = swap.asking;
 
@@ -106,7 +105,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
      * @dev See {ISwaplace-cancelSwap}.
      */
     function cancelSwap(uint256 id) public {
-        Swap memory swap = swaps[id];
+        Swap memory swap = _swaps[id];
 
         if (swap.owner != msg.sender) {
             revert InvalidAddress(msg.sender);
@@ -116,7 +115,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
             revert InvalidExpiry(swap.expiry);
         }
 
-        swaps[id].expiry = 0;
+        _swaps[id].expiry = 0;
 
         emit SwapCanceled(id, msg.sender);
     }
@@ -125,7 +124,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
      * @dev See {ISwaplace-getSwap}.
      */
     function getSwap(uint256 id) public view returns (Swap memory) {
-        return swaps[id];
+        return _swaps[id];
     }
 
     /**
