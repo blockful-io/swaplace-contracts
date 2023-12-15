@@ -2,7 +2,7 @@
 
 ## IErrors
 
-_Errors only interface for the {Swaplace} implementations._
+Errors only interface for the {Swaplace} implementations.
 
 ### InvalidAddress
 
@@ -10,7 +10,7 @@ _Errors only interface for the {Swaplace} implementations._
 error InvalidAddress(address caller)
 ```
 
-_Displayed when the caller is not the owner of the swap._
+Displayed when the caller is not the owner of the swap.
 
 ### InvalidAssetsLength
 
@@ -18,12 +18,12 @@ _Displayed when the caller is not the owner of the swap._
 error InvalidAssetsLength()
 ```
 
-_Displayed when the amount of {ISwap-Asset} has a length of zero.
+Displayed when the amount of {ISwap-Asset} has a length of zero.
 
 NOTE: The `biding` or `asking` array must not be empty to avoid mistakes
 when creating a swap. Assuming one side of the swap is empty, the
 correct approach should be the usage of {transferFrom} and we reinforce
-this behavior by requiring the length of the array to be bigger than zero._
+this behavior by requiring the length of the array to be bigger than zero.
 
 ### InvalidExpiry
 
@@ -31,5 +31,4 @@ this behavior by requiring the length of the array to be bigger than zero._
 error InvalidExpiry(uint256 timestamp)
 ```
 
-_Displayed when the `expiry` date is in the past._
-
+Displayed when the `expiry` date is in the past.

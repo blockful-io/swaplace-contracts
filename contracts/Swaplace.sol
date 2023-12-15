@@ -6,15 +6,12 @@ import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
 import {SwapFactory} from "./SwapFactory.sol";
 
-/**  ___ _    ___   ___ _  _____ _   _ _
- *  | _ ) |  / _ \ / __| |/ / __| | | | |
- *  | _ \ |_| (_) | (__| ' <| _|| |_| | |__
- *  |___/____\___/ \___|_|\_\_|  \___/|____|
+/**
  * @author @0xneves | @blockful_io
- * @dev - Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stoped.
- * Its core idea is to facilitate swaps between virtual assets following the ERC standard.
+ * @dev Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stoped.
+ * Its cern is to facilitate swaps between virtual assets following the ERC standard.
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
- * `approve` function of the Token standard or `permit` if available.
+ * `approve` or `permit` function.
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     /// @dev Swap Identifier counter.

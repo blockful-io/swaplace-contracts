@@ -2,7 +2,7 @@
 
 ## ITransfer
 
-_Generalized Interface for {IERC20} and {IERC721} `transferFrom` functions._
+Generalized Interface for {IERC20} and {IERC721} `transferFrom` functions.
 
 ### transferFrom
 
@@ -10,9 +10,8 @@ _Generalized Interface for {IERC20} and {IERC721} `transferFrom` functions._
 function transferFrom(address from, address to, uint256 amountOrId) external
 ```
 
-_See {IERC20-transferFrom} or {IERC721-transferFrom}.
+_See {IERC20-transferFrom} or {IERC721-transferFrom}._
 
 Moves an `amount` for ERC20 or `tokenId` for ERC721 from `from` to `to`.
 
-Emits a {Transfer} event._
-
+Emits a {Transfer} event.
