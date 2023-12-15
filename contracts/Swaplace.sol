@@ -11,7 +11,7 @@ import {SwapFactory} from "./SwapFactory.sol";
  * @dev Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stoped.
  * Its cern is to facilitate swaps between virtual assets following the ERC standard.
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
- * `approve` function or `permit` if available.
+ * `approve` or `permit` function.
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     /// @dev Swap Identifier counter.
