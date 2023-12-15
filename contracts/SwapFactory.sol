@@ -6,7 +6,7 @@ import {ISwap} from "./interfaces/ISwap.sol";
 import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 
 /**
- * @dev - SwapFactory is a helper for creating Swaps and making asset structs.
+ * @dev SwapFactory is a helper for creating Swaps and making asset structs.
  *
  * This helper can be used on and off-chain to easily create a Swap struct to be
  * used in the {Swaplace-createSwap} function.
@@ -44,7 +44,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
     }
 
     /**
-     *  @dev See {ISwapFactory-makeSwap}.
+     * @dev See {ISwapFactory-makeSwap}.
      */
     function makeSwap(
         address owner,

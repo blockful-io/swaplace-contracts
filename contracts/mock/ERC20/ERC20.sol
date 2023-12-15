@@ -19,7 +19,7 @@ abstract contract ERC20 is IERC20, IERC20Permit, IERC20Errors {
         );
 
     /**
-     *  @dev See {IERC20Permit-DOMAIN_SEPARATOR}.
+     * @dev See {IERC20Permit-DOMAIN_SEPARATOR}.
      */
     bytes32 private immutable _domainSeparator;
 
@@ -41,13 +41,12 @@ abstract contract ERC20 is IERC20, IERC20Permit, IERC20Errors {
     /**
      * @dev Map accounts to spender to the allowed transfereable value.
      */
-    mapping(address  => mapping(address  => uint256))
-        private _allowance;
+    mapping(address => mapping(address => uint256)) private _allowance;
 
     /**
      * @dev Map accounts to balance of Tokens.
      */
-    mapping(address  => uint256 ) private _balances;
+    mapping(address => uint256) private _balances;
 
     /**
      * @dev Map accounts to its current nonce.

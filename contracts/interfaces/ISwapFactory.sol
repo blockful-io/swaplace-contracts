@@ -17,7 +17,7 @@ interface ISwapFactory {
     ) external pure returns (ISwap.Asset memory);
 
     /**
-     *  @dev Build a swap struct to use in the {Swaplace-createSwap} function.
+     * @dev Build a swap struct to use in the {Swaplace-createSwap} function.
      *
      * Requirements:
      *
