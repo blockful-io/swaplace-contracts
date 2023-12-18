@@ -5,9 +5,44 @@
 
 This repository contains the core smart contracts for the Swaplace Protocol; The lightest Swap protocol in the market.
 
+### TL;DR
+
+-   Contracts cannot be upgraded.
+-   Contracts have no ownership.
+-   Contracts don't charge fees.
+-   There are no external contract dependencies.
+-   The protocol operates using available allowances.
+
 ## Incentives
 
 This repository is subjected to incentives for the community to contribute to the project. The incentive distribution and amount are being discussed but the eligibility has already started.
+
+## Features
+
+- **Create Swaps**: A Swap also has an `owner` and an `allowed` address. The `owner` is the one that can cancel the swap while the `allowed` address is the one that can execute the swap but anyone can accept if it's set as the Zero Address. A Swap also has an `expiry` period in seconds. The Swap can only be executed before the expiry period is reached. The `Asset` type represents in one hand the asset being bidded and the other for the asset being asked.
+
+```
+    struct Swap {
+        address owner;
+        address allowed;
+        uint256 expiry;
+        Asset[] biding;
+        Asset[] asking;
+    }
+```
+
+- **Accept Swaps**: You can accept the swaps that have 'allowed' address equal your or a Zero Address.
+
+- **Cancel Swaps**: You can cancell your swaps that it there not expired yet.
+
+- **Create Assets**: An `Asset` is a struct that stores the contract address and the amount or ID of ERC20 or ERC721.
+
+```
+struct Asset {
+    address addr;
+    uint256 amountOrId;
+}
+```
 
 ## Setup
 
@@ -45,40 +80,6 @@ Deploy the contracts in the desired network according to the networks available 
 yarn deploy <network>
 ```
 
-### TLDR:
+## Contributing
 
--   Contracts cannot be upgraded.
--   Contracts have no ownership.
--   Contracts don't charge fees.
--   There are no external contract dependencies.
--   The protocol operates using available allowances.
-
-### Making Assets
-
-An `Asset` is a struct that stores the contract address and the amount or ID of ERC20 or ERC721.
-
-```
-struct Asset {
-    address addr;
-    uint256 amountOrId;
-}
-```
-
-### Making Swaps
-
-A Swap also has an `owner` and an `allowed` address. The `owner` is the one that can cancel the swap while the `allowed` address is the one that can execute the swap but anyone can accept if
-it`s set as the Zero Address.
-
-A Swap also has an `expiry` period in seconds. The Swap can only be executed before the expiry period is reached.
-
-The `Asset` type represents in one hand the asset being bidded and the other for the asset being asked.
-
-```
-    struct Swap {
-        address owner;
-        address allowed;
-        uint256 expiry;
-        Asset[] biding;
-        Asset[] asking;
-    }
-```
+- To know about how you can contribute [see your notion](https://blockful.notion.site/Swaplace-Call-for-Contributors-6e4895d2a7264f679439ab2c124603fe)
