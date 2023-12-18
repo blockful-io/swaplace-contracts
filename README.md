@@ -11,7 +11,9 @@ This repository is subjected to incentives for the community to contribute to th
 
 ## Setup
 
-You should install the dependencies using Yarn to deploy this code to a local testnet. The project uses Hardhat as a development environment. Which relies on Node.js (Recommended v18.16.0).
+-   Yarn:
+
+You should install the dependencies using Yarn to deploy this code to a local testnet. The project uses Hardhat as a development environment. Which relies on Node.js (Recommended [v18.16.0](https://nodejs.org/download/release/v18.16.0/)).
 
 ```
 npm install --global yarn
@@ -22,6 +24,43 @@ Later on, install the dependencies using Yarn.
 
 ```
 yarn install
+```
+
+-   NodeJS:
+
+Windows: download the recommended version [v18.16.0](https://nodejs.org/download/release/v18.16.0/)
+
+MacOS/Linux: run the following command to install the correct version `nvm install 18.16.0`
+
+To make sure that NodeJS is installed correctly, open the integrated terminal in MacOS/Linux, or command line (cmd), PowerShell in Windows.
+Run the following commands to verify the installed versions:
+
+```
+node -v
+```
+
+You should see this:
+
+```
+v18.16.0
+```
+
+And also run this:
+
+```
+npm -v
+```
+
+You should see this:
+
+```
+9.5.1
+```
+
+Later on, install the dependencies using NodeJS.
+
+```
+npm install
 ```
 
 ### Environment Variables
