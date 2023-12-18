@@ -7,6 +7,7 @@ import {ISwap} from "./ISwap.sol";
  * @dev Interface of the {Swaplace} implementation.
  */
 interface ISwaplace {
+<<<<<<< HEAD
 
   /**
    * @dev Allow users to create a Swap. Each new Swap self-increments its ID by one.
@@ -53,6 +54,20 @@ interface ISwaplace {
    * Emits a {SwapCanceled} event.
    */
   function cancelSwap(uint256 swapId) external;
+=======
+    /**
+     * @dev Allow users to create a Swap. Each new Swap self-increments its id by one.
+     *
+     * Requirements:
+     *
+     * - `owner` must be the caller address.
+     * - `expiry` should be bigger than timestamp.
+     * - `biding` and `asking` must not be empty.
+     *
+     * Emits a {SwapCreated} event.
+     */
+    function createSwap(ISwap.Swap calldata Swap) external returns (uint256);
+>>>>>>> a7ca232 (refactor: Remove unecessary import and move the declarion of events signatures)
 
   /**
    * @dev Retrieves the details of a Swap based on the `swapId` provided.
