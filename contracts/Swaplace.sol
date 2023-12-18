@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import {IERC165} from "./interfaces/IERC165.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
 import {ITransfer} from "./interfaces/ITransfer.sol";
+import {ISwap} from "./interfaces/ISwap.sol";
 import {SwapFactory} from "./SwapFactory.sol";
 
 /**
@@ -16,6 +17,27 @@ import {SwapFactory} from "./SwapFactory.sol";
 contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /// @dev Swap Identifier counter.
   uint256 private _totalSwaps;
+
+      /**
+     * @dev Emitted when a new Swap is created.
+     * keccak-256(SwapCreated(uint256,address,uint256,address))
+     */
+    bytes32 private constant EVENT_SWAP_CREATED_SIGNATURE =
+        0x43a58bfac3282e5ce3bfd714c5bc0ddff8d6f2cd049db0b02a25d7cdd5026efb;
+
+    /**
+     * @dev Emitted when a Swap is accepted.
+     * keccak-256(SwapAccepted(uint256,address))
+     */
+    bytes32 private constant EVENT_SWAP_ACCEPTED_SIGNATURE =
+        0x38eced64b5c4ab50bb61d2f5fcace3c629a2d92f974374bf4a4f3e8a7c49caef;
+
+    /**
+     * @dev Emitted when a Swap is canceled.
+     * keccak-256(SwapCanceled(uint256,address))
+     */
+    bytes32 private constant EVENT_SWAP_CANCELED_SIGNATURE =
+        0x0a01e988a96145b1dd49cafc687666a0525e6b929299df4652cc646915e696d8;
 
   /// @dev Mapping of Swap ID to Swap struct. See {ISwap-Swap}.
   mapping(uint256 => Swap) private _swaps;
@@ -46,7 +68,19 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     _swaps[swapId] = swap;
 
-    emit SwapCreated(swapId, msg.sender, swap.expiry);
+    uint256 swapExpiry = swap.expiry;
+    address allowed = swap.allowed;
+    assembly {
+      mstore(0x00, allowed)
+      log4(
+        0x00,
+        0x20,
+        EVENT_SWAP_CREATED_SIGNATURE,
+        swapId,
+        caller(),
+        swapExpiry
+      )
+    }
 
     return swapId;
   }
@@ -54,8 +88,8 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /**
    * @dev See {ISwaplace-acceptSwap}.
    */
-  function acceptSwap(uint256 swapId) public returns (bool) {
-    Swap memory swap = _swaps[swapId];
+  function acceptSwap(uint256 id) public returns (bool) {
+    Swap memory swap = _swaps[id];
 
     if (swap.allowed != address(0) && swap.allowed != msg.sender) {
       revert InvalidAddress(msg.sender);
@@ -65,7 +99,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       revert InvalidExpiry(swap.expiry);
     }
 
-    _swaps[swapId].expiry = 0;
+    _swaps[id].expiry = 0;
 
     Asset[] memory assets = swap.asking;
 
@@ -93,7 +127,9 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       }
     }
 
-    emit SwapAccepted(swapId, msg.sender);
+    assembly {
+      log3(0x00, 0x00, EVENT_SWAP_ACCEPTED_SIGNATURE, id, caller())
+    }
 
     return true;
   }
@@ -101,8 +137,8 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /**
    * @dev See {ISwaplace-cancelSwap}.
    */
-  function cancelSwap(uint256 swapId) public {
-    Swap memory swap = _swaps[swapId];
+  function cancelSwap(uint256 id) public {
+    Swap memory swap = _swaps[id];
 
     if (swap.owner != msg.sender) {
       revert InvalidAddress(msg.sender);
@@ -112,9 +148,11 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       revert InvalidExpiry(swap.expiry);
     }
 
-    _swaps[swapId].expiry = 0;
+    _swaps[id].expiry = 0;
 
-    emit SwapCanceled(swapId, msg.sender);
+    assembly {
+      log3(0x00, 0x00, EVENT_SWAP_CANCELED_SIGNATURE, id, caller())
+    }
   }
 
   /**
