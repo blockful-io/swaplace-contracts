@@ -33,34 +33,34 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
  * on-chain execution and trade on Swaplace.
  */
 abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
-    /**
-     * @dev See {ISwapFactory-makeAsset}.
-     */
-    function makeAsset(
-        address addr,
-        uint256 amountOrId
-    ) public pure virtual returns (Asset memory) {
-        return Asset(addr, amountOrId);
+  /**
+   * @dev See {ISwapFactory-makeAsset}.
+   */
+  function makeAsset(
+    address addr,
+    uint256 amountOrId
+  ) public pure virtual returns (Asset memory) {
+    return Asset(addr, amountOrId);
+  }
+
+  /**
+   * @dev See {ISwapFactory-makeSwap}.
+   */
+  function makeSwap(
+    address owner,
+    address allowed,
+    uint256 expiry,
+    Asset[] memory biding,
+    Asset[] memory asking
+  ) public view virtual returns (Swap memory) {
+    if (expiry < block.timestamp) {
+      revert InvalidExpiry(expiry);
     }
 
-    /**
-     * @dev See {ISwapFactory-makeSwap}.
-     */
-    function makeSwap(
-        address owner,
-        address allowed,
-        uint256 expiry,
-        Asset[] memory biding,
-        Asset[] memory asking
-    ) public view virtual returns (Swap memory) {
-        if (expiry < block.timestamp) {
-            revert InvalidExpiry(expiry);
-        }
-
-        if (biding.length == 0 || asking.length == 0) {
-            revert InvalidAssetsLength();
-        }
-
-        return Swap(owner, allowed, expiry, biding, asking);
+    if (biding.length == 0 || asking.length == 0) {
+      revert InvalidAssetsLength();
     }
+
+    return Swap(owner, allowed, expiry, biding, asking);
+  }
 }
