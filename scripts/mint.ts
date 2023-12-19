@@ -1,14 +1,14 @@
 import { ethers } from "ethers";
 
-export async function approve(
+export async function mint(
   contract: ethers.Contract,
-  spender: string,
   amountOrId: bigint,
+  receiver: string,
 ) {
   try {
-    if (ethers.utils.isAddress(spender)) {
-      // Approve tokens
-      const tx = await contract.approve(spender, amountOrId);
+    if (ethers.utils.isAddress(receiver)) {
+      // Mint ERC tokens
+      const tx = await contract.mintTo(receiver, amountOrId);
 
       // Wait for the transaction to be mined
       await tx.wait();
