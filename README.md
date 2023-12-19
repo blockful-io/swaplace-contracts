@@ -19,7 +19,7 @@ This repository is subjected to incentives for the community to contribute to th
 
 ## Features
 
-- **Create Swaps**: A Swap also has an `owner` and an `allowed` address. The `owner` is the one that can cancel the swap while the `allowed` address is the one that can execute the swap but anyone can accept if it's set as the Zero Address. A Swap also has an `expiry` period in seconds. The Swap can only be executed before the expiry period is reached. The `Asset` type represents in one hand the asset being bidded and the other for the asset being asked.
+- **Create Swaps**: A Swap has an `owner` and an `allowed` address. The `owner` is the one that can cancel the swap while the `allowed` address is the one that can execute the swap but anyone can accept if it's set as the Zero Address. A Swap also has an `expiry` period in seconds. The Swap can only be executed before the expiry period is reached. The `Asset` type represents on one hand the bidding assets and on the other hand the asking assets.
 
 ```
     struct Swap {
@@ -31,18 +31,11 @@ This repository is subjected to incentives for the community to contribute to th
     }
 ```
 
-- **Accept Swaps**: You can accept the swaps that have 'allowed' address equal your or a Zero Address.
+- **Accept Swaps**: You can accept swaps that have an `allowed` address equal to your or the `Zero Address`. As long as you provide the asked assets.
 
-- **Cancel Swaps**: You can cancell your swaps that it there not expired yet.
+- **Cancel Swaps**: You can cancel swaps that haven't been `expired`.
 
-- **Create Assets**: An `Asset` is a struct that stores the contract address and the amount or ID of ERC20 or ERC721.
-
-```
-struct Asset {
-    address addr;
-    uint256 amountOrId;
-}
-```
+- **Swap Factory**: Aids new swap creations to be used on Swaplace. Check `contracts/SwapFactory.sol`.
 
 ## Setup
 
@@ -61,7 +54,7 @@ yarn install
 
 ### Environment Variables
 
-The project comes with a `.env.example` file. You should rename it to `.env` and fill the variables with your own values. Most RPC providers offer free testnet nodes. You can use [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) to get a free node.
+The project comes with a `.env.example` file. You should rename it to `.env` and fill the variables with your values. Most RPC providers offer free testnet nodes. You can use [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) to get a free node.
 
 WARNING: The private keys used in the `.env` file are from hardhat accounts. They are not meant to be used in production.
 
@@ -82,4 +75,4 @@ yarn deploy <network>
 
 ## Contributing
 
-- To know about how you can contribute [see your notion](https://blockful.notion.site/Swaplace-Call-for-Contributors-6e4895d2a7264f679439ab2c124603fe)
+- To know more about how you can contribute [see our notion page](https://blockful.notion.site/Swaplace-Call-for-Contributors-6e4895d2a7264f679439ab2c124603fe).
