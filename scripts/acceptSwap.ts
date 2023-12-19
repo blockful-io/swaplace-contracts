@@ -3,7 +3,7 @@ import abi from "../artifacts/contracts/Swaplace.sol/Swaplace.json";
 
 export async function main() {
   // Get the first account from the list of accounts
-  const [signer] = await ethers.getSigners();
+  const [signer, receiver] = await ethers.getSigners();
 
   // Get the Swaplace address from .env file
   const swaplaceAddress: string = process.env.SWAPLACE_ADDRESS || "";
@@ -15,7 +15,7 @@ export async function main() {
   const swapId = 1;
 
   // Accept the swap
-  const tx = await Swaplace.acceptSwap(swapId);
+  const tx = await Swaplace.acceptSwap(swapId, receiver.address);
 
   // Wait for the transaction to be mined
   await tx.wait();
