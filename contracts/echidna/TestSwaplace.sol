@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import "../echidna/TestSwapFactory.sol";
 import "../mock/MockERC20.sol";
-import "../src/Swaplace.sol";
+import "../Swaplace.sol";
 
 contract TestSwaplace is TestFactory {
     MockERC20 private _token;

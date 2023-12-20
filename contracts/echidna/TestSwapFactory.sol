@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "../src/SwapFactory.sol";
+import "../SwapFactory.sol";
 
 contract TestFactory is SwapFactory {
     Asset[] private _asset;

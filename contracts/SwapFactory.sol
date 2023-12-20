@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {IErrors} from "../interfaces/IErrors.sol";
-import {ISwap} from "../interfaces/ISwap.sol";
-import {ISwapFactory} from "../interfaces/ISwapFactory.sol";
+import {IErrors} from "./interfaces/IErrors.sol";
+import {ISwap} from "./interfaces/ISwap.sol";
+import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
 
 /**
  * @dev SwapFactory is a helper for creating Swaps and making asset structs.
