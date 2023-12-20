@@ -58,6 +58,10 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
         if (biding.length == 0 || asking.length == 0)
             revert InvalidAssetsLength();
 
-        return Swap(owner, allowed, expiry, biding, asking);
+    if (biding.length == 0 || asking.length == 0) {
+      revert InvalidAssetsLength();
     }
+
+    return Swap(owner, allowed, expiry, biding, asking);
+  }
 }
