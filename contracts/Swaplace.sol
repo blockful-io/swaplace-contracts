@@ -54,8 +54,8 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /**
    * @dev See {ISwaplace-acceptSwap}.
    */
-  function acceptSwap(uint256 id) public returns (bool) {
-    Swap memory swap = _swaps[id];
+  function acceptSwap(uint256 swapId) public returns (bool) {
+    Swap memory swap = _swaps[swapId];
 
     if (swap.allowed != address(0) && swap.allowed != msg.sender) {
       revert InvalidAddress(msg.sender);
@@ -65,7 +65,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       revert InvalidExpiry(swap.expiry);
     }
 
-    _swaps[id].expiry = 0;
+    _swaps[swapId].expiry = 0;
 
     Asset[] memory assets = swap.asking;
 
@@ -93,7 +93,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       }
     }
 
-    emit SwapAccepted(id, msg.sender);
+    emit SwapAccepted(swapId, msg.sender);
 
     return true;
   }
@@ -101,8 +101,8 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /**
    * @dev See {ISwaplace-cancelSwap}.
    */
-  function cancelSwap(uint256 id) public {
-    Swap memory swap = _swaps[id];
+  function cancelSwap(uint256 swapId) public {
+    Swap memory swap = _swaps[swapId];
 
     if (swap.owner != msg.sender) {
       revert InvalidAddress(msg.sender);
@@ -112,16 +112,16 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       revert InvalidExpiry(swap.expiry);
     }
 
-    _swaps[id].expiry = 0;
+    _swaps[swapId].expiry = 0;
 
-    emit SwapCanceled(id, msg.sender);
+    emit SwapCanceled(swapId, msg.sender);
   }
 
   /**
    * @dev See {ISwaplace-getSwap}.
    */
-  function getSwap(uint256 id) public view returns (Swap memory) {
-    return _swaps[id];
+  function getSwap(uint256 swapId) public view returns (Swap memory) {
+    return _swaps[swapId];
   }
 
   /**

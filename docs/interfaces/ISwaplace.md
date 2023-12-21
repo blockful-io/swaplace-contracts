@@ -7,7 +7,7 @@ Interface of the {Swaplace} implementation.
 ### SwapCreated
 
 ```solidity
-event SwapCreated(uint256 id, address owner, uint256 expiry)
+event SwapCreated(uint256 swapId, address owner, uint256 expiry)
 ```
 
 Emitted when a new Swap is created.
@@ -15,7 +15,7 @@ Emitted when a new Swap is created.
 ### SwapAccepted
 
 ```solidity
-event SwapAccepted(uint256 id, address acceptee)
+event SwapAccepted(uint256 swapId, address acceptee)
 ```
 
 Emitted when a Swap is accepted.
@@ -23,7 +23,7 @@ Emitted when a Swap is accepted.
 ### SwapCanceled
 
 ```solidity
-event SwapCanceled(uint256 id, address owner)
+event SwapCanceled(uint256 swapId, address owner)
 ```
 
 Emitted when a Swap is canceled.
@@ -34,20 +34,20 @@ Emitted when a Swap is canceled.
 function createSwap(struct ISwap.Swap Swap) external returns (uint256)
 ```
 
-Allow users to create a Swap. Each new Swap self-increments its id by one.
+Allow users to create a Swap. Each new Swap self-increments its ID by one.
 
 Requirements:
 
--   `owner` must be the caller address.
--   `expiry` should be bigger than timestamp.
--   `biding` and `asking` must not be empty.
+- `owner` must be the caller address.
+- `expiry` should be bigger than timestamp.
+- `biding` and `asking` must not be empty.
 
 Emits a {SwapCreated} event.
 
 ### acceptSwap
 
 ```solidity
-function acceptSwap(uint256 id) external returns (bool)
+function acceptSwap(uint256 swapId) external returns (bool)
 ```
 
 Accepts a Swap. Once the Swap is accepted, the expiry is set
@@ -55,10 +55,10 @@ to zero to avoid reutilization.
 
 Requirements:
 
--   `allowed` must be the zero address or match the caller address.
--   `expiry` must be bigger than timestamp.
--   `biding` assets must be allowed to transfer.
--   `asking` assets must be allowed to transfer.
+- `allowed` must be the zero address or match the caller address.
+- `expiry` must be bigger than timestamp.
+- `biding` assets must be allowed to transfer.
+- `asking` assets must be allowed to transfer.
 
 Emits a {SwapAccepted} event.
 
@@ -68,7 +68,7 @@ will revert, preventing reentrancy attacks.
 ### cancelSwap
 
 ```solidity
-function cancelSwap(uint256 id) external
+function cancelSwap(uint256 swapId) external
 ```
 
 Cancels an active Swap by setting the expiry to zero.
@@ -78,15 +78,15 @@ or is already canceled.
 
 Requirements:
 
--   `owner` must be the caller adress.
--   `expiry` must be bigger than timestamp.
+- `owner` must be the caller adress.
+- `expiry` must be bigger than timestamp.
 
 Emits a {SwapCanceled} event.
 
 ### getSwap
 
 ```solidity
-function getSwap(uint256 id) external view returns (struct ISwap.Swap)
+function getSwap(uint256 swapId) external view returns (struct ISwap.Swap)
 ```
 
 Retrieves the details of a Swap based on the `swapId` provided.

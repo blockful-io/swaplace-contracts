@@ -11,7 +11,7 @@ export async function main() {
   // Get the Swaplace instance
   const Swaplace = new ethers.Contract(swaplaceAddress, abi.abi, signer);
 
-  // Get the swap id
+  // Get the swap ID
   const swapId = 1;
 
   // Get the swap
