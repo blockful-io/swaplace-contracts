@@ -7,7 +7,7 @@ Interface of the {Swaplace} implementation.
 ### SwapCreated
 
 ```solidity
-event SwapCreated(uint256 swapId, address owner, uint256 expiry)
+event SwapCreated(uint256 swapId, address owner, address allowed, uint256 expiry)
 ```
 
 Emitted when a new Swap is created.
