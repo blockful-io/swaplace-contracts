@@ -11,7 +11,7 @@ interface ISwaplace {
    * @dev Emitted when a new Swap is created.
    */
   event SwapCreated(
-    uint256 indexed id,
+    uint256 indexed swapId,
     address indexed owner,
     uint256 indexed expiry
   );
@@ -19,15 +19,15 @@ interface ISwaplace {
   /**
    * @dev Emitted when a Swap is accepted.
    */
-  event SwapAccepted(uint256 indexed id, address indexed acceptee);
+  event SwapAccepted(uint256 indexed swapId, address indexed acceptee);
 
   /**
    * @dev Emitted when a Swap is canceled.
    */
-  event SwapCanceled(uint256 indexed id, address indexed owner);
+  event SwapCanceled(uint256 indexed swapId, address indexed owner);
 
   /**
-   * @dev Allow users to create a Swap. Each new Swap self-increments its id by one.
+   * @dev Allow users to create a Swap. Each new Swap self-increments its ID by one.
    *
    * Requirements:
    *
@@ -55,7 +55,7 @@ interface ISwaplace {
    * NOTE: The expiry is set to 0, because if the Swap is expired it
    * will revert, preventing reentrancy attacks.
    */
-  function acceptSwap(uint256 id) external returns (bool);
+  function acceptSwap(uint256 swapId) external returns (bool);
 
   /**
    * @dev Cancels an active Swap by setting the expiry to zero.
@@ -70,7 +70,7 @@ interface ISwaplace {
    *
    * Emits a {SwapCanceled} event.
    */
-  function cancelSwap(uint256 id) external;
+  function cancelSwap(uint256 swapId) external;
 
   /**
    * @dev Retrieves the details of a Swap based on the `swapId` provided.
@@ -79,5 +79,5 @@ interface ISwaplace {
    * You can check if a Swap exists by checking if the `owner` is the zero address.
    * If the `owner` is the zero address, then the Swap doesn't exist.
    */
-  function getSwap(uint256 id) external view returns (ISwap.Swap memory);
+  function getSwap(uint256 swapId) external view returns (ISwap.Swap memory);
 }
