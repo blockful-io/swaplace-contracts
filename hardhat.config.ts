@@ -4,8 +4,6 @@ import "solidity-docgen";
 import dotenv from "dotenv";
 dotenv.config();
 
-const { SWAP_CREATOR_PRIVATE_KEY, SWAP_ACCEPTEE_PRIVATE_KEY } = process.env;
-
 const DEPLOYER_PRIVATE_KEY =
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 
@@ -20,7 +18,13 @@ const config: HardhatUserConfig = {
      */
     sepolia: {
       url: `${process.env.SEPOLIA_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+      accounts: [
+        `${
+          process.env.DEPLOYER_PRIVATE_KEY
+            ? process.env.DEPLOYER_PRIVATE_KEY
+            : DEPLOYER_PRIVATE_KEY
+        }`,
+      ],
     },
     goerli: {
       url: `${process.env.SEPOLIA_RPC_URL}`,
