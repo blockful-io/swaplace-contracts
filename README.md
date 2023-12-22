@@ -9,21 +9,20 @@ This repository contains the core smart contracts for the Swaplace Protocol; The
 
 This repository is subjected to incentives for the community to contribute to the project. The incentive distribution and amount are being discussed but the eligibility has already started.
 
+### TL;DR
+
+-   Contracts cannot be upgraded.
+-   Contracts have no ownership.
+-   Contracts don't charge fees.
+-   There are no external contract dependencies.
+-   The protocol operates using available allowances.
+
 ## Setup
 
--   Yarn:
-
-You should install the dependencies using Yarn to deploy this code to a local testnet. The project uses Hardhat as a development environment. Which relies on Node.js (Recommended [v18.16.0](https://nodejs.org/download/release/v18.16.0/)).
-
-Install Yarn globally:
+You should install the dependencies using Yarn to deploy this code to a local testnet. The project uses Hardhat as a development environment. Which relies on Node.js (Recommended v18.16.0).
 
 ```
 npm install --global yarn
-```
-
-Check your Yarn version:
-
-```
 yarn --version
 ```
 
@@ -31,47 +30,6 @@ Later on, install the dependencies using Yarn.
 
 ```
 yarn install
-```
-
--   NodeJS:
-
-Windows: download the recommended version here: [v18.16.0](https://nodejs.org/download/release/v18.16.0/)
-
-MacOS/Linux: run the following command to install the correct version:
-
-```
-nvm install 18.16.0
-```
-
-To make sure that NodeJS is installed correctly, open the integrated terminal in MacOS/Linux, or command line (cmd), PowerShell in Windows.
-Run the following commands to verify the installed versions:
-
-```
-node -v
-```
-
-You should see this:
-
-```
-v18.16.0
-```
-
-And also run this:
-
-```
-npm -v
-```
-
-You should see this:
-
-```
-9.5.1
-```
-
-Later on, install the dependencies using NodeJS.
-
-```
-npm install
 ```
 
 ### Environment Variables
