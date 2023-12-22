@@ -13,7 +13,8 @@ interface ISwaplace {
   event SwapCreated(
     uint256 indexed swapId,
     address indexed owner,
-    uint256 indexed expiry
+    address indexed allowed,
+    uint256 expiry
   );
 
   /**

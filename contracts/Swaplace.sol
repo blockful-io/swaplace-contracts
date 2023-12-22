@@ -41,7 +41,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     _swaps[swapId] = swap;
 
-    emit SwapCreated(swapId, msg.sender, swap.expiry);
+    emit SwapCreated(swapId, msg.sender, swap.allowed, swap.expiry);
 
     return swapId;
   }
