@@ -5,10 +5,6 @@
 
 This repository contains the core smart contracts for the Swaplace Protocol; The lightest Swap protocol in the market.
 
-## Incentives
-
-This repository is subjected to incentives for the community to contribute to the project. The incentive distribution and amount are being discussed but the eligibility has already started.
-
 ### TL;DR
 
 -   Contracts cannot be upgraded.
@@ -16,6 +12,10 @@ This repository is subjected to incentives for the community to contribute to th
 -   Contracts don't charge fees.
 -   There are no external contract dependencies.
 -   The protocol operates using available allowances.
+
+## Incentives
+
+This repository is subjected to incentives for the community to contribute to the project. The incentive distribution and amount are being discussed but the eligibility has already started.
 
 ## Setup
 
