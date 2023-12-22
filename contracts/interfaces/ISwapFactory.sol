@@ -31,4 +31,13 @@ interface ISwapFactory {
     ISwap.Asset[] memory assets,
     ISwap.Asset[] memory asking
   ) external view returns (ISwap.Swap memory);
+
+  function packData(
+    address allowed,
+    uint256 expiry
+  ) external pure returns(uint256);
+
+  function parseData(
+    uint256 config
+  ) external pure returns (address,uint256);
 }

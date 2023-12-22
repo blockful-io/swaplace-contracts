@@ -26,7 +26,9 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function createSwap(Swap calldata swap) public returns (uint256) {
     if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
+    (address allowed , uint256 expiry) = parseData(swap.config);
+
+    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
     if (swap.biding.length == 0 || swap.asking.length == 0)
       revert InvalidAssetsLength();
@@ -41,7 +43,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     _swaps[swapId] = swap;
 
-    emit SwapCreated(swapId, msg.sender, swap.allowed, swap.expiry);
+    emit SwapCreated(swapId, msg.sender, allowed, expiry);
 
     return swapId;
   }
@@ -52,12 +54,16 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function acceptSwap(uint256 swapId) public returns (bool) {
     Swap memory swap = _swaps[swapId];
 
-    if (swap.allowed != address(0) && swap.allowed != msg.sender)
+    (address allowed , uint256 expiry) = parseData(swap.config);
+
+    if (allowed != address(0) && allowed != msg.sender)
       revert InvalidAddress(msg.sender);
 
-    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
+    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
-    _swaps[swapId].expiry = 0;
+    expiry = 0;
+
+    _swaps[swapId].config = packData(allowed,expiry);
 
     Asset[] memory assets = swap.asking;
 
@@ -98,9 +104,13 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
+    (address allowed , uint256 expiry) = parseData(swap.config);
 
-    _swaps[swapId].expiry = 0;
+    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
+
+    expiry = 0;
+
+    _swaps[swapId].config = packData(allowed,expiry);
 
     emit SwapCanceled(swapId, msg.sender);
   }
