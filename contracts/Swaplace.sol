@@ -24,17 +24,12 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
    * @dev See {ISwaplace-createSwap}.
    */
   function createSwap(Swap calldata swap) public returns (uint256) {
-    if (swap.owner != msg.sender) {
-      revert InvalidAddress(msg.sender);
-    }
+    if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    if (swap.expiry < block.timestamp) {
-      revert InvalidExpiry(swap.expiry);
-    }
+    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
 
-    if (swap.biding.length == 0 || swap.asking.length == 0) {
+    if (swap.biding.length == 0 || swap.asking.length == 0)
       revert InvalidAssetsLength();
-    }
 
     unchecked {
       assembly {
@@ -57,13 +52,10 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function acceptSwap(uint256 swapId) public returns (bool) {
     Swap memory swap = _swaps[swapId];
 
-    if (swap.allowed != address(0) && swap.allowed != msg.sender) {
+    if (swap.allowed != address(0) && swap.allowed != msg.sender)
       revert InvalidAddress(msg.sender);
-    }
 
-    if (swap.expiry < block.timestamp) {
-      revert InvalidExpiry(swap.expiry);
-    }
+    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
 
     _swaps[swapId].expiry = 0;
 
@@ -104,13 +96,9 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function cancelSwap(uint256 swapId) public {
     Swap memory swap = _swaps[swapId];
 
-    if (swap.owner != msg.sender) {
-      revert InvalidAddress(msg.sender);
-    }
+    if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    if (swap.expiry < block.timestamp) {
-      revert InvalidExpiry(swap.expiry);
-    }
+    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
 
     _swaps[swapId].expiry = 0;
 
