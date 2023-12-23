@@ -26,41 +26,37 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
  *
  * - The `address` of the asset. This address can be from an ERC20 or ERC721 contract.
  * - The `amount` or `id` of the asset. This amount can be the amount of ERC20 tokens
- *  or the id of an ERC721 token.
+ *  or the ID of an ERC721 token.
  *
  * To use other standards, like ERC1155, you can wrap the ownership of the asset
  * in an a trusted contract and Swap as an ERC721. This way, you can tokenize any
  * on-chain execution and trade on Swaplace.
  */
 abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
-    /**
-     * @dev See {ISwapFactory-makeAsset}.
-     */
-    function makeAsset(
-        address addr,
-        uint256 amountOrId
-    ) public pure virtual returns (Asset memory) {
-        return Asset(addr, amountOrId);
-    }
+  /**
+   * @dev See {ISwapFactory-makeAsset}.
+   */
+  function makeAsset(
+    address addr,
+    uint256 amountOrId
+  ) public pure virtual returns (Asset memory) {
+    return Asset(addr, amountOrId);
+  }
 
-    /**
-     * @dev See {ISwapFactory-makeSwap}.
-     */
-    function makeSwap(
-        address owner,
-        address allowed,
-        uint256 expiry,
-        Asset[] memory biding,
-        Asset[] memory asking
-    ) public view virtual returns (Swap memory) {
-        if (expiry < block.timestamp) {
-            revert InvalidExpiry(expiry);
-        }
+  /**
+   * @dev See {ISwapFactory-makeSwap}.
+   */
+  function makeSwap(
+    address owner,
+    address allowed,
+    uint256 expiry,
+    Asset[] memory biding,
+    Asset[] memory asking
+  ) public view virtual returns (Swap memory) {
+    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
-        if (biding.length == 0 || asking.length == 0) {
-            revert InvalidAssetsLength();
-        }
+    if (biding.length == 0 || asking.length == 0) revert InvalidAssetsLength();
 
-        return Swap(owner, allowed, expiry, biding, asking);
-    }
+    return Swap(owner, allowed, expiry, biding, asking);
+  }
 }

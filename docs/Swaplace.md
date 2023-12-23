@@ -18,7 +18,7 @@ _See {ISwaplace-createSwap}._
 ### acceptSwap
 
 ```solidity
-function acceptSwap(uint256 id) public returns (bool)
+function acceptSwap(uint256 swapId) public returns (bool)
 ```
 
 _See {ISwaplace-acceptSwap}._
@@ -26,7 +26,7 @@ _See {ISwaplace-acceptSwap}._
 ### cancelSwap
 
 ```solidity
-function cancelSwap(uint256 id) public
+function cancelSwap(uint256 swapId) public
 ```
 
 _See {ISwaplace-cancelSwap}._
@@ -34,7 +34,7 @@ _See {ISwaplace-cancelSwap}._
 ### getSwap
 
 ```solidity
-function getSwap(uint256 id) public view returns (struct ISwap.Swap)
+function getSwap(uint256 swapId) public view returns (struct ISwap.Swap)
 ```
 
 _See {ISwaplace-getSwap}._

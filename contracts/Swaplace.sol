@@ -14,131 +14,119 @@ import {SwapFactory} from "./SwapFactory.sol";
  * `approve` or `permit` function.
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165 {
-    /// @dev Swap Identifier counter.
-    uint256 private _totalSwaps;
+  /// @dev Swap Identifier counter.
+  uint256 private _totalSwaps;
 
-    /// @dev Mapping of Swap ID to Swap struct. See {ISwap-Swap}.
-    mapping(uint256 => Swap) private _swaps;
+  /// @dev Mapping of Swap ID to Swap struct. See {ISwap-Swap}.
+  mapping(uint256 => Swap) private _swaps;
 
-    /**
-     * @dev See {ISwaplace-createSwap}.
-     */
-    function createSwap(Swap calldata swap) public returns (uint256) {
-        if (swap.owner != msg.sender) {
-            revert InvalidAddress(msg.sender);
-        }
+  /**
+   * @dev See {ISwaplace-createSwap}.
+   */
+  function createSwap(Swap calldata swap) public returns (uint256) {
+    if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-        if (swap.expiry < block.timestamp) {
-            revert InvalidExpiry(swap.expiry);
-        }
+    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
 
-        if (swap.biding.length == 0 || swap.asking.length == 0) {
-            revert InvalidAssetsLength();
-        }
+    if (swap.biding.length == 0 || swap.asking.length == 0)
+      revert InvalidAssetsLength();
 
-        unchecked {
-            assembly {
-                sstore(_totalSwaps.slot, add(sload(_totalSwaps.slot), 1))
-            }
-        }
-
-        uint256 swapId = _totalSwaps;
-
-        _swaps[swapId] = swap;
-
-        emit SwapCreated(swapId, msg.sender, swap.expiry);
-
-        return swapId;
+    unchecked {
+      assembly {
+        sstore(_totalSwaps.slot, add(sload(_totalSwaps.slot), 1))
+      }
     }
 
-    /**
-     * @dev See {ISwaplace-acceptSwap}.
-     */
-    function acceptSwap(uint256 id) public returns (bool) {
-        Swap memory swap = _swaps[id];
+    uint256 swapId = _totalSwaps;
 
-        if (swap.allowed != address(0) && swap.allowed != msg.sender) {
-            revert InvalidAddress(msg.sender);
-        }
+    _swaps[swapId] = swap;
 
-        if (swap.expiry < block.timestamp) {
-            revert InvalidExpiry(swap.expiry);
-        }
+    emit SwapCreated(swapId, msg.sender, swap.allowed, swap.expiry);
 
-        _swaps[id].expiry = 0;
+    return swapId;
+  }
 
-        Asset[] memory assets = swap.asking;
+  /**
+   * @dev See {ISwaplace-acceptSwap}.
+   */
+  function acceptSwap(uint256 swapId) public returns (bool) {
+    Swap memory swap = _swaps[swapId];
 
-        for (uint256 i = 0; i < assets.length; ) {
-            ITransfer(assets[i].addr).transferFrom(
-                msg.sender,
-                swap.owner,
-                assets[i].amountOrId
-            );
-            unchecked {
-                i++;
-            }
-        }
+    if (swap.allowed != address(0) && swap.allowed != msg.sender)
+      revert InvalidAddress(msg.sender);
 
-        assets = swap.biding;
+    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
 
-        for (uint256 i = 0; i < assets.length; ) {
-            ITransfer(assets[i].addr).transferFrom(
-                swap.owner,
-                msg.sender,
-                assets[i].amountOrId
-            );
-            unchecked {
-                i++;
-            }
-        }
+    _swaps[swapId].expiry = 0;
 
-        emit SwapAccepted(id, msg.sender);
+    Asset[] memory assets = swap.asking;
 
-        return true;
+    for (uint256 i = 0; i < assets.length; ) {
+      ITransfer(assets[i].addr).transferFrom(
+        msg.sender,
+        swap.owner,
+        assets[i].amountOrId
+      );
+      unchecked {
+        i++;
+      }
     }
 
-    /**
-     * @dev See {ISwaplace-cancelSwap}.
-     */
-    function cancelSwap(uint256 id) public {
-        Swap memory swap = _swaps[id];
+    assets = swap.biding;
 
-        if (swap.owner != msg.sender) {
-            revert InvalidAddress(msg.sender);
-        }
-
-        if (swap.expiry < block.timestamp) {
-            revert InvalidExpiry(swap.expiry);
-        }
-
-        _swaps[id].expiry = 0;
-
-        emit SwapCanceled(id, msg.sender);
+    for (uint256 i = 0; i < assets.length; ) {
+      ITransfer(assets[i].addr).transferFrom(
+        swap.owner,
+        msg.sender,
+        assets[i].amountOrId
+      );
+      unchecked {
+        i++;
+      }
     }
 
-    /**
-     * @dev See {ISwaplace-getSwap}.
-     */
-    function getSwap(uint256 id) public view returns (Swap memory) {
-        return _swaps[id];
-    }
+    emit SwapAccepted(swapId, msg.sender);
 
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(
-        bytes4 interfaceID
-    ) external pure override(IERC165) returns (bool) {
-        return
-            interfaceID == type(IERC165).interfaceId ||
-            interfaceID == type(ISwaplace).interfaceId;
-    }
+    return true;
+  }
 
-    /**
-     * @dev Getter function for _totalSwaps.
-     */
-    function totalSwaps() public view returns (uint256) {
-        return _totalSwaps;
-    }
+  /**
+   * @dev See {ISwaplace-cancelSwap}.
+   */
+  function cancelSwap(uint256 swapId) public {
+    Swap memory swap = _swaps[swapId];
+
+    if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
+
+    if (swap.expiry < block.timestamp) revert InvalidExpiry(swap.expiry);
+
+    _swaps[swapId].expiry = 0;
+
+    emit SwapCanceled(swapId, msg.sender);
+  }
+
+  /**
+   * @dev See {ISwaplace-getSwap}.
+   */
+  function getSwap(uint256 swapId) public view returns (Swap memory) {
+    return _swaps[swapId];
+  }
+
+  /**
+   * @dev See {IERC165-supportsInterface}.
+   */
+  function supportsInterface(
+    bytes4 interfaceID
+  ) external pure override(IERC165) returns (bool) {
+    return
+      interfaceID == type(IERC165).interfaceId ||
+      interfaceID == type(ISwaplace).interfaceId;
+  }
+
+  /**
+   * @dev Getter function for _totalSwaps.
+   */
+  function totalSwaps() public view returns (uint256) {
+    return _totalSwaps;
+  }
 }
