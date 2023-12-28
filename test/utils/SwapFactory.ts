@@ -13,8 +13,7 @@ export interface Asset {
  */
 export interface Swap {
   owner: string;
-  allowed: string;
-  expiry: number;
+  config: number;
   biding: Asset[];
   asking: Asset[];
 }
@@ -55,11 +54,13 @@ export async function makeAsset(
  */
 export async function makeSwap(
   owner: any,
-  allowed: any,
-  expiry: any,
+  config: any,
   biding: Asset[],
   asking: Asset[],
 ) {
+  const expiry: bigint =
+    BigInt(config) & ((BigInt(1) << BigInt(96)) - BigInt(1));
+
   // check for the current `block.timestamp` because `expiry` cannot be in the past
   const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
   if (expiry < timestamp) {
@@ -79,8 +80,7 @@ export async function makeSwap(
 
   const swap: Swap = {
     owner: owner,
-    allowed: allowed,
-    expiry: expiry,
+    config: config,
     biding: biding,
     asking: asking,
   };
@@ -109,8 +109,7 @@ export async function makeSwap(
  */
 export async function composeSwap(
   owner: any,
-  allowed: any,
-  expiry: any,
+  config: any,
   bidingAddr: any[],
   bidingAmountOrId: any[],
   askingAddr: any[],
@@ -135,7 +134,7 @@ export async function composeSwap(
     asking.push(await makeAsset(addr, askingAmountOrId[index]));
   });
 
-  return await makeSwap(owner, allowed, expiry, biding, asking);
+  return await makeSwap(owner, config, biding, asking);
 }
 
 module.exports = {
