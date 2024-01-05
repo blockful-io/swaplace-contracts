@@ -19,12 +19,13 @@ This repository is subjected to incentives for the community to contribute to th
 
 ## Features
 
-- **Create Swaps**: A Swap has an `owner` and an `allowed` address. The `owner` is the one that can cancel the swap while the `allowed` address is the one that can execute the swap but anyone can accept if it's set as the Zero Address. A Swap also has an `expiry` period in seconds. The `allowed` and `expiry` are packed into `config` for gas optimization. The Swap can only be executed before the expiry period is reached. The `Asset` type represents on one hand the bidding assets and on the other hand the asking assets.
+- **Create Swaps**: A Swap has an `owner` and an `allowed` address. The `owner` is the one that can cancel the swap while the `allowed` address is the one that can execute the swap but anyone can accept if it's set as the Zero Address. A Swap also has an `expiry` period in seconds. The Swap can only be executed before the expiry period is reached. The `Asset` type represents on one hand the bidding assets and on the other hand the asking assets.
 
 ```
     struct Swap {
         address owner;
-        uint256 config;
+        address allowed;
+        uint256 expiry;
         Asset[] biding;
         Asset[] asking;
     }
