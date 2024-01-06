@@ -39,7 +39,7 @@ This repository is subjected to incentives for the community to contribute to th
 
 ## Setup
 
-You should install the dependencies using Yarn to deploy this code to a local testnet. The project uses Hardhat as a development environment. Which relies on Node.js (Recommended v18.16.0).
+You should install the dependencies using Yarn to deploy this code to a local testnet. The project uses Hardhat as a development environment, which relies on Node.js (Recommended v18.16.0).
 
 ```
 npm install --global yarn
