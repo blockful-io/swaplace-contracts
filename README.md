@@ -39,80 +39,35 @@ This repository is subjected to incentives for the community to contribute to th
 
 ## Setup
 
--   Yarn:
+You should install the dependencies using Yarn (used in the project) or npm to deploy this code. The project uses Hardhat as a development environment. Which relies on Node.js (Recommended version [v18.16.0](https://nodejs.org/download/release/v18.16.0/)).
 
-You should install the dependencies using Yarn to deploy this code to a local testnet. The project uses Hardhat as a development environment. Which relies on Node.js (Recommended [v18.16.0](https://nodejs.org/download/release/v18.16.0/)).
+To make sure that NodeJS is installed correctly, open the integrated terminal and run the following command:
 
-Install Yarn globally:
+```
+node -v
+```
+
+### Yarn:
+
+Install Yarn globally and check if the version appears:
 
 ```
 npm install --global yarn
-```
-
-Check your Yarn version:
-
-```
 yarn --version
-
 ```
 
-Later on, install the dependencies using Yarn.
+Install the dependencies using Yarn:
 
 ```
-
 yarn install
-
 ```
 
--   NodeJS:
+### npm:
 
-Windows: download the recommended version here: [v18.16.0](https://nodejs.org/download/release/v18.16.0/)
-
-MacOS/Linux: run the following command to install the correct version:
+Install the dependencies using npm:
 
 ```
-nvm install 18.16.0
-```
-
-To make sure that NodeJS is installed correctly, open the integrated terminal in MacOS/Linux, or command line (cmd), PowerShell in Windows.
-Run the following commands to verify the installed versions:
-
-```
-
-node -v
-
-```
-
-You should see this:
-
-```
-
-v18.16.0
-
-```
-
-And also run this:
-
-```
-
-npm -v
-
-```
-
-You should see this:
-
-```
-
-9.5.1
-
-```
-
-Later on, install the dependencies using NodeJS.
-
-```
-
 npm install
-
 ```
 
 ### Environment Variables
