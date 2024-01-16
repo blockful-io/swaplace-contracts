@@ -32,10 +32,12 @@ describe("Swaplace", async function () {
     const askingAddr = [MockERC20.address];
     const askingAmountOrId = [50];
 
+    const expiry = (await blocktimestamp()) * 2;
+    const config = await Swaplace.packData(zeroAddress, expiry);
+
     const swap: Swap = await composeSwap(
       owner.address,
-      zeroAddress,
-      (await blocktimestamp()) * 2,
+      config,
       bidingAddr,
       bidingAmountOrId,
       askingAddr,
@@ -61,10 +63,12 @@ describe("Swaplace", async function () {
         const askingAddr = [MockERC20.address];
         const askingAmountOrId = [50];
 
+        const expiry = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, expiry);
+
         const swap: Swap = await composeSwap(
           owner.address,
-          zeroAddress,
-          (await blocktimestamp()) * 2,
+          config,
           bidingAddr,
           bidingAmountOrId,
           askingAddr,
@@ -73,7 +77,12 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            zeroAddress,
+            expiry,
+          );
       });
 
       it("Should be able to create a 1-N swap with ERC20", async function () {
@@ -87,10 +96,12 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [50, 100, 150];
 
+        const expiry = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, expiry);
+
         const swap: Swap = await composeSwap(
           owner.address,
-          zeroAddress,
-          (await blocktimestamp()) * 2,
+          config,
           bidingAddr,
           bidingAmountOrId,
           askingAddr,
@@ -99,7 +110,12 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            zeroAddress,
+            expiry,
+          );
       });
 
       it("Should be able to create a N-N swap with ERC20", async function () {
@@ -117,10 +133,12 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [50, 100, 150];
 
+        const expiry = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, expiry);
+
         const swap: Swap = await composeSwap(
           owner.address,
-          zeroAddress,
-          (await blocktimestamp()) * 2,
+          config,
           bidingAddr,
           bidingAmountOrId,
           askingAddr,
@@ -129,7 +147,12 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            zeroAddress,
+            expiry,
+          );
       });
 
       it("Should be able to create a 1-1 swap with ERC721", async function () {
@@ -139,10 +162,12 @@ describe("Swaplace", async function () {
         const askingAddr = [MockERC721.address];
         const askingAmountOrId = [4];
 
+        const expiry = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, expiry);
+
         const swap: Swap = await composeSwap(
           owner.address,
-          zeroAddress,
-          (await blocktimestamp()) * 2,
+          config,
           bidingAddr,
           bidingAmountOrId,
           askingAddr,
@@ -151,7 +176,12 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            zeroAddress,
+            expiry,
+          );
       });
 
       it("Should be able to create a 1-N swap with ERC721", async function () {
@@ -165,10 +195,12 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [4, 5, 6];
 
+        const expiry = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, expiry);
+
         const swap: Swap = await composeSwap(
           owner.address,
-          zeroAddress,
-          (await blocktimestamp()) * 2,
+          config,
           bidingAddr,
           bidingAmountOrId,
           askingAddr,
@@ -177,7 +209,12 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            zeroAddress,
+            expiry,
+          );
       });
 
       it("Should be able to create a N-N swap with ERC721", async function () {
@@ -195,10 +232,12 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [4, 5, 6];
 
+        const expiry = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, expiry);
+
         const swap: Swap = await composeSwap(
           owner.address,
-          zeroAddress,
-          (await blocktimestamp()) * 2,
+          config,
           bidingAddr,
           bidingAmountOrId,
           askingAddr,
@@ -207,7 +246,12 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            zeroAddress,
+            expiry,
+          );
       });
     });
 
@@ -222,11 +266,13 @@ describe("Swaplace", async function () {
       it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
         const swap = await mockSwap();
 
-        swap.expiry /= 2;
+        let [allowed, expiry] = await Swaplace.parseData(swap.config);
+        expiry /= 2;
+        swap.config = await Swaplace.packData(allowed, expiry);
 
         await expect(Swaplace.connect(owner).createSwap(swap))
           .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
-          .withArgs(swap.expiry);
+          .withArgs(expiry);
       });
 
       it("Should revert when {biding} and {asking} lengths are equal 0", async function () {
@@ -259,10 +305,12 @@ describe("Swaplace", async function () {
       const askingAddr = [MockERC20.address];
       const askingAmountOrId = [1000];
 
+      const expiry = (await blocktimestamp()) * 2;
+      const config = await Swaplace.packData(zeroAddress, expiry);
+
       swap = await composeSwap(
         owner.address,
-        zeroAddress,
-        (await blocktimestamp()) * 2,
+        config,
         bidingAddr,
         bidingAmountOrId,
         askingAddr,
@@ -302,9 +350,16 @@ describe("Swaplace", async function () {
         swap.biding.push(bidingAsset);
         swap.asking.push(askingAsset);
 
+        const [allowed, expiry] = await Swaplace.parseData(swap.config);
+
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed,
+            expiry,
+          );
 
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
@@ -324,11 +379,19 @@ describe("Swaplace", async function () {
         await MockERC721.connect(acceptee).approve(Swaplace.address, 10);
 
         const swap = await mockSwap();
-        swap.allowed = acceptee.address;
+        const allowed = acceptee.address;
+        const [, expiry] = await Swaplace.parseData(swap.config);
+
+        swap.config = await Swaplace.packData(allowed, expiry);
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed,
+            expiry,
+          );
 
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
@@ -367,7 +430,9 @@ describe("Swaplace", async function () {
       it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
         await Swaplace.connect(owner).createSwap(swap);
 
-        await network.provider.send("evm_increaseTime", [swap.expiry * 2]);
+        const [, expiry] = await Swaplace.parseData(swap.config);
+
+        await network.provider.send("evm_increaseTime", [expiry * 2]);
 
         await expect(
           Swaplace.connect(owner).acceptSwap(
@@ -376,7 +441,7 @@ describe("Swaplace", async function () {
           ),
         )
           .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
-          .withArgs(swap.expiry);
+          .withArgs(expiry);
       });
 
       it("Should revert when {allowance} is not provided", async function () {
@@ -400,11 +465,19 @@ describe("Swaplace", async function () {
         await MockERC721.connect(acceptee).approve(Swaplace.address, 10);
 
         const swap = await mockSwap();
-        swap.allowed = deployer.address;
+        const allowed = deployer.address;
+
+        const [, expiry] = await Swaplace.parseData(swap.config);
+        swap.config = await Swaplace.packData(allowed, expiry);
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed,
+            expiry,
+          );
 
         await expect(
           Swaplace.connect(acceptee).acceptSwap(
@@ -458,12 +531,14 @@ describe("Swaplace", async function () {
       });
 
       it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
-        await network.provider.send("evm_increaseTime", [swap.expiry * 2]);
+        const [, expiry] = await Swaplace.parseData(swap.config);
+
+        await network.provider.send("evm_increaseTime", [expiry * 2]);
 
         const lastSwap = await Swaplace.totalSwaps();
         await expect(Swaplace.connect(owner).cancelSwap(lastSwap))
           .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
-          .withArgs(swap.expiry);
+          .withArgs(expiry);
       });
     });
   });
@@ -483,10 +558,12 @@ describe("Swaplace", async function () {
       const askingAddr = [MockERC20.address];
       const askingAmountOrId = [1000];
 
+      const expiry = (await blocktimestamp()) * 2;
+      const config = await Swaplace.packData(zeroAddress, expiry);
+
       swap = await composeSwap(
         owner.address,
-        zeroAddress,
-        (await blocktimestamp()) * 2,
+        config,
         bidingAddr,
         bidingAmountOrId,
         askingAddr,
@@ -512,8 +589,11 @@ describe("Swaplace", async function () {
       const fetchedSwap = await Swaplace.getSwap(imaginarySwapId);
       // swap.allowed can be the zero address and shoul not be trusted for validation
       expect(fetchedSwap.owner).to.be.deep.equals(zeroAddress);
-      expect(fetchedSwap.allowed).to.be.deep.equals(zeroAddress);
-      expect(fetchedSwap.expiry).to.be.deep.equals(0);
+      const [fetchedAllowed, fetchedExpiry] = await Swaplace.parseData(
+        fetchedSwap.config,
+      );
+      expect(fetchedAllowed).to.be.deep.equals(zeroAddress);
+      expect(fetchedExpiry).to.be.deep.equals(0);
     });
   });
 });
