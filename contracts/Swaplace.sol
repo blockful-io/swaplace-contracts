@@ -8,7 +8,7 @@ import {SwapFactory} from "./SwapFactory.sol";
 
 /**
  * @author @0xneves | @blockful_io
- * @dev Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stoped.
+ * @dev Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stopped.
  * Its cern is to facilitate swaps between virtual assets following the ERC standard.
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
  * `approve` or `permit` function.
@@ -26,7 +26,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function createSwap(Swap calldata swap) public returns (uint256) {
     if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    (address allowed , uint256 expiry) = parseData(swap.config);
+    (address allowed, uint256 expiry) = parseData(swap.config);
 
     if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
@@ -54,14 +54,14 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function acceptSwap(uint256 swapId) public returns (bool) {
     Swap memory swap = _swaps[swapId];
 
-    (address allowed , uint256 expiry) = parseData(swap.config);
+    (address allowed, uint256 expiry) = parseData(swap.config);
 
     if (allowed != address(0) && allowed != msg.sender)
       revert InvalidAddress(msg.sender);
 
     if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
-    _swaps[swapId].config = packData(allowed,0);
+    _swaps[swapId].config = packData(allowed, 0);
 
     Asset[] memory assets = swap.asking;
 
@@ -102,13 +102,11 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    (address allowed , uint256 expiry) = parseData(swap.config);
+    (address allowed, uint256 expiry) = parseData(swap.config);
 
     if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
-    expiry = 0;
-
-    _swaps[swapId].config = packData(allowed,expiry);
+    _swaps[swapId].config = packData(allowed, 0);
 
     emit SwapCanceled(swapId, msg.sender);
   }
