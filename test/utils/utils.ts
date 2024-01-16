@@ -32,5 +32,5 @@ export async function deploy(contractName: any, signer: any) {
 
 module.exports = {
   blocktimestamp,
-  deploy,
+  deploy
 };

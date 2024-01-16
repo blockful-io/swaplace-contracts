@@ -32,7 +32,7 @@ contract TestSwaplace is TestFactory {
     _token.approve(address(_swaplace), type(uint256).max);
 
     uint256 lastId = _swaplace.totalSwaps();
-    return (_swaplace.acceptSwap(lastId));
+    return (_swaplace.acceptSwap(lastId, address(0)));
   }
 
   function echidna_id_overflow() public view returns (bool) {

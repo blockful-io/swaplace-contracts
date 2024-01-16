@@ -15,6 +15,7 @@ describe("Swaplace", async function () {
   let deployer: SignerWithAddress;
   let owner: SignerWithAddress;
   let acceptee: SignerWithAddress;
+  let receiver: SignerWithAddress;
 
   // Solidity address(0)
   const zeroAddress = ethers.constants.AddressZero;
@@ -45,7 +46,7 @@ describe("Swaplace", async function () {
   }
 
   before(async () => {
-    [deployer, owner, acceptee] = await ethers.getSigners();
+    [deployer, owner, acceptee, receiver] = await ethers.getSigners();
     Swaplace = await deploy("Swaplace", deployer);
     MockERC20 = await deploy("MockERC20", deployer);
     MockERC721 = await deploy("MockERC721", deployer);
@@ -275,6 +276,7 @@ describe("Swaplace", async function () {
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
             await Swaplace.totalSwaps(),
+            receiver.address,
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
@@ -307,6 +309,7 @@ describe("Swaplace", async function () {
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
             await Swaplace.totalSwaps(),
+            receiver.address,
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
@@ -330,6 +333,7 @@ describe("Swaplace", async function () {
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
             await Swaplace.totalSwaps(),
+            receiver.address,
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
@@ -344,13 +348,17 @@ describe("Swaplace", async function () {
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
             await Swaplace.totalSwaps(),
+            receiver.address,
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
           .withArgs(await Swaplace.totalSwaps(), acceptee.address);
 
         await expect(
-          Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps()),
+          Swaplace.connect(acceptee).acceptSwap(
+            await Swaplace.totalSwaps(),
+            receiver.address,
+          ),
         )
           .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
           .withArgs(0);
@@ -362,7 +370,10 @@ describe("Swaplace", async function () {
         await network.provider.send("evm_increaseTime", [swap.expiry * 2]);
 
         await expect(
-          Swaplace.connect(owner).acceptSwap(await Swaplace.totalSwaps()),
+          Swaplace.connect(owner).acceptSwap(
+            await Swaplace.totalSwaps(),
+            receiver.address,
+          ),
         )
           .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
           .withArgs(swap.expiry);
@@ -374,7 +385,10 @@ describe("Swaplace", async function () {
         await Swaplace.connect(owner).createSwap(swap);
 
         await expect(
-          Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps()),
+          Swaplace.connect(acceptee).acceptSwap(
+            await Swaplace.totalSwaps(),
+            receiver.address,
+          ),
         ).to.be.revertedWith(`ERC721: caller is not token owner or approved`);
       });
 
@@ -393,7 +407,10 @@ describe("Swaplace", async function () {
           .withArgs(await Swaplace.totalSwaps(), owner.address, swap.allowed, swap.expiry);
 
         await expect(
-          Swaplace.connect(acceptee).acceptSwap(await Swaplace.totalSwaps()),
+          Swaplace.connect(acceptee).acceptSwap(
+            await Swaplace.totalSwaps(),
+            receiver.address,
+          ),
         )
           .to.be.revertedWithCustomError(Swaplace, "InvalidAddress")
           .withArgs(acceptee.address);
@@ -418,7 +435,9 @@ describe("Swaplace", async function () {
 
       it("Should not be able to {acceptSwap} a canceled a Swap", async function () {
         const lastSwap = await Swaplace.totalSwaps();
-        await expect(Swaplace.connect(owner).acceptSwap(lastSwap))
+        await expect(
+          Swaplace.connect(owner).acceptSwap(lastSwap, receiver.address),
+        )
           .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
           .withArgs(0);
       });

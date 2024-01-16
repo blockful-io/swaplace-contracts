@@ -49,7 +49,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /**
    * @dev See {ISwaplace-acceptSwap}.
    */
-  function acceptSwap(uint256 swapId) public returns (bool) {
+  function acceptSwap(uint256 swapId, address receiver) public returns (bool) {
     Swap memory swap = _swaps[swapId];
 
     if (swap.allowed != address(0) && swap.allowed != msg.sender)
@@ -77,7 +77,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     for (uint256 i = 0; i < assets.length; ) {
       ITransfer(assets[i].addr).transferFrom(
         swap.owner,
-        msg.sender,
+        receiver,
         assets[i].amountOrId
       );
       unchecked {
