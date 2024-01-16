@@ -57,7 +57,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
 
     if (biding.length == 0 || asking.length == 0) revert InvalidAssetsLength();
 
-    uint256 config=packData(allowed, expiry);
+    uint256 config = packData(allowed, expiry);
  
     return Swap(owner,config, biding, asking);
   }
