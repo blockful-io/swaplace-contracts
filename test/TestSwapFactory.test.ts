@@ -257,4 +257,15 @@ describe("Swaplace Factory", async function () {
       expect(error.message).to.be.equals("InvalidAssetsLength");
     }
   });
+
+  it("Should ensure packData() and parseData() return the right values",async function () {
+    const currentTimestamp = (await blocktimestamp()) * 2;
+
+    const config = await Swaplace.packData(acceptee.address, currentTimestamp);
+
+    const [allowed, expiry] = await Swaplace.parseData(config);
+
+    expect(allowed).to.be.equals(acceptee.address);
+    expect(expiry).to.be.equals(currentTimestamp);
+  });
 });
