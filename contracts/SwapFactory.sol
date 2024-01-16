@@ -62,6 +62,9 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
     return Swap(owner,config, biding, asking);
   }
 
+  /**
+   * @dev See {ISwapFactory-packData}.
+   */
   function packData(
     address allowed,
     uint256 expiry
@@ -69,6 +72,9 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
       return (uint256(uint160(allowed)) << 96) | uint256(expiry);
   }
 
+  /**
+   * @dev See {ISwapFactory-parseData}.
+   */
   function parseData(
     uint256 config
   ) public pure returns(address,uint256) {

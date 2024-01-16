@@ -24,9 +24,8 @@ interface ISwap {
      *
      * It is composed of:
      * - `owner` of the Swap.
-     * - `config` holds two values 'allowed' and 'expiry',packed using bitwise.  
-     *       'allowed' address to accept the Swap.
-     *       'expiry' date of the Swap.
+     * - `config` represents two packed values: 'allowed' for the allowed address   
+     * to accept the swap and 'expiry' for the expiration date of the swap.
      * - `biding` assets that are being bided by the owner.
      * - `asking` assets that are being asked by the owner.
      *

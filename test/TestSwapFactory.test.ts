@@ -44,12 +44,12 @@ describe("Swaplace Factory", async function () {
   });
 
   it("Should be able to {makeSwap} with ERC20 and ERC721", async function () {
-    const _expiry = (await blocktimestamp()) * 2;
+    const currentTimestamp = (await blocktimestamp()) * 2;
 
     const ERC20Asset: Asset = await makeAsset(MockERC20.address, 1000);
     const ERC721Asset: Asset = await makeAsset(MockERC721.address, 1);
 
-    const config = await Swaplace.packData(zeroAddress, _expiry);
+    const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
     const swap = await makeSwap(
       owner.address,
@@ -61,7 +61,7 @@ describe("Swaplace Factory", async function () {
     const [allowed, expiry] = await Swaplace.parseData(swap.config);
 
     expect(swap.owner).to.be.equals(owner.address);
-    expect(expiry).to.be.equals(_expiry);
+    expect(expiry).to.be.equals(currentTimestamp);
     expect(allowed).to.be.equals(zeroAddress);
     expect(swap.biding[0]).to.be.equals(ERC20Asset);
     expect(swap.asking[0]).to.be.equals(ERC721Asset);
@@ -111,12 +111,12 @@ describe("Swaplace Factory", async function () {
   });
 
   it("Should be able to {makeSwap} with multiple assets", async function () {
-    const _expiry = (await blocktimestamp()) * 2;
+    const currentTimestamp = (await blocktimestamp()) * 2;
 
     const ERC20Asset = await makeAsset(MockERC20.address, 1000);
     const ERC721Asset = await makeAsset(MockERC721.address, 1);
 
-    const config = await Swaplace.packData(zeroAddress, _expiry);
+    const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
     const swap = await makeSwap(
       owner.address,
@@ -136,7 +136,7 @@ describe("Swaplace Factory", async function () {
   });
 
   it("Should be able to {composeSwap} using both ERC20, ERC721", async function () {
-    const _expiry = (await blocktimestamp()) * 2;
+    const currentTimestamp = (await blocktimestamp()) * 2;
 
     const bidingAddr = [MockERC20.address, MockERC721.address];
     const bidingAmountOrId = [1000, 1];
@@ -144,7 +144,7 @@ describe("Swaplace Factory", async function () {
     const askingAddr = [MockERC721.address];
     const askingAmountOrId = [2];
 
-    const config = await Swaplace.packData(zeroAddress, _expiry);
+    const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
     const swap = await composeSwap(
       owner.address,
