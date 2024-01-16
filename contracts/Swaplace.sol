@@ -65,7 +65,11 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         assets[i].amountOrId
       );
       unchecked {
-        i++;
+        assembly {
+          i := mload(0x40)
+          i := add(i, 1)
+          mstore(0x40, i)
+        }
       }
     }
 
@@ -78,7 +82,11 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         assets[i].amountOrId
       );
       unchecked {
-        i++;
+        assembly {
+          i := mload(0x40)
+          i := add(i, 1)
+          mstore(0x40, i)
+        }
       }
     }
 
