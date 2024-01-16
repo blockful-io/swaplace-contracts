@@ -26,13 +26,15 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function createSwap(Swap calldata swap) public returns (uint256) {
     if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
+    uint256 swapId;
+
     unchecked {
       assembly {
         sstore(_totalSwaps.slot, add(sload(_totalSwaps.slot), 1))
+
+        swapId := sload(_totalSwaps.slot)
       }
     }
-
-    uint256 swapId = _totalSwaps;
 
     _swaps[swapId] = swap;
 
@@ -65,7 +67,13 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         assets[i].amountOrId
       );
       unchecked {
-        i++;
+        assembly {
+          i := mload(0x40)
+
+          i := add(i, 1)
+
+          mstore(0x40, i)
+        }
       }
     }
 
@@ -78,7 +86,13 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         assets[i].amountOrId
       );
       unchecked {
-        i++;
+        assembly {
+          i := mload(0x40)
+
+          i := add(i, 1)
+
+          mstore(0x40, i)
+        }
       }
     }
 
@@ -126,6 +140,14 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
    * @dev Getter function for _totalSwaps.
    */
   function totalSwaps() public view returns (uint256) {
-    return _totalSwaps;
+    uint256 swapId;
+
+    unchecked {
+      assembly {
+        swapId := sload(_totalSwaps.slot)
+      }
+    }
+    
+    return swapId;
   }
 }
