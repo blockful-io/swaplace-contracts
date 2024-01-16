@@ -11,10 +11,7 @@ interface ISwaplace {
    * @dev Emitted when a new Swap is created.
    */
   event SwapCreated(
-    uint256 indexed swapId,
-    address indexed owner,
-    address indexed allowed,
-    uint256 expiry
+    uint256 indexed swapId
   );
 
   /**

@@ -26,13 +26,6 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   function createSwap(Swap calldata swap) public returns (uint256) {
     if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    (address allowed, uint256 expiry) = parseData(swap.config);
-
-    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
-
-    if (swap.biding.length == 0 || swap.asking.length == 0)
-      revert InvalidAssetsLength();
-
     unchecked {
       assembly {
         sstore(_totalSwaps.slot, add(sload(_totalSwaps.slot), 1))
@@ -43,7 +36,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     _swaps[swapId] = swap;
 
-    emit SwapCreated(swapId, msg.sender, allowed, expiry);
+    emit SwapCreated(swapId);
 
     return swapId;
   }
