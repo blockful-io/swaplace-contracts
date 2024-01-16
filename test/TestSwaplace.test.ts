@@ -32,8 +32,8 @@ describe("Swaplace", async function () {
     const askingAddr = [MockERC20.address];
     const askingAmountOrId = [50];
 
-    const expiry = (await blocktimestamp()) * 2;
-    const config = await Swaplace.packData(zeroAddress, expiry);
+    const currentTimestamp = (await blocktimestamp()) * 2;
+    const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
     const swap: Swap = await composeSwap(
       owner.address,
@@ -63,8 +63,8 @@ describe("Swaplace", async function () {
         const askingAddr = [MockERC20.address];
         const askingAmountOrId = [50];
 
-        const expiry = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, expiry);
+        const currentTimestamp = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -81,7 +81,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             owner.address,
             zeroAddress,
-            expiry,
+            currentTimestamp,
           );
       });
 
@@ -96,8 +96,8 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [50, 100, 150];
 
-        const expiry = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, expiry);
+        const currentTimestamp = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -114,7 +114,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             owner.address,
             zeroAddress,
-            expiry,
+            currentTimestamp,
           );
       });
 
@@ -133,8 +133,8 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [50, 100, 150];
 
-        const expiry = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, expiry);
+        const currentTimestamp = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -151,7 +151,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             owner.address,
             zeroAddress,
-            expiry,
+            currentTimestamp,
           );
       });
 
@@ -162,8 +162,8 @@ describe("Swaplace", async function () {
         const askingAddr = [MockERC721.address];
         const askingAmountOrId = [4];
 
-        const expiry = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, expiry);
+        const currentTimestamp = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -180,7 +180,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             owner.address,
             zeroAddress,
-            expiry,
+            currentTimestamp,
           );
       });
 
@@ -195,8 +195,8 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [4, 5, 6];
 
-        const expiry = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, expiry);
+        const currentTimestamp = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -213,7 +213,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             owner.address,
             zeroAddress,
-            expiry,
+            currentTimestamp,
           );
       });
 
@@ -232,8 +232,8 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [4, 5, 6];
 
-        const expiry = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, expiry);
+        const currentTimestamp = (await blocktimestamp()) * 2;
+        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -250,7 +250,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             owner.address,
             zeroAddress,
-            expiry,
+            currentTimestamp,
           );
       });
     });
@@ -305,8 +305,8 @@ describe("Swaplace", async function () {
       const askingAddr = [MockERC20.address];
       const askingAmountOrId = [1000];
 
-      const expiry = (await blocktimestamp()) * 2;
-      const config = await Swaplace.packData(zeroAddress, expiry);
+      const currentTimestamp = (await blocktimestamp()) * 2;
+      const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
       swap = await composeSwap(
         owner.address,
@@ -558,8 +558,8 @@ describe("Swaplace", async function () {
       const askingAddr = [MockERC20.address];
       const askingAmountOrId = [1000];
 
-      const expiry = (await blocktimestamp()) * 2;
-      const config = await Swaplace.packData(zeroAddress, expiry);
+      const currentTimestamp = (await blocktimestamp()) * 2;
+      const config = await Swaplace.packData(zeroAddress, currentTimestamp);
 
       swap = await composeSwap(
         owner.address,

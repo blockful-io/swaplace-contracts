@@ -62,8 +62,8 @@ export async function makeSwap(
     BigInt(config) & ((BigInt(1) << BigInt(96)) - BigInt(1));
 
   // check for the current `block.timestamp` because `expiry` cannot be in the past
-  const timestamp = (await ethers.provider.getBlock("latest")).timestamp;
-  if (expiry < timestamp) {
+  const currentTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
+  if (expiry < currentTimestamp) {
     throw new Error("InvalidExpiry");
   }
 
