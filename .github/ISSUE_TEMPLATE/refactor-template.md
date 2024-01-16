@@ -1,10 +1,9 @@
 ---
-name: Refactor Template
-about: 'Refactor '
-title: 'refactor:'
-labels: ''
-assignees: ''
-
+name: Refactor Request
+about: Suggest the refactoring for this project
+title: "refactor:"
+labels: enhancement
+assignees: ""
 ---
 
 ## Refactor Request
