@@ -68,7 +68,7 @@ const config: HardhatUserConfig = {
   },
   defaultNetwork: "hardhat",
   docgen: {
-    outputDir: "docs",
+    outputDir: "docs/solidity-docgen",
     pages: "files",
   },
   gasReporter: {
