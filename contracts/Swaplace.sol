@@ -99,17 +99,15 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
    * @dev See {ISwaplace-cancelSwap}.
    */
   function cancelSwap(uint256 swapId) public {
-    Swap memory swap = _swaps[swapId];
+    if (_swaps[swapId].owner != msg.sender) revert InvalidAddress(msg.sender);
 
-    if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
-
-    (address allowed, uint256 expiry) = parseData(swap.config);
+    (, uint256 expiry) = parseData(_swaps[swapId].config);
 
     if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
-    _swaps[swapId].config = packData(allowed, 0);
+    _swaps[swapId].config = 0;
 
-    emit SwapCanceled(swapId, msg.sender);
+    emit SwapCanceled(swapId);
   }
 
   /**

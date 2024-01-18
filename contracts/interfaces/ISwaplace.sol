@@ -22,7 +22,7 @@ interface ISwaplace {
   /**
    * @dev Emitted when a Swap is canceled.
    */
-  event SwapCanceled(uint256 indexed swapId, address indexed owner);
+  event SwapCanceled(uint256 indexed swapId);
 
   /**
    * @dev Allow users to create a Swap. Each new Swap self-increments its ID by one.
