@@ -434,9 +434,9 @@ describe("Swaplace", async function () {
 
       it("Should be able to {cancelSwap} a Swap", async function () {
         const lastSwap = await Swaplace.totalSwaps();
-        expect(await Swaplace.connect(owner).cancelSwap(lastSwap))
+        await expect(await Swaplace.connect(owner).cancelSwap(lastSwap))
           .to.emit(Swaplace, "SwapCanceled")
-          .withArgs(lastSwap, swap.owner);
+          .withArgs(lastSwap);
       });
 
       it("Should not be able to {acceptSwap} a canceled a Swap", async function () {
