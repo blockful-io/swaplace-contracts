@@ -54,7 +54,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     if (expiry < block.timestamp) revert InvalidExpiry(expiry);
 
-    _swaps[swapId].config = packData(allowed, 0);
+    _swaps[swapId].config = 0;
 
     Asset[] memory assets = swap.asking;
 
