@@ -77,7 +77,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
       it("Should be able to create a 1-N swap with ERC20", async function () {
@@ -105,7 +105,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
       it("Should be able to create a N-N swap with ERC20", async function () {
@@ -137,7 +137,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
       it("Should be able to create a 1-1 swap with ERC721", async function () {
@@ -161,7 +161,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
       it("Should be able to create a 1-N swap with ERC721", async function () {
@@ -189,7 +189,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
       it("Should be able to create a N-N swap with ERC721", async function () {
@@ -221,7 +221,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
     });
 
@@ -276,7 +276,7 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
       it("Should be able to {acceptSwap} as N-N Swap", async function () {
@@ -302,7 +302,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
 
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
@@ -311,7 +311,7 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(),owner.address, zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
       it("Should be able to {acceptSwap} as P2P Swap", async function () {
@@ -329,7 +329,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,allowed);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, allowed);
 
         await expect(
           await Swaplace.connect(acceptee).acceptSwap(
@@ -338,7 +338,7 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(),owner.address, allowed);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, allowed);
       });
     });
 
@@ -353,7 +353,7 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(), owner.address,zeroAddress);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
 
         await expect(
           Swaplace.connect(acceptee).acceptSwap(
@@ -410,7 +410,7 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(),owner.address,allowed);
+          .withArgs(await Swaplace.totalSwaps(), owner.address, allowed);
 
         await expect(
           Swaplace.connect(acceptee).acceptSwap(
@@ -436,7 +436,7 @@ describe("Swaplace", async function () {
         const lastSwap = await Swaplace.totalSwaps();
         await expect(await Swaplace.connect(owner).cancelSwap(lastSwap))
           .to.emit(Swaplace, "SwapCanceled")
-          .withArgs(lastSwap,owner.address);
+          .withArgs(lastSwap, owner.address);
       });
 
       it("Should not be able to {acceptSwap} a canceled a Swap", async function () {
