@@ -36,7 +36,9 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     _swaps[swapId] = swap;
 
-    emit SwapCreated(swapId);
+    (address allowed,) = parseData(swap.config);
+
+    emit SwapCreated(swapId, swap.owner, allowed);
 
     return swapId;
   }
@@ -90,7 +92,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       }
     }
 
-    emit SwapAccepted(swapId, msg.sender);
+    emit SwapAccepted(swapId, swap.owner, allowed);
 
     return true;
   }
@@ -107,7 +109,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     _swaps[swapId].config = 0;
 
-    emit SwapCanceled(swapId);
+    emit SwapCanceled(swapId, _swaps[swapId].owner);
   }
 
   /**

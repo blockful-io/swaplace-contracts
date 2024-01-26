@@ -10,19 +10,17 @@ interface ISwaplace {
   /**
    * @dev Emitted when a new Swap is created.
    */
-  event SwapCreated(
-    uint256 indexed swapId
-  );
+  event SwapCreated(uint256 indexed swapId, address indexed owner, address indexed allowed);
 
   /**
    * @dev Emitted when a Swap is accepted.
    */
-  event SwapAccepted(uint256 indexed swapId, address indexed acceptee);
+  event SwapAccepted(uint256 indexed swapId, address indexed owner, address indexed allowed);
 
   /**
    * @dev Emitted when a Swap is canceled.
    */
-  event SwapCanceled(uint256 indexed swapId);
+  event SwapCanceled(uint256 indexed swapId, address indexed owner);
 
   /**
    * @dev Allow users to create a Swap. Each new Swap self-increments its ID by one.
