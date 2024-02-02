@@ -109,7 +109,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
     _swaps[swapId].config = 0;
 
-    emit SwapCanceled(swapId, _swaps[swapId].owner);
+    emit SwapCanceled(swapId, msg.sender);
   }
 
   /**
