@@ -258,7 +258,7 @@ describe("Swaplace Factory", async function () {
     }
   });
 
-  it("Should ensure packData() and parseData() return the right values",async function () {
+  it("Should ensure packData() and parseData() return the right values", async function () {
     const currentTimestamp = (await blocktimestamp()) * 2;
 
     const config = await Swaplace.packData(acceptee.address, currentTimestamp);

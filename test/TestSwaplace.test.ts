@@ -326,7 +326,11 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, allowed.address);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed.address,
+          );
 
         await expect(
           await Swaplace.connect(allowed).acceptSwap(
@@ -335,7 +339,11 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, allowed.address);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed.address,
+          );
       });
     });
 
@@ -406,7 +414,11 @@ describe("Swaplace", async function () {
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, deployer.address);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            deployer.address,
+          );
 
         await expect(
           Swaplace.connect(allowed).acceptSwap(
