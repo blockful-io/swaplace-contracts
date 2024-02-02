@@ -2,10 +2,10 @@
 
 ## Swaplace
 
-Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stoped.
+_Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stopped.
 Its cern is to facilitate swaps between virtual assets following the ERC standard.
 Users can propose or accept swaps by allowing Swaplace to move their assets using the
-`approve` function or `permit` if available.
+`approve` or `permit` function._
 
 ### createSwap
 
@@ -18,7 +18,7 @@ _See {ISwaplace-createSwap}._
 ### acceptSwap
 
 ```solidity
-function acceptSwap(uint256 swapId) public returns (bool)
+function acceptSwap(uint256 swapId, address receiver) public returns (bool)
 ```
 
 _See {ISwaplace-acceptSwap}._
@@ -53,4 +53,5 @@ _See {IERC165-supportsInterface}._
 function totalSwaps() public view returns (uint256)
 ```
 
-_Getter function for \_totalSwaps._
+_Getter function for _totalSwaps._
+

@@ -22,7 +22,8 @@ interface ISwaplace {
   event SwapAccepted(
     uint256 indexed swapId,
     address indexed owner,
-    address indexed allowed);
+    address indexed allowed
+  );
 
   /**
    * @dev Emitted when a Swap is canceled.

@@ -21,7 +21,7 @@ export async function deployMock(signer: any) {
     MockERC721.address,
     MockERC721.deployTransaction.hash,
   );
-  
+
   // Return the transaction response
   return { MockERC20, MockERC721 };
 }

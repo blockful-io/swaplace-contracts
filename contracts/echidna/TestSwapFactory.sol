@@ -37,7 +37,7 @@ contract TestFactory is SwapFactory {
       make_asset_array(addr, amountOrId)
     );
 
-    ( , uint256 expiry) = parseData(swap.config);
+    (, uint256 expiry) = parseData(swap.config);
 
     assert(expiry > block.timestamp);
     assert(swap.biding.length > 0);

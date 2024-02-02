@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
  * @dev Get the current `block.timestamp` in seconds from the current
  * selected network.
  *
- * Use `-- network localhost` to run the tests in a local network.
+ * Use `--network localhost` to run the tests in a local network.
  * Networks should be in `hardhat.config.ts` file or via command line.
  */
 export async function blocktimestamp(): Promise<any> {
@@ -32,5 +32,5 @@ export async function deploy(contractName: any, signer: any) {
 
 module.exports = {
   blocktimestamp,
-  deploy
+  deploy,
 };

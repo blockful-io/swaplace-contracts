@@ -26,11 +26,13 @@ export async function main() {
   const askingAddr = ["0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"]; // WBTC
   const askingAmountOrId = [1];
 
+  // Pack the config together
+  const config = await Swaplace.packData(allowed, expiry);
+
   // Compose the swap
   const swap: Swap = await composeSwap(
     owner,
-    allowed,
-    expiry,
+    config,
     bidingAddr,
     bidingAmountOrId,
     askingAddr,

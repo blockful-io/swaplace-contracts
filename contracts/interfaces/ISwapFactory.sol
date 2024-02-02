@@ -39,13 +39,11 @@ interface ISwapFactory {
   function packData(
     address allowed,
     uint256 expiry
-  ) external pure returns(uint256);
+  ) external pure returns (uint256);
 
   /**
    * @dev Parsing the `config`.
    * This function returns the extracted values of `allowed` and `expiry`.
    */
-  function parseData(
-    uint256 config
-  ) external pure returns (address,uint256);
+  function parseData(uint256 config) external pure returns (address, uint256);
 }
