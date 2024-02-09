@@ -92,7 +92,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       }
     }
 
-    emit SwapAccepted(swapId, swap.owner, allowed);
+    emit SwapAccepted(swapId, swap.owner, msg.sender);
 
     return true;
   }
