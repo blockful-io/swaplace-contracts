@@ -276,7 +276,11 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed.address,
+          );
       });
 
       it("Should be able to {acceptSwap} as N-N Swap", async function () {
@@ -309,7 +313,11 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed.address,
+          );
       });
 
       it("Should be able to {acceptSwap} as P2P Swap", async function () {
@@ -358,7 +366,11 @@ describe("Swaplace", async function () {
           ),
         )
           .to.emit(Swaplace, "SwapAccepted")
-          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed.address,
+          );
 
         await expect(
           Swaplace.connect(allowed).acceptSwap(
