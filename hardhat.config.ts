@@ -47,10 +47,6 @@ const config: HardhatUserConfig = {
      */
     hardhat: {
       chainId: 31337,
-      forking: {
-        url: `${process.env.SEPOLIA_RPC_URL}`,
-        blockNumber: 5328000,
-      },
     },
   },
   defaultNetwork: "hardhat",
