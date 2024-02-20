@@ -4,7 +4,10 @@ import "solidity-docgen";
 import dotenv from "dotenv";
 dotenv.config();
 
-const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
+// Using a hardcoded solution to avoid GitHub actions issues
+const DEPLOYER_PRIVATE_KEY =
+  process.env.DEPLOYER_PRIVATE_KEY ||
+  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 
 const config: HardhatUserConfig = {
   solidity: {
