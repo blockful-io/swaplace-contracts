@@ -31,14 +31,6 @@ const config: HardhatUserConfig = {
       url: `${process.env.MUMBAI_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
-    fuji: {
-      url: `${process.env.FUJI_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
-    },
-    bnbtest: {
-      url: `${process.env.BNB_TESTNET_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
-    },
     /**
      * @dev Mainnets
      */
@@ -50,14 +42,9 @@ const config: HardhatUserConfig = {
       url: `${process.env.MATIC_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
-    avalanche: {
-      url: `${process.env.AVAX_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
-    },
-    binance: {
-      url: `${process.env.BNB_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
-    },
+    /**
+     * @dev Localnet (Hardhat)
+     */
     hardhat: {
       chainId: 31337,
       forking: {
