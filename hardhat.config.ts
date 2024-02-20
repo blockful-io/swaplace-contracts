@@ -7,7 +7,15 @@ dotenv.config();
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   etherscan: {
     apiKey: `${process.env.ETHERSCAN_API_KEY}`,
   },
@@ -50,6 +58,13 @@ const config: HardhatUserConfig = {
       url: `${process.env.BNB_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
+    hardhat: {
+      chainId: 31337,
+      forking: {
+        url: `${process.env.SEPOLIA_RPC_URL}`,
+        blockNumber: 5328000,
+      },
+    },
   },
   defaultNetwork: "hardhat",
   docgen: {
@@ -59,6 +74,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: true,
   },
+  allowUnlimitedContractSize: true,
 };
 
 export default config;
