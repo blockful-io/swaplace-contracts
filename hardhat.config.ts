@@ -17,10 +17,6 @@ const config: HardhatUserConfig = {
      */
     sepolia: {
       url: `${process.env.SEPOLIA_RPC_URL}`,
-      accounts: [`${process.env.DEPLOYER_PRIVATE_KEY}`],
-    },
-    goerli: {
-      url: `${process.env.SEPOLIA_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
     mumbai: {
@@ -52,10 +48,6 @@ const config: HardhatUserConfig = {
     },
     binance: {
       url: `${process.env.BNB_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
-    },
-    fantom: {
-      url: `${process.env.FTM_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
   },
