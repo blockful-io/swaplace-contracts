@@ -30,10 +30,10 @@
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
     "docs": "npx hardhat docgen",
+    "deploy:mocks": "npx hardhat run scripts/deployMock.ts --network $1",
     "deploy:swaplace": "npx hardhat run scripts/deploy.ts --network $1",
     "compile-echidna": "crytic-compile . && slither . --print echidna",
     "fuzz-p": "echidna . --contract TestSwaplace --test-mode property --config echidna.config.yml",
-    "fuzz-a": "echidna . --contract TestSwaplace --test-mode assertion --config echidna.config.yml",
-    "deploy:mocks": "npx hardhat run scripts/deployMock.ts --network $1"
+    "fuzz-a": "echidna . --contract TestSwaplace --test-mode assertion --config echidna.config.yml"
   }
 }
