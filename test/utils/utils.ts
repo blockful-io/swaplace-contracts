@@ -1,4 +1,6 @@
 import { ethers } from "hardhat";
+import fs from "fs";
+import path from "path";
 
 /**
  * @dev Get the current `block.timestamp` in seconds from the current
@@ -30,7 +32,35 @@ export async function deploy(contractName: any, signer: any) {
   return Contract;
 }
 
+export function storeAddress(contractAddress: string, envVarName: string) {
+  const filePath = path.join(__dirname, "../../.env");
+
+  fs.readFile(filePath, "utf8", (readErr: any, data: string) => {
+    if (readErr) {
+      throw new Error("Error reading .env file:");
+    }
+
+    const updatedContent = data.replace(
+      new RegExp(`${envVarName}=.*`),
+      `${envVarName}=${contractAddress}`,
+    );
+
+    fs.writeFile(filePath, updatedContent, "utf8", (writeErr: any) => {
+      if (writeErr) {
+        console.error("Error writing to .env file:", writeErr);
+      } else {
+        console.log(
+          "Stored contract address %s in .env file under the %s variable name",
+          contractAddress,
+          envVarName,
+        );
+      }
+    });
+  });
+}
+
 module.exports = {
   blocktimestamp,
+  storeAddress,
   deploy,
 };
