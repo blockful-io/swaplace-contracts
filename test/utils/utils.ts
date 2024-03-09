@@ -55,18 +55,21 @@ export async function deploy(contractName: any, signer: any) {
 }
 
 export function storeAddress(contractAddress: string, envVarName: string) {
-  const filePath = path.join(__dirname, "../../.env");
+  const filePath = path.join(__dirname, "../../.env"); // .env file path
 
+  // @dev Read the .env file
   fs.readFile(filePath, "utf8", (readErr: any, data: string) => {
     if (readErr) {
       throw new Error("Error reading .env file:");
     }
 
+    // @dev Replace the contract address in the .env file
     const updatedContent = data.replace(
       new RegExp(`${envVarName}=.*`),
       `${envVarName}=${contractAddress}`,
     );
 
+    // @dev Write the updated content to the .env file
     fs.writeFile(filePath, updatedContent, "utf8", (writeErr: any) => {
       if (writeErr) {
         console.error("Error writing to .env file:", writeErr);
