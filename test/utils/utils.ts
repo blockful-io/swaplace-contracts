@@ -54,14 +54,16 @@ export async function deploy(contractName: any, signer: any) {
   return Contract;
 }
 
-export function storeAddress(contractAddress: string, envVarName: string) {
+export async function storeEnv(
+  contractAddress: any,
+  envVarName: string,
+  showLog: boolean,
+) {
   const filePath = path.join(__dirname, "../../.env"); // .env file path
 
-  // @dev Read the .env file
-  fs.readFile(filePath, "utf8", (readErr: any, data: string) => {
-    if (readErr) {
-      throw new Error("Error reading .env file:");
-    }
+  try {
+    /// @dev Read the file synchronously
+    let data = fs.readFileSync(filePath, "utf8");
 
     // @dev Replace the contract address in the .env file
     const updatedContent = data.replace(
@@ -69,23 +71,23 @@ export function storeAddress(contractAddress: string, envVarName: string) {
       `${envVarName}=${contractAddress}`,
     );
 
-    // @dev Write the updated content to the .env file
-    fs.writeFile(filePath, updatedContent, "utf8", (writeErr: any) => {
-      if (writeErr) {
-        console.error("Error writing to .env file:", writeErr);
-      } else {
-        console.log(
-          "Stored contract address %s in .env file under the %s variable name",
-          contractAddress,
-          envVarName,
-        );
-      }
-    });
-  });
+    /// @dev Write the updated content to the file synchronously
+    fs.writeFileSync(filePath, updatedContent, "utf8");
+
+    if (showLog) {
+      console.log(
+        "Stored the data %s in .env file at the %s variable",
+        contractAddress,
+        envVarName,
+      );
+    }
+  } catch (err) {
+    console.error("Error reading or writing file:", err);
+  }
 }
 
 module.exports = {
   blocktimestamp,
-  storeAddress,
+  storeEnv,
   deploy,
 };
