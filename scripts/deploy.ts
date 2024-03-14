@@ -35,6 +35,9 @@ async function main() {
 
   // @dev Store the contract address in the .env file.
   await storeEnv(Swaplace.address, "SWAPLACE_ADDRESS", true);
+
+  /// @dev Awaits for the transaction to be mined.
+  await Swaplace.deployed();
 }
 
 main().catch((error) => {

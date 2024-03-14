@@ -43,9 +43,13 @@ async function main() {
     MockERC721.deployTransaction.hash,
   );
 
-  // @dev Store the contract addresses in the .env file.
+  /// @dev Store the contract addresses in the .env file.
   await storeEnv(MockERC20.address, "ERC20_ADDRESS", true);
   await storeEnv(MockERC721.address, "ERC721_ADDRESS", true);
+
+  /// @dev Awaits for the transaction to be mined.
+  await MockERC20.deployed();
+  await MockERC721.deployed();
 }
 
 main().catch((error) => {

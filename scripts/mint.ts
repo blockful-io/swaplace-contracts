@@ -95,6 +95,10 @@ async function main() {
   );
 
   await storeEnv(tokenId, "TOKEN_ID", false);
+
+  /// @dev Awaits for the transaction to be mined.
+  await txErc20.wait();
+  await txErc721.wait();
 }
 
 main().catch((error) => {

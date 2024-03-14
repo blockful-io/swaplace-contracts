@@ -113,6 +113,9 @@ export async function main() {
   /// @dev Store the recently created swap and it's corresponding ID in the `.env` file.
   const swapId = await Swaplace.totalSwaps();
   await storeEnv(swapId, "SWAP_ID", tx.hash);
+
+  /// @dev Awaits for the transaction to be mined.
+  await tx.wait();
 }
 
 main().catch((error) => {
