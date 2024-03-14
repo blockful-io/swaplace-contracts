@@ -1,7 +1,5 @@
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
-import { blocktimestamp } from "../test/utils/utils";
-import { Swap, composeSwap } from "../test/utils/SwapFactory";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 export async function main() {
