@@ -28,10 +28,15 @@
   "scripts": {
     "clean": "npx hardhat clean",
     "compile": "npx hardhat compile",
-    "test": "npx hardhat test",
     "docs": "npx hardhat docgen",
-    "testnet": "npx hardhat test --network $1",
-    "deploy": "npx hardhat run scripts/deploy.ts --network $1",
+    "test": "npx hardhat test",
+    "mint": "npx hardhat run scripts/mint.ts --network $1",
+    "create-swap": "npx hardhat run scripts/createSwap.ts --network $1",
+    "accept-swap": "npx hardhat run scripts/acceptSwap.ts --network $1",
+    "cancel-swap": "npx hardhat run scripts/cancelSwap.ts --network $1",
+    "approve": "npx hardhat run scripts/approve.ts --network $1",
+    "deploy:mocks": "npx hardhat run scripts/deployMock.ts --network $1",
+    "deploy:swaplace": "npx hardhat run scripts/deploy.ts --network $1",
     "compile-echidna": "crytic-compile . && slither . --print echidna",
     "fuzz-p": "echidna . --contract TestSwaplace --test-mode property --config echidna.config.yml",
     "fuzz-a": "echidna . --contract TestSwaplace --test-mode assertion --config echidna.config.yml"

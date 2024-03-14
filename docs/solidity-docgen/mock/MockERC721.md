@@ -14,9 +14,8 @@ uint256 totalSupply
 constructor() public
 ```
 
-### mintTo
+### mint
 
 ```solidity
-function mintTo(address to, uint256 id) public
+function mint(address to, uint256 id) public
 ```
-

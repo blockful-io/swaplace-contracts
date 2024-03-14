@@ -8,7 +8,7 @@ contract MockERC721 is ERC721 {
 
   constructor() ERC721("MockERC721", "ERC721") {}
 
-  function mintTo(address to, uint256 id) public {
+  function mint(address to, uint256 id) public {
     totalSupply++;
     _mint(to, id);
   }

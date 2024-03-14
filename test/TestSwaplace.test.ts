@@ -241,8 +241,8 @@ describe("Swaplace", async function () {
       MockERC20 = await deploy("MockERC20", deployer);
       MockERC721 = await deploy("MockERC721", deployer);
 
-      await MockERC721.mintTo(owner.address, 1);
-      await MockERC20.mintTo(allowed.address, 1000);
+      await MockERC721.mint(owner.address, 1);
+      await MockERC20.mint(allowed.address, 1000);
 
       await MockERC721.connect(owner).approve(Swaplace.address, 1);
       await MockERC20.connect(allowed).approve(Swaplace.address, 1000);
@@ -284,8 +284,8 @@ describe("Swaplace", async function () {
       });
 
       it("Should be able to {acceptSwap} as N-N Swap", async function () {
-        await MockERC20.mintTo(owner.address, 500);
-        await MockERC721.mintTo(allowed.address, 5);
+        await MockERC20.mint(owner.address, 500);
+        await MockERC721.mint(allowed.address, 5);
 
         await MockERC20.connect(owner).approve(Swaplace.address, 500);
         await MockERC721.connect(allowed).approve(Swaplace.address, 5);
@@ -321,8 +321,8 @@ describe("Swaplace", async function () {
       });
 
       it("Should be able to {acceptSwap} as P2P Swap", async function () {
-        await MockERC20.mintTo(owner.address, 1000);
-        await MockERC721.mintTo(allowed.address, 10);
+        await MockERC20.mint(owner.address, 1000);
+        await MockERC721.mint(allowed.address, 10);
 
         await MockERC20.connect(owner).approve(Swaplace.address, 1000);
         await MockERC721.connect(allowed).approve(Swaplace.address, 10);
@@ -413,8 +413,8 @@ describe("Swaplace", async function () {
       });
 
       it("Should revert when {acceptSwap} as not allowed to P2P Swap", async function () {
-        await MockERC20.mintTo(owner.address, 1000);
-        await MockERC721.mintTo(allowed.address, 10);
+        await MockERC20.mint(owner.address, 1000);
+        await MockERC721.mint(allowed.address, 10);
 
         await MockERC20.connect(owner).approve(Swaplace.address, 1000);
         await MockERC721.connect(allowed).approve(Swaplace.address, 10);
@@ -502,8 +502,8 @@ describe("Swaplace", async function () {
       MockERC20 = await deploy("MockERC20", deployer);
       MockERC721 = await deploy("MockERC721", deployer);
 
-      await MockERC721.mintTo(owner.address, 1);
-      await MockERC20.mintTo(allowed.address, 1000);
+      await MockERC721.mint(owner.address, 1);
+      await MockERC20.mint(allowed.address, 1000);
 
       const bidingAddr = [MockERC721.address];
       const bidingAmountOrId = [1];

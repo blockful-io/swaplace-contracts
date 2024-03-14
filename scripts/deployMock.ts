@@ -1,34 +1,54 @@
 import { ethers } from "hardhat";
-import { deploy } from "../test/utils/utils";
+import { Contract } from "ethers";
+import { deploy, storeEnv } from "../test/utils/utils";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
-export async function deployMock(signer: any) {
-  // Deploy in the currrent network and return the contract instance
-  const MockERC20 = await deploy("MockERC20", signer);
-  const MockERC721 = await deploy("MockERC721", signer);
+async function main() {
+  /// @dev This is the list of accounts that were set in the hardhat config file.
+  /// The first account will be performing the signing of the transactions, hence becoming the contract deployer.
+  let signers: SignerWithAddress[];
 
-  // Log Contract address, the Tx then return the Contract instance of MockERC20
+  /// @dev The returned contract instance that will be deployed via the deploy function in utils.
+  let MockERC20: Contract;
+  let MockERC721: Contract;
+
+  /// @dev will throw an error if any of the accounts was not set up correctly.
+  try {
+    signers = await ethers.getSigners();
+  } catch (error) {
+    throw new Error(
+      `Error getting the first account from the list of accounts. Make sure it is 
+      set up in correctly in hardhat.config.ts. 
+      ${error}`,
+    );
+  }
+
+  // @dev Deploy in the currrent network in which the script was called and return the Swaplace instance.
+  // We are deploying both contracts to test the user flux with the entire functionality.
+  MockERC20 = await deploy("MockERC20", signers[0]);
+  MockERC721 = await deploy("MockERC721", signers[0]);
+
+  // @dev Log Contract address and the Tx hash which can be searched on Etherscan (or any other block explorer).
   console.log(
-    "\nDEPLOY:\nContract %s \nDeployed to %s \nAt Tx %s",
+    "\nContract %s \nDeployed to %s \nAt Tx %s",
     "MockERC20",
     MockERC20.address,
     MockERC20.deployTransaction.hash,
   );
 
-  // Log Contract address, the Tx then return the Contract instance of MockERC721
   console.log(
-    "\nContract %s \nDeployed to %s \nAt Tx %s",
+    "\nContract %s \nDeployed to %s \nAt Tx %s\n",
     "MockERC721",
     MockERC721.address,
     MockERC721.deployTransaction.hash,
   );
 
-  // Return the transaction response
-  return { MockERC20, MockERC721 };
+  // @dev Store the contract addresses in the .env file.
+  await storeEnv(MockERC20.address, "ERC20_ADDRESS", true);
+  await storeEnv(MockERC721.address, "ERC721_ADDRESS", true);
 }
 
-ethers.getSigners().then((signers) => {
-  deployMock(signers[0]).catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
 });

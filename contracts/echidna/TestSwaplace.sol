@@ -12,7 +12,7 @@ contract TestSwaplace is TestFactory {
   constructor() {
     _token = new MockERC20();
     _swaplace = new Swaplace();
-    _token.mintTo(address(this), 100);
+    _token.mint(address(this), 100);
   }
 
   function echidna_create_swap() public returns (bool) {

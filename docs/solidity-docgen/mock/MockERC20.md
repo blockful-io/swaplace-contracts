@@ -8,9 +8,8 @@
 constructor() public
 ```
 
-### mintTo
+### mint
 
 ```solidity
-function mintTo(address to, uint256 amount) public
+function mint(address to, uint256 amount) public
 ```
-
