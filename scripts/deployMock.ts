@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
-import { deploy, storeAddress } from "../test/utils/utils";
+import { deploy, storeEnv } from "../test/utils/utils";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 async function main() {
@@ -17,7 +17,9 @@ async function main() {
     signers = await ethers.getSigners();
   } catch (error) {
     throw new Error(
-      "Error getting the first account from the list of accounts. Make sure it is set up in correctly in hardhat.config.ts.",
+      `Error getting the first account from the list of accounts. Make sure it is 
+      set up in correctly in hardhat.config.ts. 
+      ${error}`,
     );
   }
 
@@ -42,8 +44,8 @@ async function main() {
   );
 
   // @dev Store the contract addresses in the .env file.
-  storeAddress(MockERC20.address, "ERC20_ADDRESS");
-  storeAddress(MockERC721.address, "ERC721_ADDRESS");
+  await storeEnv(MockERC20.address, "ERC20_ADDRESS", true);
+  await storeEnv(MockERC721.address, "ERC721_ADDRESS", true);
 }
 
 main().catch((error) => {
