@@ -96,7 +96,14 @@ export async function main() {
 
   /// @dev Catching any errors while creating the swap.
   try {
-    tx = await Swaplace.createSwap(swap);
+    let lastNonce = await ethers.provider.getTransactionCount(
+      signers[0].address,
+    );
+    tx = await Swaplace.createSwap(swap, {
+      nonce: Number(lastNonce) + 1,
+      maxFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum fee per gas
+      maxPriorityFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum tip
+    });
     // @dev Wait for the transaction to be mined
     await tx.wait();
   } catch (error) {

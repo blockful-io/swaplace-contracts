@@ -79,13 +79,26 @@ async function main() {
 
   /// @dev We are approving the signer address to spend the amount of tokens.
   try {
-    txErc20 = await MockERC20.approve(SWAPLACE_ADDRESS, amount);
-    txErc721 = await MockERC721.approve(SWAPLACE_ADDRESS, tokenId);
+    let lastNonce = await ethers.provider.getTransactionCount(
+      signers[0].address,
+    );
+    txErc20 = await MockERC20.approve(SWAPLACE_ADDRESS, amount, {
+      gasLimit: 500000,
+      nonce: Number(lastNonce) + 1,
+      maxFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum fee per gas
+      maxPriorityFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum tip
+    });
+    txErc721 = await MockERC721.approve(SWAPLACE_ADDRESS, tokenId, {
+      gasLimit: 500000,
+      nonce: Number(lastNonce) + 2,
+      maxFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum fee per gas
+      maxPriorityFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum tip
+    });
   } catch (error) {
     throw new Error(
       `Error while approving the tokens. Make sure that the approve function is 
       correctly implemented in the contract and that the signer address is 
-      correctly set up in the hardhat.config.ts file. 
+      correctly set up in the hardhat.config.ts file. Gas errors are common.
       ${error}`,
     );
   }
