@@ -3,7 +3,7 @@ compile:
 	yarn compile
 
 ## Please specify which network following the available ones in hardhat.config.ts.
-network=localhost
+network=sepolia
 
 ## Deploying Swaplace contract to the desired network.
 swaplace:
@@ -43,6 +43,15 @@ test-suite-runner:
 	make swaplace
 	make mocks
 	make mint
+	make approve
+	make swap
+	make accept
+	make swap
+	make cancel
+
+## Feed existing Swaplace contract with some transactions.
+## make mint
+transactions:
 	make approve
 	make swap
 	make accept
