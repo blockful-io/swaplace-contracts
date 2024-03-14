@@ -79,21 +79,8 @@ async function main() {
 
   /// @dev We are approving the signer address to spend the amount of tokens.
   try {
-    let lastNonce = await ethers.provider.getTransactionCount(
-      signers[0].address,
-    );
-    txErc20 = await MockERC20.approve(SWAPLACE_ADDRESS, amount, {
-      gasLimit: 500000,
-      nonce: Number(lastNonce) + 1,
-      maxFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum fee per gas
-      maxPriorityFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum tip
-    });
-    txErc721 = await MockERC721.approve(SWAPLACE_ADDRESS, tokenId, {
-      gasLimit: 500000,
-      nonce: Number(lastNonce) + 2,
-      maxFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum fee per gas
-      maxPriorityFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum tip
-    });
+    txErc20 = await MockERC20.approve(SWAPLACE_ADDRESS, amount);
+    txErc721 = await MockERC721.approve(SWAPLACE_ADDRESS, tokenId);
   } catch (error) {
     throw new Error(
       `Error while approving the tokens. Make sure that the approve function is 

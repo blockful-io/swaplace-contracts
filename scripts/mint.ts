@@ -75,19 +75,8 @@ async function main() {
   /// tokens of ERC20 and the last token id for ERC721.
   /// We start the mint from the last token id + 1 because it starts from 0.
   try {
-    let lastNonce = await ethers.provider.getTransactionCount(
-      signers[0].address,
-    );
-    txErc20 = await MockERC20.mint(signers[0].address, amount, {
-      nonce: Number(lastNonce) + 1,
-      maxFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum fee per gas
-      maxPriorityFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum tip
-    });
-    txErc721 = await MockERC721.mint(signers[0].address, tokenId, {
-      nonce: Number(lastNonce) + 2,
-      maxFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum fee per gas
-      maxPriorityFeePerGas: ethers.utils.parseUnits("200", "gwei"), // Maximum tip
-    });
+    txErc20 = await MockERC20.mint(signers[0].address, amount);
+    txErc721 = await MockERC721.mint(signers[0].address, tokenId);
   } catch (error) {
     throw new Error(
       `Error while minting tokens. Make sure that the minting function is 
