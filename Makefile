@@ -3,7 +3,7 @@ compile:
 	yarn compile
 
 ## Please specify which network following the available ones in hardhat.config.ts.
-network=mumbai
+network=localhost
 
 ## Deploying Swaplace contract to the desired network.
 swaplace:
