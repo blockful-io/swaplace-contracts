@@ -22,11 +22,11 @@ describe("Swaplace", async function () {
 
   it("Should test the {mint} function", async function () {
     // Testing the mint of ERC20
-    await MockERC20.mintTo(owner.address, 1000);
+    await MockERC20.mint(owner.address, 1000);
     expect(await MockERC20.balanceOf(owner.address)).to.be.equals(1000);
 
     // Testing the mint of ERC721
-    await MockERC721.mintTo(owner.address, 1);
+    await MockERC721.mint(owner.address, 1);
     expect(await MockERC721.balanceOf(owner.address)).to.be.equals(1);
   });
 
