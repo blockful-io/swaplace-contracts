@@ -50,7 +50,7 @@ test-suite-runner:
 	make cancel
 
 ## Feed existing Swaplace contract with some transactions.
-## make mint
+## Requires a deployed Swaplace contract and mocks.
 transactions:
 	make mint
 	make approve
