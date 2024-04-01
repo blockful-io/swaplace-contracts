@@ -21,20 +21,39 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   mapping(uint256 => Swap) private _swaps;
 
   /**
+   * @dev See {ISwaplace-getSwap}.
+   */
+  function getSwap(uint256 swapId) public view returns (Swap memory) {
+    return _swaps[swapId];
+  }
+
+  /**
+   * @dev Getter function for _totalSwaps.
+   */
+  function totalSwaps() public view returns (uint256) {
+    return _totalSwaps;
+  }
+
+  /**
    * @dev See {ISwaplace-createSwap}.
    */
-  function createSwap(Swap calldata swap) public returns (uint256) {
-    if (swap.owner != msg.sender) revert InvalidAddress(msg.sender);
+  function createSwap(Swap calldata swap) public payable returns (uint256) {
+    if (swap.owner != msg.sender) revert InvalidAddress();
 
     assembly {
       sstore(_totalSwaps.slot, add(sload(_totalSwaps.slot), 1))
     }
 
     uint256 swapId = _totalSwaps;
-
     _swaps[swapId] = swap;
 
-    (address allowed, ) = parseData(swap.config);
+    (address allowed, , uint8 recipient, uint56 value) = decodeConfig(
+      swap.config
+    );
+
+    if (value > 0 && recipient == 0) {
+      if (value * 1e12 != msg.value) revert InvalidValue();
+    }
 
     emit SwapCreated(swapId, msg.sender, allowed);
 
@@ -44,43 +63,31 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /**
    * @dev See {ISwaplace-acceptSwap}.
    */
-  function acceptSwap(uint256 swapId, address receiver) public returns (bool) {
+  function acceptSwap(
+    uint256 swapId,
+    address receiver
+  ) public payable returns (bool) {
     Swap memory swap = _swaps[swapId];
 
-    (address allowed, uint256 expiry) = parseData(swap.config);
+    (
+      address allowed,
+      uint32 expiry,
+      uint8 recipient,
+      uint56 value
+    ) = decodeConfig(swap.config);
 
-    if (allowed != address(0) && allowed != msg.sender)
-      revert InvalidAddress(msg.sender);
-
-    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
-
+    if (allowed != address(0) && allowed != msg.sender) revert InvalidAddress();
+    if (expiry < block.timestamp) revert InvalidExpiry();
     _swaps[swapId].config = 0;
 
-    Asset[] memory assets = swap.asking;
+    _transferFrom(msg.sender, swap.owner, swap.asking);
+    _transferFrom(swap.owner, receiver, swap.biding);
 
-    for (uint256 i = 0; i < assets.length; ) {
-      ITransfer(assets[i].addr).transferFrom(
-        msg.sender,
-        swap.owner,
-        assets[i].amountOrId
-      );
-      assembly {
-        i := add(i, 1)
-      }
-    }
-
-    assets = swap.biding;
-
-    for (uint256 i = 0; i < assets.length; ) {
-      ITransfer(assets[i].addr).transferFrom(
-        swap.owner,
-        receiver,
-        assets[i].amountOrId
-      );
-      assembly {
-        i := add(i, 1)
-      }
-    }
+    if (value > 0)
+      if (recipient == 0) _payNativeEth(receiver, value * 1e12);
+      else if (recipient > 0 && value * 1e12 == msg.value)
+        _payNativeEth(swap.owner, value * 1e12);
+      else revert InvalidValue();
 
     emit SwapAccepted(swapId, swap.owner, msg.sender);
 
@@ -91,22 +98,47 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
    * @dev See {ISwaplace-cancelSwap}.
    */
   function cancelSwap(uint256 swapId) public {
-    if (_swaps[swapId].owner != msg.sender) revert InvalidAddress(msg.sender);
+    Swap memory swap = _swaps[swapId];
+    if (swap.owner != msg.sender) revert InvalidAddress();
 
-    (, uint256 expiry) = parseData(_swaps[swapId].config);
+    (, uint32 expiry, uint8 recipient, uint56 value) = decodeConfig(
+      swap.config
+    );
 
-    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
-
+    if (expiry < block.timestamp) revert InvalidExpiry();
     _swaps[swapId].config = 0;
+
+    if (value > 0 && recipient == 0) _payNativeEth(msg.sender, value * 1e12);
 
     emit SwapCanceled(swapId, msg.sender);
   }
 
   /**
-   * @dev See {ISwaplace-getSwap}.
+   * @dev Send and amount of native Ether to the receiver.
    */
-  function getSwap(uint256 swapId) public view returns (Swap memory) {
-    return _swaps[swapId];
+  function _payNativeEth(address receiver, uint256 value) internal {
+    (bool success, ) = receiver.call{value: value}("");
+    if (!success) revert InvalidValue();
+  }
+
+  /**
+   * @dev Transfer 'assets' from 'from' to 'to'.
+   * Where 0x23b872dd is the selector of the `transferFrom` function.
+   */
+  function _transferFrom(
+    address from,
+    address to,
+    Asset[] memory assets
+  ) internal {
+    for (uint256 i; i < assets.length; ) {
+      (bool success, ) = address(assets[i].addr).call(
+        abi.encodeWithSelector(0x23b872dd, from, to, assets[i].amountOrId)
+      );
+      if (!success) revert InvalidCall();
+      assembly {
+        i := add(i, 1)
+      }
+    }
   }
 
   /**
@@ -118,12 +150,5 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     return
       interfaceID == type(IERC165).interfaceId ||
       interfaceID == type(ISwaplace).interfaceId;
-  }
-
-  /**
-   * @dev Getter function for _totalSwaps.
-   */
-  function totalSwaps() public view returns (uint256) {
-    return _totalSwaps;
   }
 }

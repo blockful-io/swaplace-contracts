@@ -18,6 +18,8 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
  * - The `allowed` address is the address that can accept the Swap. If the allowed
  *   address is the zero address, then anyone can accept the Swap.
  * - The `expiry` date is the timestamp that the Swap will be available to accept.
+ * - The `recipient` is the address that will receive the ETH.
+ * - The `value` is the amount of ETH that the recipient will receive.
  * - The `biding` are the assets that the owner is offering.
  * - The `asking` are the assets that the owner wants in exchange.
  *
@@ -49,33 +51,44 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
   function makeSwap(
     address owner,
     address allowed,
-    uint256 expiry,
+    uint32 expiry,
+    uint8 recipient,
+    uint56 value,
     Asset[] memory biding,
     Asset[] memory asking
   ) public view virtual returns (Swap memory) {
-    if (expiry < block.timestamp) revert InvalidExpiry(expiry);
-
-    if (biding.length == 0 || asking.length == 0) revert InvalidAssetsLength();
-
-    uint256 config = packData(allowed, expiry);
-
+    if (expiry < block.timestamp) revert InvalidExpiry();
+    uint256 config = encodeConfig(allowed, expiry, recipient, value);
     return Swap(owner, config, biding, asking);
   }
 
   /**
-   * @dev See {ISwapFactory-packData}.
+   * @dev See {ISwapFactory-encodeConfig}.
    */
-  function packData(
+  function encodeConfig(
     address allowed,
-    uint256 expiry
+    uint32 expiry,
+    uint8 recipient,
+    uint56 value
   ) public pure returns (uint256) {
-    return (uint256(uint160(allowed)) << 96) | uint256(expiry);
+    return
+      (uint256(uint160(allowed)) << 96) |
+      (uint256(expiry) << 64) |
+      (uint256(recipient) << 56) |
+      uint256(value);
   }
 
   /**
-   * @dev See {ISwapFactory-parseData}.
+   * @dev See {ISwapFactory-decodeConfig}.
    */
-  function parseData(uint256 config) public pure returns (address, uint256) {
-    return (address(uint160(config >> 96)), uint256(config & ((1 << 96) - 1)));
+  function decodeConfig(
+    uint256 config
+  ) public pure returns (address, uint32, uint8, uint56) {
+    return (
+      address(uint160(config >> 96)),
+      uint32(config >> 64),
+      uint8(config >> 56),
+      uint56(config)
+    );
   }
 }

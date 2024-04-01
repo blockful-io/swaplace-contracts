@@ -24,8 +24,11 @@ interface ISwap {
    *
    * It is composed of:
    * - `owner` of the Swap.
-   * - `config` represents two packed values: 'allowed' for the allowed address
-   * to accept the swap and 'expiry' for the expiration date of the swap.
+   * - `config` represents two packed values:
+   * - - `allowed` for the allowed address to accept the swap
+   * - - `expiry` for the expiration date of the swap.
+   * - - `recipient` for the address that will receive the ETH.
+   * - - `value` for the amount of ETH that the recipient will receive.
    * - `biding` assets that are being bided by the owner.
    * - `asking` assets that are being asked by the owner.
    *

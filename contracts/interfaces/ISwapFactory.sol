@@ -27,23 +27,33 @@ interface ISwapFactory {
   function makeSwap(
     address owner,
     address allowed,
-    uint256 expiry,
+    uint32 expiry,
+    uint8 recipient,
+    uint56 value,
     ISwap.Asset[] memory assets,
     ISwap.Asset[] memory asking
   ) external view returns (ISwap.Swap memory);
 
   /**
-   * @dev Packs `allowed` and the `expiry`.
-   * This function returns the bitwise packing of `allowed` and `expiry` as a uint256.
+   * @dev This function returns the bitwise packing as a uint256.
    */
-  function packData(
+  function encodeConfig(
     address allowed,
-    uint256 expiry
+    uint32 expiry,
+    uint8 recipient,
+    uint56 value
   ) external pure returns (uint256);
 
   /**
-   * @dev Parsing the `config`.
-   * This function returns the extracted values of `allowed` and `expiry`.
+   * @dev Decode the `config` variable.
+   *
+   * This function returns the extracted values of:
+   * - `allowed`
+   * - `expiry`
+   * - `recipient`
+   * - `value`
    */
-  function parseData(uint256 config) external pure returns (address, uint256);
+  function decodeConfig(
+    uint256 config
+  ) external pure returns (address, uint32, uint8, uint56);
 }
