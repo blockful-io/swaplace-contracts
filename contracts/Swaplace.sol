@@ -9,7 +9,7 @@ import {SwapFactory} from "./SwapFactory.sol";
 /**
  * @author @0xneves | @blockful_io
  * @dev Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stopped.
- * Its cern is to facilitate swaps between virtual assets following the ERC standard.
+ * It's core is to facilitate swaps between virtual assets following the ERC standard.
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
  * `approve` or `permit` function.
  */
