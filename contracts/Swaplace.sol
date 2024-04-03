@@ -8,10 +8,10 @@ import {SwapFactory} from "./SwapFactory.sol";
 
 /**
  * @author @0xneves | @blockful_io
- * @dev Swaplace is a Decentralized Feeless DEX. It has no owners, it cannot be stopped.
- * It's core is to facilitate swaps between virtual assets following the ERC standard.
+ * @dev Swaplace is a decentralized and feeless DEX/OTC. Ownerless, it cannot be stopped.
+ * It's core is to facilitate swaps between virtual assets using the ERC standard.
  * Users can propose or accept swaps by allowing Swaplace to move their assets using the
- * `approve` or `permit` function.
+ * `approve`, `permit` or similar functions.
  */
 contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   /// @dev Swap Identifier counter.
