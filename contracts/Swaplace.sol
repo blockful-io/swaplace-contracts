@@ -114,7 +114,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   }
 
   /**
-   * @dev Send and amount of native Ether to the receiver.
+   * @dev Send an amount of native Ether to the receiver address.
    */
   function _payNativeEth(address receiver, uint256 value) internal {
     (bool success, ) = receiver.call{value: value}("");
