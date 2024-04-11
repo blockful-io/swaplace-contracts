@@ -32,8 +32,14 @@ describe("Swaplace", async function () {
     const askingAddr = [MockERC20.address];
     const askingAmountOrId = [50];
 
-    const currentTimestamp = (await blocktimestamp()) * 2;
-    const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+    const currentTimestamp = (await blocktimestamp()) + 1000000;
+
+    const config = await Swaplace.encodeConfig(
+      zeroAddress,
+      currentTimestamp,
+      0,
+      0,
+    );
 
     const swap: Swap = await composeSwap(
       owner.address,
@@ -63,8 +69,13 @@ describe("Swaplace", async function () {
         const askingAddr = [MockERC20.address];
         const askingAmountOrId = [50];
 
-        const currentTimestamp = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          0,
+          0,
+        );
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -91,8 +102,13 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [50, 100, 150];
 
-        const currentTimestamp = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          0,
+          0,
+        );
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -123,8 +139,13 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [50, 100, 150];
 
-        const currentTimestamp = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          0,
+          0,
+        );
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -147,8 +168,13 @@ describe("Swaplace", async function () {
         const askingAddr = [MockERC721.address];
         const askingAmountOrId = [4];
 
-        const currentTimestamp = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          0,
+          0,
+        );
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -175,8 +201,13 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [4, 5, 6];
 
-        const currentTimestamp = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          0,
+          0,
+        );
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -207,8 +238,13 @@ describe("Swaplace", async function () {
         ];
         const askingAmountOrId = [4, 5, 6];
 
-        const currentTimestamp = (await blocktimestamp()) * 2;
-        const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          0,
+          0,
+        );
 
         const swap: Swap = await composeSwap(
           owner.address,
@@ -228,9 +264,9 @@ describe("Swaplace", async function () {
     context("Reverts when creating Swaps", () => {
       it("Should revert when {owner} is not {msg.sender}", async function () {
         const swap = await mockSwap();
-        await expect(Swaplace.connect(allowed).createSwap(swap))
-          .to.be.revertedWithCustomError(Swaplace, `InvalidAddress`)
-          .withArgs(allowed.address);
+        await expect(
+          Swaplace.connect(allowed).createSwap(swap),
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidAddress`);
       });
     });
   });
@@ -253,8 +289,13 @@ describe("Swaplace", async function () {
       const askingAddr = [MockERC20.address];
       const askingAmountOrId = [1000];
 
-      const currentTimestamp = (await blocktimestamp()) * 2;
-      const config = await Swaplace.packData(zeroAddress, currentTimestamp);
+      const currentTimestamp = (await blocktimestamp()) + 1000000;
+      const config = await Swaplace.encodeConfig(
+        zeroAddress,
+        currentTimestamp,
+        0,
+        0,
+      );
 
       swap = await composeSwap(
         owner.address,
@@ -328,9 +369,14 @@ describe("Swaplace", async function () {
         await MockERC721.connect(allowed).approve(Swaplace.address, 10);
 
         const swap = await mockSwap();
-        const [, expiry] = await Swaplace.parseData(swap.config);
+        const [, expiry, ,] = await Swaplace.decodeConfig(swap.config);
 
-        swap.config = await Swaplace.packData(allowed.address, expiry);
+        swap.config = await Swaplace.encodeConfig(
+          allowed.address,
+          expiry,
+          0,
+          0,
+        );
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
@@ -377,26 +423,22 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             receiver.address,
           ),
-        )
-          .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
-          .withArgs(0);
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
       });
 
       it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
         await Swaplace.connect(owner).createSwap(swap);
 
-        const [, expiry] = await Swaplace.parseData(swap.config);
+        const [, expiry, ,] = await Swaplace.decodeConfig(swap.config);
 
-        await network.provider.send("evm_increaseTime", [expiry * 2]);
+        await network.provider.send("evm_increaseTime", [2000000]);
 
         await expect(
           Swaplace.connect(owner).acceptSwap(
             await Swaplace.totalSwaps(),
             receiver.address,
           ),
-        )
-          .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
-          .withArgs(expiry);
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
       });
 
       it("Should revert when {allowance} is not provided", async function () {
@@ -409,7 +451,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             receiver.address,
           ),
-        ).to.be.revertedWith(`ERC721: caller is not token owner or approved`);
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidCall`);
       });
 
       it("Should revert when {acceptSwap} as not allowed to P2P Swap", async function () {
@@ -421,8 +463,13 @@ describe("Swaplace", async function () {
 
         const swap = await mockSwap();
 
-        const [, expiry] = await Swaplace.parseData(swap.config);
-        swap.config = await Swaplace.packData(deployer.address, expiry);
+        const [, expiry, ,] = await Swaplace.decodeConfig(swap.config);
+        swap.config = await Swaplace.encodeConfig(
+          deployer.address,
+          expiry,
+          0,
+          0,
+        );
 
         await expect(await Swaplace.connect(owner).createSwap(swap))
           .to.emit(Swaplace, "SwapCreated")
@@ -437,9 +484,7 @@ describe("Swaplace", async function () {
             await Swaplace.totalSwaps(),
             receiver.address,
           ),
-        )
-          .to.be.revertedWithCustomError(Swaplace, "InvalidAddress")
-          .withArgs(allowed.address);
+        ).to.be.revertedWithCustomError(Swaplace, "InvalidAddress");
       });
     });
   });
@@ -464,29 +509,27 @@ describe("Swaplace", async function () {
         await Swaplace.connect(owner).acceptSwap(lastSwap, receiver.address),
           await expect(
             Swaplace.connect(owner).acceptSwap(lastSwap, receiver.address),
-          )
-            .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
-            .withArgs(0);
+          ).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
       });
     });
 
     context("Reverts when canceling Swaps", () => {
       it("Should revert when {owner} is not {msg.sender}", async function () {
         const lastSwap = await Swaplace.totalSwaps();
-        await expect(Swaplace.connect(allowed).cancelSwap(lastSwap))
-          .to.be.revertedWithCustomError(Swaplace, `InvalidAddress`)
-          .withArgs(allowed.address);
+        await expect(
+          Swaplace.connect(allowed).cancelSwap(lastSwap),
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidAddress`);
       });
 
       it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
-        const [, expiry] = await Swaplace.parseData(swap.config);
+        const [, expiry, ,] = await Swaplace.decodeConfig(swap.config);
 
-        await network.provider.send("evm_increaseTime", [expiry * 2]);
+        await network.provider.send("evm_increaseTime", [2000000]);
 
         const lastSwap = await Swaplace.totalSwaps();
-        await expect(Swaplace.connect(owner).cancelSwap(lastSwap))
-          .to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`)
-          .withArgs(expiry);
+        await expect(
+          Swaplace.connect(owner).cancelSwap(lastSwap),
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
       });
     });
   });
@@ -502,9 +545,10 @@ describe("Swaplace", async function () {
       const lastSwap = await Swaplace.totalSwaps();
       const fetchedSwap = await Swaplace.getSwap(lastSwap);
 
+      const [, expiry, ,] = await Swaplace.decodeConfig(swap.config);
+
       expect(fetchedSwap.owner).not.to.be.equals(zeroAddress);
-      // swap.allowed can be the zero address and should not be trusted for validation
-      expect(fetchedSwap.expiry).not.to.be.equals(0);
+      expect(expiry).not.to.be.equals(0);
       expect(fetchedSwap.biding.length).to.be.greaterThan(0);
       expect(fetchedSwap.asking.length).to.be.greaterThan(0);
     });
@@ -514,7 +558,7 @@ describe("Swaplace", async function () {
       const fetchedSwap = await Swaplace.getSwap(imaginarySwapId);
       // swap.allowed can be the zero address and shoul not be trusted for validation
       expect(fetchedSwap.owner).to.be.deep.equals(zeroAddress);
-      const [fetchedAllowed, fetchedExpiry] = await Swaplace.parseData(
+      const [fetchedAllowed, fetchedExpiry, ,] = await Swaplace.decodeConfig(
         fetchedSwap.config,
       );
       expect(fetchedAllowed).to.be.deep.equals(zeroAddress);

@@ -5,7 +5,7 @@ import { ethers } from "hardhat";
  */
 export interface Asset {
   addr: string;
-  amountOrId: bigint;
+  amountOrId: bigint | number;
 }
 
 /**
@@ -13,9 +13,47 @@ export interface Asset {
  */
 export interface Swap {
   owner: string;
-  config: number;
+  config: bigint;
   biding: Asset[];
   asking: Asset[];
+}
+
+/**
+ * @dev See {ISwapFactory-encodeConfig}.
+ */
+export async function encodeConfig(
+  allowed: string,
+  expiry: bigint | number,
+  recipient: bigint | number,
+  value: bigint | number,
+): Promise<bigint> {
+  return (
+    (BigInt(allowed) << BigInt(96)) |
+    (BigInt(expiry) << BigInt(64)) |
+    (BigInt(recipient) << BigInt(56)) |
+    BigInt(value)
+  );
+}
+
+/**
+ * @dev See {ISwapFactory-decodeConfig}.
+ */
+export async function decodeConfig(config: bigint): Promise<{
+  allowed: string;
+  expiry: bigint | number;
+  recipient: bigint | number;
+  value: bigint | number;
+}> {
+  // ethers check sum address
+  return {
+    allowed:
+      config >> BigInt(96) == BigInt(0)
+        ? ethers.constants.AddressZero
+        : ethers.utils.getAddress((config >> BigInt(96)).toString(16)),
+    expiry: (config >> BigInt(64)) & ((BigInt(1) << BigInt(32)) - BigInt(1)),
+    recipient: (config >> BigInt(56)) & ((BigInt(1) << BigInt(8)) - BigInt(1)),
+    value: config & ((BigInt(1) << BigInt(56)) - BigInt(1)),
+  };
 }
 
 /**
@@ -23,7 +61,7 @@ export interface Swap {
  */
 export async function makeAsset(
   addr: string,
-  amountOrId: number | bigint,
+  amountOrId: bigint | number,
 ): Promise<Asset> {
   // validate if its an ethereum address
   if (!ethers.utils.isAddress(addr)) {
@@ -43,7 +81,7 @@ export async function makeAsset(
    */
   const asset: Asset = {
     addr: addr,
-    amountOrId: typeof amountOrId == "number" ? BigInt(amountOrId) : amountOrId,
+    amountOrId: amountOrId,
   };
 
   return asset;
@@ -53,8 +91,8 @@ export async function makeAsset(
  * @dev See {ISwapFactory-makeSwap}.
  */
 export async function makeSwap(
-  owner: any,
-  config: any,
+  owner: string,
+  config: bigint,
   biding: Asset[],
   asking: Asset[],
 ) {
@@ -108,12 +146,12 @@ export async function makeSwap(
  * - `askingAddr` and `askingAmountOrId` must have the same length.
  */
 export async function composeSwap(
-  owner: any,
-  config: any,
-  bidingAddr: any[],
-  bidingAmountOrId: any[],
-  askingAddr: any[],
-  askingAmountOrId: any[],
+  owner: string,
+  config: bigint,
+  bidingAddr: string[],
+  bidingAmountOrId: bigint[] | number[],
+  askingAddr: string[],
+  askingAmountOrId: bigint[] | number[],
 ) {
   // lenght of addresses and their respective amounts must be equal
   if (
@@ -124,12 +162,12 @@ export async function composeSwap(
   }
 
   // push new assets to the array of bids and asks
-  const biding: any[] = [];
+  const biding: Asset[] = [];
   bidingAddr.forEach(async (addr, index) => {
     biding.push(await makeAsset(addr, bidingAmountOrId[index]));
   });
 
-  const asking: any[] = [];
+  const asking: Asset[] = [];
   askingAddr.forEach(async (addr, index) => {
     asking.push(await makeAsset(addr, askingAmountOrId[index]));
   });
@@ -141,4 +179,6 @@ module.exports = {
   makeAsset,
   makeSwap,
   composeSwap,
+  encodeConfig,
+  decodeConfig,
 };
