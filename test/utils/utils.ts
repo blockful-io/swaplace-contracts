@@ -32,7 +32,8 @@ export async function deploy(contractName: any, signer: any) {
     throw new Error(
       `Error getting the Contract Factory for ${contractName}. 
        Make sure the contract is compiled, the type-chain generated 
-       and a valid Ethereum Address for signer set in hardhat.config.ts.`,
+       and a valid Ethereum Address for signer set in hardhat.config.ts.
+       ${error}`,
     );
   }
 
@@ -44,7 +45,8 @@ export async function deploy(contractName: any, signer: any) {
       `Error deploying the Contract ${contractName}. 
        Make sure the network is correct, that you have a valid Ethereum Address 
        for signer with enough funds for the transaction. The gas settings might
-       as well be lower than the amount required by the network at the moment.`,
+       as well be lower than the amount required by the network at the moment.
+       ${error}`,
     );
   }
 
