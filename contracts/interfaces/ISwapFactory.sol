@@ -8,8 +8,7 @@ import {ISwap} from "./ISwap.sol";
  */
 interface ISwapFactory {
   /**
-   * @dev Constructs an asset struct that works for token standards.
-   * This function is a utility to easily create an `Asset` type on-chain or off-chain.
+   * @dev Constructs an {ISwap-Asset} struct to work with token standards.
    */
   function makeAsset(
     address addr,
