@@ -8,8 +8,8 @@ import {ISwap} from "./ISwap.sol";
  */
 interface ISwapFactory {
   /**
-   * @dev Constructs an asset struct that works for ERC20 or ERC721.
-   * This function is a utility to easily create an `Asset` struct on-chain or off-chain.
+   * @dev Constructs an asset struct that works for token standards.
+   * This function is a utility to easily create an `Asset` type on-chain or off-chain.
    */
   function makeAsset(
     address addr,
@@ -21,8 +21,7 @@ interface ISwapFactory {
    *
    * Requirements:
    *
-   * - `expiry` cannot be in the past timestamp.
-   * - `biding` and `asking` cannot be empty.
+   * - `expiry` cannot be in the past.
    */
   function makeSwap(
     address owner,
@@ -35,7 +34,7 @@ interface ISwapFactory {
   ) external view returns (ISwap.Swap memory);
 
   /**
-   * @dev This function returns the bitwise packing as a uint256.
+   * @dev This function uses bitwise to return a uint256.
    */
   function encodeConfig(
     address allowed,
@@ -45,15 +44,12 @@ interface ISwapFactory {
   ) external pure returns (uint256);
 
   /**
-   * @dev Decode the `config` variable.
-   *
-   * This function returns the extracted values of:
-   * - `allowed`
-   * - `expiry`
-   * - `recipient`
-   * - `value`
+   * @dev Decode `config` into their respective variables.
    */
   function decodeConfig(
     uint256 config
-  ) external pure returns (address, uint32, uint8, uint56);
+  )
+    external
+    pure
+    returns (address allowed, uint32 expiry, uint8 recipient, uint56 value);
 }

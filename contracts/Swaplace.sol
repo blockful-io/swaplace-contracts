@@ -123,7 +123,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
 
   /**
    * @dev Transfer 'assets' from 'from' to 'to'.
-   * Where 0x23b872dd is the selector of the `transferFrom` function.
+   * The selector of the `transferFrom` function in bytes4: 0x23b872dd
    */
   function _transferFrom(
     address from,
