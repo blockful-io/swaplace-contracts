@@ -63,6 +63,32 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
   }
 
   /**
+   * @dev See {ISwapFactory-encodeAsset}.
+   */
+  function encodeAsset(
+    uint120 tokenId,
+    uint120 tokenAmount
+  ) public pure returns (uint256 amountOrId) {
+    return
+      (uint256(type(uint16).max) << 240) |
+      (uint256(tokenId) << 120) |
+      uint256(tokenAmount);
+  }
+
+  /**
+   * @dev See {ISwapFactory-decodeAsset}.
+   */
+  function decodeAsset(
+    uint256 amountOrId
+  ) public pure returns (uint16, uint256, uint256) {
+    return (
+      uint16(amountOrId >> 240),
+      uint256(amountOrId >> 120),
+      uint256(amountOrId)
+    );
+  }
+
+  /**
    * @dev See {ISwapFactory-encodeConfig}.
    */
   function encodeConfig(
