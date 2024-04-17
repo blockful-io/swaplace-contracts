@@ -26,13 +26,11 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
  * The Swap struct uses an {Asset} struct to represent the asset. This struct is
  * composed of:
  *
- * - The `address` of the asset. This address can be from an ERC20 or ERC721 contract.
+ * - The `address` of the token asset.
  * - The `amount` or `id` of the asset. This amount can be the amount of ERC20 tokens
- *  or the ID of an ERC721 token.
- *
- * To use other standards, like ERC1155, you can wrap the ownership of the asset
- * in an a trusted contract and Swap as an ERC721. This way, you can tokenize any
- * on-chain execution and trade on Swaplace.
+ *  or the NFT ID of an ERC721.
+ * - The `amount` and `id` can be encoded together in a single uint256, allowing the
+ * ERC1155 tokens to be swapped.
  */
 abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
   /**
