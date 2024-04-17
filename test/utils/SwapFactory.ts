@@ -44,12 +44,13 @@ export async function decodeConfig(config: bigint): Promise<{
   recipient: bigint | number;
   value: bigint | number;
 }> {
-  // ethers check sum address
   return {
     allowed:
       config >> BigInt(96) == BigInt(0)
         ? ethers.constants.AddressZero
-        : ethers.utils.getAddress((config >> BigInt(96)).toString(16)),
+        : ethers.utils.getAddress(
+            `0x${(config >> BigInt(96)).toString(16).padStart(40, "0")}`,
+          ),
     expiry: (config >> BigInt(64)) & ((BigInt(1) << BigInt(32)) - BigInt(1)),
     recipient: (config >> BigInt(56)) & ((BigInt(1) << BigInt(8)) - BigInt(1)),
     value: config & ((BigInt(1) << BigInt(56)) - BigInt(1)),
