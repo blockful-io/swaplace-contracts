@@ -3,7 +3,6 @@ pragma solidity ^0.8.17;
 
 import {IERC165} from "./interfaces/IERC165.sol";
 import {ISwaplace} from "./interfaces/ISwaplace.sol";
-import {ITransfer} from "./interfaces/ITransfer.sol";
 import {SwapFactory} from "./SwapFactory.sol";
 
 /**
@@ -136,6 +135,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       (uint16 assetType, uint256 tokenId, uint256 tokenAmount) = decodeAsset(
         assets[i].amountOrId
       );
+
       if (assetType == type(uint16).max) {
         (bool success, ) = address(assets[i].addr).call(
           abi.encodeWithSelector(0xf242432a, from, to, tokenId, tokenAmount, "")
@@ -147,6 +147,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         );
         if (!success) revert InvalidCall();
       }
+
       assembly {
         i := add(i, 1)
       }
