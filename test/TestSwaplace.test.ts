@@ -10,6 +10,7 @@ describe("Swaplace", async function () {
   let Swaplace: Contract;
   let MockERC20: Contract;
   let MockERC721: Contract;
+  let MockERC1155: Contract;
 
   // The signers of the test
   let deployer: SignerWithAddress;
@@ -58,10 +59,76 @@ describe("Swaplace", async function () {
     Swaplace = await deploy("Swaplace", deployer);
     MockERC20 = await deploy("MockERC20", deployer);
     MockERC721 = await deploy("MockERC721", deployer);
+    MockERC1155 = await deploy("MockERC1155", deployer);
   });
 
   describe("Creating Swaps", () => {
     context("Creating different types of Swaps", () => {
+      it("Should be able to create a 1-1 swap with ERC1155", async function () {
+        const bidingAddr = [MockERC1155.address];
+        const tokenId = 1;
+        const amount = 3;
+        const amountAndId = await Swaplace.encodeAsset(tokenId, amount);
+        const bidingAmountOrId = [amountAndId];
+
+        const askingAddr = [MockERC721.address];
+        const askingAmountOrId = [50];
+
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          allowed.address,
+          currentTimestamp,
+          0,
+          0,
+        );
+
+        const swap: Swap = await composeSwap(
+          owner.address,
+          config,
+          bidingAddr,
+          bidingAmountOrId,
+          askingAddr,
+          askingAmountOrId,
+        );
+
+        await MockERC1155.mint(owner.address, tokenId, amount);
+        await MockERC1155.connect(owner).setApprovalForAll(
+          Swaplace.address,
+          true,
+        );
+        await MockERC721.mint(allowed.address, askingAmountOrId[0]);
+        await MockERC721.connect(allowed).approve(
+          Swaplace.address,
+          askingAmountOrId[0],
+        );
+
+        const nextSwapId = Number(await Swaplace.totalSwaps()) + 1;
+
+        await expect(await Swaplace.connect(owner).createSwap(swap))
+          .to.emit(Swaplace, "SwapCreated")
+          .withArgs(nextSwapId, owner.address, allowed.address);
+
+        await expect(
+          await Swaplace.connect(allowed).acceptSwap(
+            nextSwapId,
+            receiver.address,
+          ),
+        )
+          .to.emit(Swaplace, "SwapAccepted")
+          .withArgs(nextSwapId, owner.address, allowed.address);
+
+        expect(
+          await MockERC1155.balanceOf(owner.address, tokenId),
+        ).to.be.equals(0);
+        expect(
+          await MockERC1155.balanceOf(receiver.address, tokenId),
+        ).to.be.equals(amount);
+        expect(await MockERC721.ownerOf(askingAmountOrId[0])).to.be.equals(
+          owner.address,
+        );
+        expect(await MockERC721.balanceOf(allowed.address)).to.be.equals(0);
+      });
+
       it("Should be able to create a 1-1 swap with ERC20", async function () {
         const bidingAddr = [MockERC20.address];
         const bidingAmountOrId = [50];
