@@ -122,25 +122,11 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
   }
 
   /**
-   * @dev Transfer 'assets' from 'from' to 'to'.
-   * The selector of the `transferFrom` function in bytes4: 0x23b872dd
+   * @dev Transfer multiple 'assets' from 'from' to 'to'.
+   *
+   * `0x23b872dd` - Selector of the `transferFrom` function (ERC20, ERC721).
+   * `0xf242432a` - Selector of the `safeTransferFrom` function (ERC1155).
    */
-  function _transferFrom2(
-    address from,
-    address to,
-    Asset[] memory assets
-  ) internal {
-    for (uint256 i; i < assets.length; ) {
-      (bool success, ) = address(assets[i].addr).call(
-        abi.encodeWithSelector(0x23b872dd, from, to, assets[i].amountOrId)
-      );
-      if (!success) revert InvalidCall();
-      assembly {
-        i := add(i, 1)
-      }
-    }
-  }
-
   function _transferFrom(
     address from,
     address to,

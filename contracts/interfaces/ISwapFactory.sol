@@ -8,11 +8,24 @@ import {ISwap} from "./ISwap.sol";
  */
 interface ISwapFactory {
   /**
-   * @dev Constructs an {ISwap-Asset} struct to work with token standards.
+   * @dev Make an {ISwap-Asset} struct to work with token standards.
    */
   function makeAsset(
     address addr,
     uint256 amountOrId
+  ) external pure returns (ISwap.Asset memory);
+
+  /**
+   * @dev Make an {ISwap-Asset} struct to work with token standards.
+   *
+   * NOTE: Different from the {makeAsset} function, this function is used to
+   * encode the token ID and token amount into a single uint256. This is made
+   * to work with the ERC1155 standard.
+   */
+  function make1155Asset(
+    address addr,
+    uint120 tokenId,
+    uint120 tokenAmount
   ) external pure returns (ISwap.Asset memory);
 
   /**
@@ -33,7 +46,31 @@ interface ISwapFactory {
   ) external view returns (ISwap.Swap memory);
 
   /**
-   * @dev This function uses bitwise to return a uint256.
+   * @dev Encode `tokenId` and `tokenAmount` into a single uint256 while adding a flag
+   * to indicate that it's an ERC1155 token.
+   */
+  function encodeAsset(
+    uint120 tokenId,
+    uint120 tokenAmount
+  ) external pure returns (uint256 amountOrId);
+
+  /**
+   * @dev Decode `amountOrId` to check if the first 4 bytes are set to 0xFFFFFFFF.
+   * If the flag is set to 0xFFFFFFFF, then it's an ERC1155 standard, otherwise it's
+   * assumed to be an ERC20 or ERC721 standard.
+   *
+   * NOTE: If it's an ERC1155 token, then the next 120 bits are the token ID and the next
+   * 120 bits are the token amount.
+   */
+  function decodeAsset(
+    uint256 amountOrId
+  )
+    external
+    pure
+    returns (uint16 tokenType, uint256 tokenId, uint256 tokenAmount);
+
+  /**
+   * @dev This function uses bitwise to return an encoded uint256 of the following parameters.
    */
   function encodeConfig(
     address allowed,

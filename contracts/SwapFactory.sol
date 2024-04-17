@@ -46,6 +46,17 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
   }
 
   /**
+   * @dev See {ISwapFactory-make1155Asset}.
+   */
+  function make1155Asset(
+    address addr,
+    uint120 tokenId,
+    uint120 tokenAmount
+  ) public pure virtual returns (Asset memory) {
+    return Asset(addr, encodeAsset(tokenId, tokenAmount));
+  }
+
+  /**
    * @dev See {ISwapFactory-makeSwap}.
    */
   function makeSwap(
@@ -80,7 +91,11 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
    */
   function decodeAsset(
     uint256 amountOrId
-  ) public pure returns (uint16, uint256, uint256) {
+  )
+    public
+    pure
+    returns (uint16 tokenType, uint256 tokenId, uint256 tokenAmount)
+  {
     return (
       uint16(amountOrId >> 240),
       uint256(amountOrId >> 120),
