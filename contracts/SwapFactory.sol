@@ -98,8 +98,8 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
   {
     return (
       uint16(amountOrId >> 240),
-      uint256(amountOrId >> 120),
-      uint256(amountOrId)
+      uint256(uint120(amountOrId >> 120)),
+      uint256(uint120(amountOrId))
     );
   }
 
