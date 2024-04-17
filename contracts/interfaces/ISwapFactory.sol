@@ -8,8 +8,7 @@ import {ISwap} from "./ISwap.sol";
  */
 interface ISwapFactory {
   /**
-   * @dev Constructs an asset struct that works for ERC20 or ERC721.
-   * This function is a utility to easily create an `Asset` struct on-chain or off-chain.
+   * @dev Make an {ISwap-Asset} struct to work with token standards.
    */
   function makeAsset(
     address addr,
@@ -17,33 +16,76 @@ interface ISwapFactory {
   ) external pure returns (ISwap.Asset memory);
 
   /**
+   * @dev Make an {ISwap-Asset} struct to work with token standards.
+   *
+   * NOTE: Different from the {makeAsset} function, this function is used to
+   * encode the token ID and token amount into a single uint256. This is made
+   * to work with the ERC1155 standard.
+   */
+  function make1155Asset(
+    address addr,
+    uint120 tokenId,
+    uint120 tokenAmount
+  ) external pure returns (ISwap.Asset memory);
+
+  /**
    * @dev Build a swap struct to use in the {Swaplace-createSwap} function.
    *
    * Requirements:
    *
-   * - `expiry` cannot be in the past timestamp.
-   * - `biding` and `asking` cannot be empty.
+   * - `expiry` cannot be in the past.
    */
   function makeSwap(
     address owner,
     address allowed,
-    uint256 expiry,
+    uint32 expiry,
+    uint8 recipient,
+    uint56 value,
     ISwap.Asset[] memory assets,
     ISwap.Asset[] memory asking
   ) external view returns (ISwap.Swap memory);
 
   /**
-   * @dev Packs `allowed` and the `expiry`.
-   * This function returns the bitwise packing of `allowed` and `expiry` as a uint256.
+   * @dev Encode `tokenId` and `tokenAmount` into a single uint256 while adding a flag
+   * to indicate that it's an ERC1155 token.
    */
-  function packData(
+  function encodeAsset(
+    uint120 tokenId,
+    uint120 tokenAmount
+  ) external pure returns (uint256 amountOrId);
+
+  /**
+   * @dev Decode `amountOrId` to check if the first 4 bytes are set to 0xFFFFFFFF.
+   * If the flag is set to 0xFFFFFFFF, then it's an ERC1155 standard, otherwise it's
+   * assumed to be an ERC20 or ERC721 standard.
+   *
+   * NOTE: If it's an ERC1155 token, then the next 120 bits are the token ID and the next
+   * 120 bits are the token amount.
+   */
+  function decodeAsset(
+    uint256 amountOrId
+  )
+    external
+    pure
+    returns (uint16 tokenType, uint256 tokenId, uint256 tokenAmount);
+
+  /**
+   * @dev This function uses bitwise to return an encoded uint256 of the following parameters.
+   */
+  function encodeConfig(
     address allowed,
-    uint256 expiry
+    uint32 expiry,
+    uint8 recipient,
+    uint56 value
   ) external pure returns (uint256);
 
   /**
-   * @dev Parsing the `config`.
-   * This function returns the extracted values of `allowed` and `expiry`.
+   * @dev Decode `config` into their respective variables.
    */
-  function parseData(uint256 config) external pure returns (address, uint256);
+  function decodeConfig(
+    uint256 config
+  )
+    external
+    pure
+    returns (address allowed, uint32 expiry, uint8 recipient, uint56 value);
 }
