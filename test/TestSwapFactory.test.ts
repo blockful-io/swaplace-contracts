@@ -70,6 +70,7 @@ describe("Swaplace Factory", async function () {
       configOnChain,
     );
     const decodedConfig = await decodeConfig(configOffChain);
+
     expect(BigInt(allowed)).to.be.equals(decodedConfig.allowed);
     expect(expiry).to.be.equals(decodedConfig.expiry);
     expect(recipient).to.be.equals(decodedConfig.recipient);
