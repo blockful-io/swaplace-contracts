@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Contract } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
@@ -156,6 +156,61 @@ describe("Swaplace Factory", async function () {
     );
   });
 
+  it("Should be able to {makeSwap} with native ethers value", async function () {
+    const currentTimestamp = (await blocktimestamp()) + 2000000;
+
+    const ERC20Asset: Asset = await makeAsset(MockERC20.address, 1000);
+    const ERC721Asset: Asset = await makeAsset(MockERC721.address, 1);
+
+    const valueToSend: BigNumber = ethers.utils.parseEther("0.2");
+
+    const config = await Swaplace.encodeConfig(
+      zeroAddress,
+      currentTimestamp,
+      1,
+      valueToSend.div(1e12),
+    );
+
+    const swap = await makeSwap(
+      owner.address,
+      config,
+      [ERC20Asset],
+      [ERC721Asset],
+    );
+
+    const onChainSwap = await Swaplace.makeSwap(
+      owner.address,
+      zeroAddress,
+      currentTimestamp,
+      1,
+      valueToSend.div(1e12),
+      [ERC20Asset],
+      [ERC721Asset],
+    );
+
+    const [allowed, expiry, recipient, value] = await Swaplace.decodeConfig(
+      swap.config,
+    );
+    const [onChainAllowed, onChainExpiry, onChainRecipient, onChainValue] =
+      await Swaplace.decodeConfig(onChainSwap.config);
+
+    expect(swap.owner).to.be.equals(onChainSwap.owner);
+    expect(expiry).to.be.equals(onChainExpiry);
+    expect(allowed).to.be.equals(onChainAllowed);
+    expect(recipient).to.be.equals(onChainRecipient);
+    expect(value).to.be.equals(onChainValue);
+
+    expect(swap.biding[0].addr).to.be.equals(onChainSwap.biding[0].addr);
+    expect(swap.biding[0].amountOrId).to.be.equals(
+      onChainSwap.biding[0].amountOrId,
+    );
+
+    expect(swap.asking[0].addr).to.be.equals(onChainSwap.asking[0].addr);
+    expect(swap.asking[0].amountOrId).to.be.equals(
+      onChainSwap.asking[0].amountOrId,
+    );
+  });
+
   it("Should be able to {makeSwap} with multiple assets", async function () {
     const currentTimestamp = (await blocktimestamp()) + 2000000;
 
@@ -216,6 +271,44 @@ describe("Swaplace Factory", async function () {
     expect(swap.owner).to.be.equals(owner.address);
     expect(allowed).to.be.equals(zeroAddress);
     expect(expiry).to.be.equals(expiry);
+  });
+
+  it("Should be able to {composeSwap} using native ethers value", async function () {
+    const currentTimestamp = (await blocktimestamp()) + 2000000;
+
+    const bidingAddr = [MockERC20.address, MockERC721.address];
+    const bidingAmountOrId = [1000, 1];
+
+    const askingAddr = [MockERC721.address];
+    const askingAmountOrId = [2];
+
+    const valueToSend: BigNumber = ethers.utils.parseEther("1");
+
+    const config = await Swaplace.encodeConfig(
+      zeroAddress,
+      currentTimestamp,
+      0,
+      valueToSend.div(1e12),
+    );
+
+    const swap = await composeSwap(
+      owner.address,
+      config,
+      bidingAddr,
+      bidingAmountOrId,
+      askingAddr,
+      askingAmountOrId,
+    );
+
+    const [allowed, expiry, recipient, value] = await Swaplace.decodeConfig(
+      swap.config,
+    );
+
+    expect(swap.owner).to.be.equals(owner.address);
+    expect(allowed).to.be.equals(zeroAddress);
+    expect(expiry).to.be.equals(expiry);
+    expect(recipient).to.be.equals(0);
+    expect(value).to.be.equals(valueToSend.div(1e12));
   });
 
   it("Should revert using {composeSwap} without minimum expiry", async function () {
