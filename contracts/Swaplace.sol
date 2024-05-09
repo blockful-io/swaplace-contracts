@@ -46,7 +46,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     uint256 swapId = _totalSwaps;
     _swaps[swapId] = swap;
 
-    (address allowed, , uint8 recipient, uint56 value) = decodeConfig(
+    (address allowed, , uint8 recipient, uint256 value) = decodeConfig(
       swap.config
     );
 
@@ -72,7 +72,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       address allowed,
       uint32 expiry,
       uint8 recipient,
-      uint56 value
+      uint256 value
     ) = decodeConfig(swap.config);
 
     if (allowed != address(0) && allowed != msg.sender) revert InvalidAddress();
@@ -100,7 +100,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     Swap memory swap = _swaps[swapId];
     if (swap.owner != msg.sender) revert InvalidAddress();
 
-    (, uint32 expiry, uint8 recipient, uint56 value) = decodeConfig(
+    (, uint32 expiry, uint8 recipient, uint256 value) = decodeConfig(
       swap.config
     );
 
