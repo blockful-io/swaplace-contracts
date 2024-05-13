@@ -11,10 +11,11 @@ async function main() {
   /// @dev This is the list of mock deployments addresses that were stored in the `.env` file.
   const ERC20_ADDRESS = process.env.ERC20_ADDRESS || 0x0;
   const ERC721_ADDRESS = process.env.ERC721_ADDRESS || 0x0;
+  const ERC1155_ADDRESS = process.env.ERC1155_ADDRESS || 0x0;
   /// @dev Will throw an error if any of the addresses were not set in the `.env` file.
-  if (!ERC20_ADDRESS || !ERC721_ADDRESS) {
+  if (!ERC20_ADDRESS || !ERC721_ADDRESS || !ERC1155_ADDRESS) {
     throw new Error(
-      "Invalid ERC20 or ERC721 address, please check if the addresse in the `.env` file is set up correctly.",
+      "Invalid ERC20 or ERC721 or ERC1155 address, please check if the addresses in the `.env` file are set up correctly.",
     );
   }
 
@@ -25,6 +26,7 @@ async function main() {
   /// @dev The returned contract instance that will be deployed via the deploy function in utils.
   let MockERC20: Contract;
   let MockERC721: Contract;
+  let MockERC1155: Contract;
 
   /// @dev will throw an error if any of the accounts was not set up correctly.
   try {
@@ -49,6 +51,11 @@ async function main() {
       ERC721_ADDRESS,
       signers[0],
     );
+    MockERC1155 = await ethers.getContractAt(
+      "MockERC1155",
+      ERC1155_ADDRESS,
+      signers[0],
+    );
   } catch (error) {
     throw new Error(
       `Error deploying one of the Mock Contracts. 
@@ -69,6 +76,7 @@ async function main() {
   /// @dev Responses from the minting transactions.
   let txErc20;
   let txErc721;
+  let txErc1155;
 
   /// @dev Minting function will throw an error if the minting fails.
   /// We are minting for the first signer of `hardhat.config.ts` 1000
@@ -77,6 +85,7 @@ async function main() {
   try {
     txErc20 = await MockERC20.mint(signers[0].address, amount);
     txErc721 = await MockERC721.mint(signers[0].address, tokenId);
+    txErc1155 = await MockERC1155.mint(signers[0].address, tokenId, amount);
   } catch (error) {
     throw new Error(
       `Error while minting tokens. Make sure that the minting function is 
@@ -93,12 +102,19 @@ async function main() {
     tokenId,
     txErc721.hash,
   );
+  console.log(
+    "\nERC1155 Minted %s tokens with ID #%s \nAt Tx %s",
+    amount,
+    tokenId,
+    txErc1155.hash,
+  );
 
   await storeEnv(tokenId, "TOKEN_ID", false);
 
   /// @dev Awaits for the transaction to be mined.
   await txErc20.wait();
   await txErc721.wait();
+  await txErc1155.wait();
 }
 
 main().catch((error) => {

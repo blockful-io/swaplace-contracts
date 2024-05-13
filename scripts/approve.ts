@@ -10,12 +10,18 @@ async function main() {
   /// @dev This is the list of mock deployments addresses that were stored in the `.env` file.
   const ERC20_ADDRESS = process.env.ERC20_ADDRESS || 0x0;
   const ERC721_ADDRESS = process.env.ERC721_ADDRESS || 0x0;
+  const ERC1155_ADDRESS = process.env.ERC1155_ADDRESS || 0x0;
   /// @dev The Swaplace address also needs to be instance to receive the approvals.
   const SWAPLACE_ADDRESS = process.env.SWAPLACE_ADDRESS || 0x0;
   /// @dev Will throw an error if any of the addresses were not set in the `.env` file.
-  if (!ERC20_ADDRESS || !ERC721_ADDRESS || !SWAPLACE_ADDRESS) {
+  if (
+    !ERC20_ADDRESS ||
+    !ERC721_ADDRESS ||
+    !SWAPLACE_ADDRESS ||
+    !ERC1155_ADDRESS
+  ) {
     throw new Error(
-      "Invalid ERC20, ERC721 or Swaplace address, please check if the addresse in the `.env` file is set up correctly.",
+      "Invalid ERC20, ERC721, ERC1155 or Swaplace address, please check if the addresse in the `.env` file is set up correctly.",
     );
   }
 
@@ -39,6 +45,7 @@ async function main() {
   /// @dev The returned contract instance that will be deployed via the deploy function in utils.
   let MockERC20: Contract;
   let MockERC721: Contract;
+  let MockERC1155: Contract;
 
   /// @dev will throw an error if any of the accounts was not set up correctly.
   try {
@@ -63,6 +70,11 @@ async function main() {
       ERC721_ADDRESS,
       signers[0],
     );
+    MockERC1155 = await ethers.getContractAt(
+      "MockERC1155",
+      ERC1155_ADDRESS,
+      signers[0],
+    );
   } catch (error) {
     throw new Error(
       `Error deploying one of the Mock Contracts. 
@@ -76,11 +88,13 @@ async function main() {
   /// @dev Responses from the minting transactions.
   let txErc20;
   let txErc721;
+  let txErc1155;
 
   /// @dev We are approving the signer address to spend the amount of tokens.
   try {
     txErc20 = await MockERC20.approve(SWAPLACE_ADDRESS, amount);
     txErc721 = await MockERC721.approve(SWAPLACE_ADDRESS, tokenId);
+    txErc1155 = await MockERC1155.setApprovalForAll(SWAPLACE_ADDRESS, true);
   } catch (error) {
     throw new Error(
       `Error while approving the tokens. Make sure that the approve function is 
@@ -97,6 +111,7 @@ async function main() {
     tokenId,
     txErc721.hash,
   );
+  console.log("\nERC1155 Approved all tokens \nAt Tx %s", txErc1155.hash);
 }
 
 main().catch((error) => {
