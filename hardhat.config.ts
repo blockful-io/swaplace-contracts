@@ -27,7 +27,7 @@ const config: HardhatUserConfig = {
      * @dev Testnets
      */
     kakarot: {
-      url: `${process.env.KAKAROT_RPC_URL}`,
+      url: `${process.env.KAKAROT_SEPOLIA_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
     sepolia: {
