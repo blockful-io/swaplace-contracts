@@ -89,6 +89,27 @@ export async function makeAsset(
 }
 
 /**
+ * @dev See {ISwapFactory-encodeAsset}.
+ */
+export async function encodeAsset(
+  tokenId: bigint | number,
+  tokenAmount: bigint | number,
+): Promise<bigint> {
+  // if the amount or ID is negative, it will throw an error
+  if (tokenId < 0 || tokenAmount < 0) {
+    throw new Error("tokenId or tokenAmount cannot be less than 0");
+  }
+
+  const uint16Max = 65535;
+
+  return BigInt(
+    (BigInt(uint16Max) << BigInt(240)) |
+      (BigInt(tokenId) << BigInt(120)) |
+      BigInt(tokenAmount),
+  );
+}
+
+/**
  * @dev See {ISwapFactory-makeSwap}.
  */
 export async function makeSwap(
