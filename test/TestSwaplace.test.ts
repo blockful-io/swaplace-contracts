@@ -327,7 +327,7 @@ describe("Swaplace", async function () {
           .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
       });
 
-      it("Should be able to create a swap with native ethers", async function () {
+      it("Should be able to {createSwap} with native ethers sent by the {owner}", async function () {
         const bidingAddr = [MockERC20.address];
         const bidingAmountOrId = [50];
 
@@ -339,7 +339,7 @@ describe("Swaplace", async function () {
         const askingAmountOrId = [50, 100, 150];
 
         const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
-
+        
         const currentTimestamp = (await blocktimestamp()) + 1000000;
         const config = await Swaplace.encodeConfig(
           zeroAddress,
@@ -374,7 +374,7 @@ describe("Swaplace", async function () {
         ).to.be.revertedWithCustomError(Swaplace, `InvalidAddress`);
       });
 
-      it("Should revert when the wrong amount of ethers is sent by the {owner}", async function () {
+      it("Should revert when the wrong amount of ethers are sent by the {owner}", async function () {
         const bidingAddr = [MockERC20.address];
         const bidingAmountOrId = [50];
 
@@ -539,7 +539,7 @@ describe("Swaplace", async function () {
           );
       });
 
-      it("Should be able to {acceptSwap} with native ethers", async function () {
+      it("Should be able to {acceptSwap} with native ethers sent by the {owner}", async function () {
         await MockERC20.mint(owner.address, 1000);
         await MockERC721.mint(allowed.address, 10);
 
@@ -555,11 +555,8 @@ describe("Swaplace", async function () {
           MockERC20.address,
         ];
         const askingAmountOrId = [50, 100, 150];
-
         const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
-
         const expiry = (await blocktimestamp()) + 1000000;
-
         const config = await Swaplace.encodeConfig(
           allowed.address,
           expiry,
@@ -575,6 +572,9 @@ describe("Swaplace", async function () {
           askingAddr,
           askingAmountOrId,
         );
+
+        const balanceBefore: BigNumber = await receiver.getBalance();
+        const expectedBalance: BigNumber = balanceBefore.add(valueToSend);
 
         await expect(
           await Swaplace.connect(owner).createSwap(swap, {
@@ -600,6 +600,72 @@ describe("Swaplace", async function () {
             owner.address,
             allowed.address,
           );
+
+        const balanceAfter: BigNumber = await receiver.getBalance();
+        await expect(balanceAfter).to.be.equals(expectedBalance);
+      });
+
+      it("Should be able to {acceptSwap} with native ethers sent by the {acceptee}", async function () {
+        await MockERC20.mint(owner.address, 1000);
+        await MockERC721.mint(allowed.address, 10);
+
+        await MockERC20.connect(owner).approve(Swaplace.address, 1000);
+        await MockERC721.connect(allowed).approve(Swaplace.address, 10);
+
+        const bidingAddr = [MockERC20.address];
+        const bidingAmountOrId = [50];
+
+        const askingAddr = [
+          MockERC20.address,
+          MockERC20.address,
+          MockERC20.address,
+        ];
+        const askingAmountOrId = [50, 100, 150];
+        const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
+        const expiry = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          allowed.address,
+          expiry,
+          1,
+          valueToSend.div(1e12),
+        );
+
+        const swap: Swap = await composeSwap(
+          owner.address,
+          config,
+          bidingAddr,
+          bidingAmountOrId,
+          askingAddr,
+          askingAmountOrId,
+        );
+
+        await expect(await Swaplace.connect(owner).createSwap(swap))
+          .to.emit(Swaplace, "SwapCreated")
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed.address,
+          );
+
+        const balanceBefore: BigNumber = await owner.getBalance();
+        const expectedBalance: BigNumber = balanceBefore.add(valueToSend);
+
+        await expect(
+          Swaplace.connect(allowed).acceptSwap(
+            await Swaplace.totalSwaps(),
+            receiver.address,
+            { value: valueToSend },
+          ),
+        )
+          .to.emit(Swaplace, "SwapAccepted")
+          .withArgs(
+            await Swaplace.totalSwaps(),
+            owner.address,
+            allowed.address,
+          );
+
+        const balanceAfter: BigNumber = await owner.getBalance();
+        await expect(balanceAfter).to.be.equals(expectedBalance);
       });
     });
 
@@ -705,11 +771,8 @@ describe("Swaplace", async function () {
           MockERC20.address,
         ];
         const askingAmountOrId = [50, 100, 150];
-
         const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
-
         const expiry = (await blocktimestamp()) + 1000000;
-
         const config = await Swaplace.encodeConfig(
           allowed.address,
           expiry,
