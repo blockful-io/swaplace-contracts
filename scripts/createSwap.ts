@@ -1,19 +1,30 @@
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import { blocktimestamp, storeEnv } from "../test/utils/utils";
-import { Swap, composeSwap } from "../test/utils/SwapFactory";
+import {
+  Swap,
+  composeSwap,
+  encodeAsset,
+  encodeConfig,
+} from "../test/utils/SwapFactory";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 export async function main() {
   /// @dev This is the list of mock deployments addresses that were stored in the `.env` file.
   const ERC20_ADDRESS = process.env.ERC20_ADDRESS || 0x0;
   const ERC721_ADDRESS = process.env.ERC721_ADDRESS || 0x0;
+  const ERC1155_ADDRESS = process.env.ERC1155_ADDRESS || 0x0;
   /// @dev The Swaplace address also needs to be instance to receive the approvals.
   const SWAPLACE_ADDRESS = process.env.SWAPLACE_ADDRESS || 0x0;
   /// @dev Will throw an error if any of the addresses were not set in the `.env` file.
-  if (!ERC20_ADDRESS || !ERC721_ADDRESS || !SWAPLACE_ADDRESS) {
+  if (
+    !ERC20_ADDRESS ||
+    !ERC721_ADDRESS ||
+    !SWAPLACE_ADDRESS ||
+    !ERC1155_ADDRESS
+  ) {
     throw new Error(
-      "Invalid ERC20, ERC721 or Swaplace address, please check if the addresse in the `.env` file is set up correctly.",
+      "Invalid ERC20, ERC721, ERC1155 or Swaplace address, please check if the addresses in the `.env` file are set up correctly.",
     );
   }
 
@@ -65,21 +76,26 @@ export async function main() {
     );
   }
 
-  /// @dev Fill the Swap struct
+  /// @dev Fill the Swap struct and config
   const owner = signers[0].address;
   const allowed = ethers.constants.AddressZero;
   const expiry = (await blocktimestamp()) * 2;
+  const recipient = 0;
+  const value = 0;
+
+  /// @dev Encode ERC1155 asset
+  const amountAndId = await encodeAsset(BigInt(tokenId), BigInt(amount));
 
   /// @dev Build the biding assets
-  const bidingAddr = [ERC20_ADDRESS];
-  const bidingAmountOrId = [amount];
+  const bidingAddr = [ERC20_ADDRESS, ERC1155_ADDRESS];
+  const bidingAmountOrId = [BigInt(amount), amountAndId];
 
   /// @dev Build the asking assets
   const askingAddr = [ERC721_ADDRESS];
-  const askingAmountOrId = [tokenId];
+  const askingAmountOrId = [BigInt(tokenId)];
 
   /// @dev Pack the config together
-  const config = (BigInt(allowed) << BigInt(96)) | BigInt(expiry);
+  const config = await encodeConfig(allowed, expiry, recipient, value);
 
   /// @dev Compose the above swap into the Swap Struct
   const swap: Swap = await composeSwap(
