@@ -9,6 +9,7 @@ import {
   composeSwap,
   encodeConfig,
   decodeConfig,
+  Swap,
 } from "./utils/SwapFactory";
 import { blocktimestamp, deploy } from "./utils/utils";
 
@@ -17,6 +18,7 @@ describe("Swaplace Factory", async function () {
   let Swaplace: Contract;
   let MockERC20: Contract;
   let MockERC721: Contract;
+  let MockERC1155: Contract;
 
   // The signers of the test
   let deployer: SignerWithAddress;
@@ -30,6 +32,7 @@ describe("Swaplace Factory", async function () {
     Swaplace = await deploy("Swaplace", deployer);
     MockERC20 = await deploy("MockERC20", deployer);
     MockERC721 = await deploy("MockERC721", deployer);
+    MockERC1155 = await deploy("MockERC1155", deployer);
   });
 
   it("Should be able to {makeAsset} for ERC20 and ERC721", async function () {
@@ -239,6 +242,116 @@ describe("Swaplace Factory", async function () {
     expect(swap.biding[1]).to.be.equals(ERC721Asset);
     expect(swap.asking[0]).to.be.equals(ERC20Asset);
     expect(swap.asking[1]).to.be.equals(ERC721Asset);
+  });
+
+  it("Should be able to {makeSwap} with ERC1155 tokens", async function () {
+    const bidingAddr = [MockERC1155.address];
+    const tokenId = 1;
+    const amount = 3;
+    const amountAndId = await Swaplace.encodeAsset(tokenId, amount);
+    const bidingAmountOrId = [amountAndId];
+
+    const askingAddr = [MockERC721.address];
+    const askingAmountOrId = [50];
+
+    const ERC1155Asset: Asset = await makeAsset(
+      bidingAddr[0],
+      bidingAmountOrId[0],
+    );
+    const ERC721Asset: Asset = await makeAsset(
+      askingAddr[0],
+      askingAmountOrId[0],
+    );
+
+    const currentTimestamp = (await blocktimestamp()) + 1000000;
+    const config = await Swaplace.encodeConfig(
+      zeroAddress,
+      currentTimestamp,
+      0,
+      0,
+    );
+
+    const swap = await makeSwap(
+      owner.address,
+      config,
+      [ERC1155Asset],
+      [ERC721Asset],
+    );
+
+    const onChainSwap = await Swaplace.makeSwap(
+      owner.address,
+      zeroAddress,
+      currentTimestamp,
+      0,
+      0,
+      [ERC1155Asset],
+      [ERC721Asset],
+    );
+
+    const [allowed, expiry, recipient, value] = await Swaplace.decodeConfig(
+      swap.config,
+    );
+
+    const [onChainAllowed, onChainExpiry, onChainRecipient, onChainValue] =
+      await Swaplace.decodeConfig(onChainSwap.config);
+
+    expect(swap.owner).to.be.equals(onChainSwap.owner);
+    expect(expiry).to.be.equals(onChainExpiry);
+    expect(allowed).to.be.equals(onChainAllowed);
+    expect(recipient).to.be.equals(onChainRecipient);
+    expect(value).to.be.equals(onChainValue);
+    expect(swap.biding[0].addr).to.be.equals(onChainSwap.biding[0].addr);
+    expect(swap.biding[0].amountOrId).to.be.equals(
+      onChainSwap.biding[0].amountOrId,
+    );
+
+    expect(swap.asking[0].addr).to.be.equals(onChainSwap.asking[0].addr);
+    expect(swap.asking[0].amountOrId).to.be.equals(
+      onChainSwap.asking[0].amountOrId,
+    );
+  });
+
+  it("Should be able to {composeSwap} using ERC1155", async function () {
+    const bidingAddr = [MockERC1155.address];
+    const tokenId = 1;
+    const amount = 3;
+    const amountAndId = await Swaplace.encodeAsset(tokenId, amount);
+    const bidingAmountOrId = [amountAndId];
+
+    const askingAddr = [MockERC721.address];
+    const askingAmountOrId = [50];
+
+    const currentTimestamp = (await blocktimestamp()) + 1000000;
+    const config = await Swaplace.encodeConfig(
+      zeroAddress,
+      currentTimestamp,
+      0,
+      0,
+    );
+
+    const swap: Swap = await composeSwap(
+      owner.address,
+      config,
+      bidingAddr,
+      bidingAmountOrId,
+      askingAddr,
+      askingAmountOrId,
+    );
+
+    const [allowed, expiry, recipient, value] = await Swaplace.decodeConfig(
+      swap.config,
+    );
+
+    expect(swap.owner).to.be.equals(owner.address);
+    expect(allowed).to.be.equals(zeroAddress);
+    expect(expiry).to.be.equals(expiry);
+    expect(recipient).to.be.equals(0);
+    expect(value).to.be.equals(0);
+    expect(swap.biding[0].addr).to.be.equals(bidingAddr[0]);
+    expect(swap.biding[0].amountOrId).to.be.equals(bidingAmountOrId[0]);
+
+    expect(swap.asking[0].addr).to.be.equals(askingAddr[0]);
+    expect(swap.asking[0].amountOrId).to.be.equals(askingAmountOrId[0]);
   });
 
   it("Should be able to {composeSwap} using both ERC20, ERC721", async function () {

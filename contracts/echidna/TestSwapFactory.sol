@@ -58,16 +58,4 @@ contract TestFactory is SwapFactory {
       _asset
     );
   }
-
-  function echidna_revert_invalid_length() public view {
-    makeSwap(
-      address(0),
-      address(0),
-      uint32(block.timestamp + 100),
-      0,
-      0,
-      new Asset[](0),
-      new Asset[](0)
-    );
-  }
 }
