@@ -339,7 +339,6 @@ describe("Swaplace", async function () {
         const askingAmountOrId = [50, 100, 150];
 
         const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
-        
         const currentTimestamp = (await blocktimestamp()) + 1000000;
         const config = await Swaplace.encodeConfig(
           zeroAddress,
