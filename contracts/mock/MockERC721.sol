@@ -16,6 +16,6 @@ contract MockERC721 is ERC721 {
   function tokenURI(
     uint256
   ) public view virtual override returns (string memory) {
-    return "ipfs://QmQJnHseE9VPw5qVxuEhxTiZ7avzgkCdFz69rg86UvTZdk/";
+    return "ipfs://QmWodCkovJk18U75g8Veg6rCnw7951vQvTjYfS7J3nMFma/";
   }
 }
