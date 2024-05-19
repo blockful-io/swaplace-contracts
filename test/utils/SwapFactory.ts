@@ -101,6 +101,13 @@ export async function encodeAsset(
   }
 
   const uint16Max = 65535;
+  const uint120Max = BigInt(2) ** BigInt(120) - BigInt(1);
+
+  if (tokenId > uint120Max || tokenAmount > uint120Max) {
+    throw new Error(
+      "Maxium bits exceeded for tokenId or tokenAmount. Max: 120 bits.",
+    );
+  }
 
   return BigInt(
     (BigInt(uint16Max) << BigInt(240)) |
@@ -203,4 +210,5 @@ module.exports = {
   composeSwap,
   encodeConfig,
   decodeConfig,
+  encodeAsset,
 };
