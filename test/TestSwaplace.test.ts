@@ -590,6 +590,40 @@ describe("Swaplace", async function () {
           Swaplace.connect(owner).createSwap(swap, { value: 69 }),
         ).to.be.revertedWithCustomError(Swaplace, `InvalidValue`);
       });
+
+      it("Should revert when the {owner} sends ethers while not being set as the {recipient}", async function () {
+        const bidingAddr = [MockERC20.address];
+        const bidingAmountOrId = [50];
+
+        const askingAddr = [
+          MockERC20.address,
+          MockERC20.address,
+          MockERC20.address,
+        ];
+        const askingAmountOrId = [50, 100, 150];
+
+        const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
+
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          1,
+          valueToSend.div(1e12),
+        );
+
+        const swap: Swap = await composeSwap(
+          owner.address,
+          config,
+          bidingAddr,
+          bidingAmountOrId,
+          askingAddr,
+          askingAmountOrId,
+        );
+        await expect(
+          Swaplace.connect(owner).createSwap(swap, { value: valueToSend }),
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidSender`);
+      });
     });
   });
 
