@@ -50,11 +50,11 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       swap.config
     );
 
-    if (msg.value > 0) {
+    if (value > 0) {
       if (recipient == 0) {
         if (value * 1e12 != msg.value) revert InvalidValue();
       }
-      else revert InvalidSender();
+      else if (msg.value > 0) revert InvalidSender();
     }
 
     emit SwapCreated(swapId, msg.sender, allowed);
