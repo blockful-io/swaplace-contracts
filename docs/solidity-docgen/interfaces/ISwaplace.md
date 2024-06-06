@@ -31,7 +31,7 @@ _Emitted when a Swap is canceled._
 ### createSwap
 
 ```solidity
-function createSwap(struct ISwap.Swap Swap) external returns (uint256)
+function createSwap(struct ISwap.Swap Swap) external payable returns (uint256)
 ```
 
 _Allow users to create a Swap. Each new Swap self-increments its ID by one.
@@ -47,7 +47,7 @@ Emits a {SwapCreated} event._
 ### acceptSwap
 
 ```solidity
-function acceptSwap(uint256 swapId, address receiver) external returns (bool)
+function acceptSwap(uint256 swapId, address receiver) external payable returns (bool)
 ```
 
 _Accepts a Swap. Once the Swap is accepted, the expiry is set
