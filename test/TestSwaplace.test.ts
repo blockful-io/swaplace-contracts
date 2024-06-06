@@ -591,7 +591,7 @@ describe("Swaplace", async function () {
         ).to.be.revertedWithCustomError(Swaplace, `InvalidValue`);
       });
 
-      it("Should revert when the {owner} sends ethers while not being set as the {recipient}", async function () {
+      it("Should revert when the {owner} sends ethers while being the {recipient}", async function () {
         const bidingAddr = [MockERC20.address];
         const bidingAmountOrId = [50];
 
