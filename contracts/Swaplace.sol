@@ -145,7 +145,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         if (!success) revert InvalidCall();
       } else {
         (bool success, ) = address(assets[i].addr).call(
-          abi.encodeWithSelector(0x23b872dd, from, to, tokenAmount)
+          abi.encodeWithSelector(0x23b872dd, from, to, assets[i].amountOrId)
         );
         if (!success) revert InvalidCall();
       }
