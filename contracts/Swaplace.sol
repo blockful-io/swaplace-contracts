@@ -102,14 +102,12 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
     Swap memory swap = _swaps[swapId];
     if (swap.owner != msg.sender) revert InvalidAddress();
 
-    (, uint32 expiry, uint8 recipient, uint256 value) = decodeConfig(
-      swap.config
-    );
+    (, uint32 expiry, , uint256 value) = decodeConfig(swap.config);
 
     if (expiry < block.timestamp) revert InvalidExpiry();
     _swaps[swapId].config = 0;
 
-    if (value > 0 && recipient == 0) _payNativeEth(msg.sender, value * 1e12);
+    if (value > 0) _payNativeEth(msg.sender, value * 1e12);
 
     emit SwapCanceled(swapId, msg.sender);
   }
