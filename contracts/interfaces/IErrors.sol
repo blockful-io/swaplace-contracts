@@ -24,9 +24,4 @@ interface IErrors {
    * @dev Displayed when a low level call failed to execute.
    */
   error InvalidCall();
-
-  /**
-   * @dev Displayed when the wrong caller sends ethers. 
-   */
-  error InvalidSender();
 }
