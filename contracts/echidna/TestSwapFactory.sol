@@ -32,12 +32,14 @@ contract TestFactory is SwapFactory {
     Swap memory swap = makeSwap(
       owner,
       address(0),
-      block.timestamp + 1000,
+      uint32(block.timestamp + 1000),
+      0,
+      0,
       make_asset_array(addr, amountOrId),
       make_asset_array(addr, amountOrId)
     );
 
-    (, uint256 expiry) = parseData(swap.config);
+    (, uint32 expiry, , ) = decodeConfig(swap.config);
 
     assert(expiry > block.timestamp);
     assert(swap.biding.length > 0);
@@ -46,16 +48,14 @@ contract TestFactory is SwapFactory {
   }
 
   function echidna_revert_invalid_expiry() public view {
-    makeSwap(address(0), address(0), block.timestamp - 100, _asset, _asset);
-  }
-
-  function echidna_revert_invalid_length() public view {
     makeSwap(
       address(0),
       address(0),
-      block.timestamp + 100,
-      new Asset[](0),
-      new Asset[](0)
+      uint32(block.timestamp - 100),
+      0,
+      0,
+      _asset,
+      _asset
     );
   }
 }

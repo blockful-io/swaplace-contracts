@@ -8,20 +8,20 @@ interface IErrors {
   /**
    * @dev Displayed when the caller is not the owner of the swap.
    */
-  error InvalidAddress(address caller);
-
-  /**
-   * @dev Displayed when the amount of {ISwap-Asset} has a length of zero.
-   *
-   * NOTE: The `biding` or `asking` array must not be empty to avoid mistakes
-   * when creating a swap. Assuming one side of the swap is empty, the
-   * correct approach should be the usage of {transferFrom} and we reinforce
-   * this behavior by requiring the length of the array to be bigger than zero.
-   */
-  error InvalidAssetsLength();
+  error InvalidAddress();
 
   /**
    * @dev Displayed when the `expiry` date is in the past.
    */
-  error InvalidExpiry(uint256 timestamp);
+  error InvalidExpiry();
+
+  /**
+   * @dev Displayed when the `msg.value` doesn't match the swap request.
+   */
+  error InvalidValue();
+
+  /**
+   * @dev Displayed when a low level call failed to execute.
+   */
+  error InvalidCall();
 }

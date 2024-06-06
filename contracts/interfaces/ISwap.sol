@@ -23,11 +23,14 @@ interface ISwap {
    * @dev The Swap struct is the heart of Swaplace.
    *
    * It is composed of:
-   * - `owner` of the Swap.
-   * - `config` represents two packed values: 'allowed' for the allowed address
-   * to accept the swap and 'expiry' for the expiration date of the swap.
-   * - `biding` assets that are being bided by the owner.
-   * - `asking` assets that are being asked by the owner.
+   * - `owner` creator of the Swap.
+   * - `config` configuration of four packed values:
+   * - - `allowed` for the allowed address to accept the swap.
+   * - - `expiry` for the expiration date of the swap in unix time.
+   * - - `recipient` for the address that will receive the ETH.
+   * - - `value` for the amount of ETH that the recipient will receive.
+   * - `biding` assets offered by the swap creator.
+   * - `asking` assets asked by the swap creator.
    *
    * NOTE: When `allowed` address is the zero address, anyone can accept the Swap.
    */

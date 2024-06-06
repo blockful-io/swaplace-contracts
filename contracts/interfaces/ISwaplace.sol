@@ -41,7 +41,9 @@ interface ISwaplace {
    *
    * Emits a {SwapCreated} event.
    */
-  function createSwap(ISwap.Swap calldata Swap) external returns (uint256);
+  function createSwap(
+    ISwap.Swap calldata Swap
+  ) external payable returns (uint256);
 
   /**
    * @dev Accepts a Swap. Once the Swap is accepted, the expiry is set
@@ -59,7 +61,10 @@ interface ISwaplace {
    * NOTE: The expiry is set to 0, because if the Swap is expired it
    * will revert, preventing reentrancy attacks.
    */
-  function acceptSwap(uint256 swapId, address receiver) external returns (bool);
+  function acceptSwap(
+    uint256 swapId,
+    address receiver
+  ) external payable returns (bool);
 
   /**
    * @dev Cancels an active Swap by setting the expiry to zero.
