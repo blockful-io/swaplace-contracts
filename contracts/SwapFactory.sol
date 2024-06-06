@@ -80,7 +80,7 @@ abstract contract SwapFactory is ISwapFactory, ISwap, IErrors {
   function encodeAsset(
     uint120 tokenId,
     uint120 tokenAmount
-  ) public pure returns (uint256 amountOrId) {
+  ) public pure returns (uint256 amountAndId) {
     return
       (uint256(type(uint16).max) << 240) |
       (uint256(tokenId) << 120) |
