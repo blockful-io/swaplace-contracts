@@ -18,8 +18,11 @@ import {ISwapFactory} from "./interfaces/ISwapFactory.sol";
  * - The `allowed` address is the address that can accept the Swap. If the allowed
  *   address is the zero address, then anyone can accept the Swap.
  * - The `expiry` date is the timestamp that the Swap will be available to accept.
- * - The `recipient` is the address that will receive the ETH.
- * - The `value` is the amount of ETH that the recipient will receive.
+ * - The `recipient` is the address that will receive the ETH as type uint8. If the
+ * recipient is equals to 0, the acceptee will receive the ETH. If the recipient is
+ * between 1<>255 then the recipient will be the owner of the Swap.
+ * - The `value` is the amount of ETH that the recipient will receive with a maximum
+ * of 6 decimals (0.000001 ETH). The contract will fill the value up to 18 decimals.
  * - The `biding` are the assets that the owner is offering.
  * - The `asking` are the assets that the owner wants in exchange.
  *
