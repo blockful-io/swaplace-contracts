@@ -1078,7 +1078,6 @@ describe("Swaplace", async function () {
           askingAmountOrId,
         );
 
-        const lastSwap = await Swaplace.totalSwaps();
         await expect(
           await Swaplace.connect(owner).createSwap(swap, {
             value: valueToSend,
@@ -1087,9 +1086,18 @@ describe("Swaplace", async function () {
           .to.emit(Swaplace, "SwapCreated")
           .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
 
-        await expect(Swaplace.connect(owner).cancelSwap(lastSwap))
-          .to.emit(Swaplace, "SwapCanceled")
-          .withArgs(lastSwap, owner.address);
+        const balanceBefore = await owner.getBalance();
+
+        const lastSwap = await Swaplace.totalSwaps();
+        const tx = await Swaplace.connect(owner).cancelSwap(lastSwap);
+        const receipt = await tx.wait();
+        const gasUsed = receipt.gasUsed;
+        const gasPrice = receipt.effectiveGasPrice;
+
+        const balanceAfter = await owner.getBalance();
+        expect(balanceBefore.add(valueToSend)).to.be.equals(
+          balanceAfter.add(gasPrice.mul(gasUsed)),
+        );
       });
     });
 
@@ -1102,8 +1110,6 @@ describe("Swaplace", async function () {
       });
 
       it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
-        const [, expiry, ,] = await Swaplace.decodeConfig(swap.config);
-
         await network.provider.send("evm_increaseTime", [2000000]);
 
         const lastSwap = await Swaplace.totalSwaps();
