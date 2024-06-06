@@ -590,6 +590,40 @@ describe("Swaplace", async function () {
           Swaplace.connect(owner).createSwap(swap, { value: 69 }),
         ).to.be.revertedWithCustomError(Swaplace, `InvalidValue`);
       });
+
+      it("Should revert when the {owner} sends ethers while being the {recipient}", async function () {
+        const bidingAddr = [MockERC20.address];
+        const bidingAmountOrId = [50];
+
+        const askingAddr = [
+          MockERC20.address,
+          MockERC20.address,
+          MockERC20.address,
+        ];
+        const askingAmountOrId = [50, 100, 150];
+
+        const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
+
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          1,
+          valueToSend.div(1e12),
+        );
+
+        const swap: Swap = await composeSwap(
+          owner.address,
+          config,
+          bidingAddr,
+          bidingAmountOrId,
+          askingAddr,
+          askingAmountOrId,
+        );
+        await expect(
+          Swaplace.connect(owner).createSwap(swap, { value: valueToSend }),
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidValue`);
+      });
     });
   });
 
@@ -1044,7 +1078,6 @@ describe("Swaplace", async function () {
           askingAmountOrId,
         );
 
-        const lastSwap = await Swaplace.totalSwaps();
         await expect(
           await Swaplace.connect(owner).createSwap(swap, {
             value: valueToSend,
@@ -1053,9 +1086,158 @@ describe("Swaplace", async function () {
           .to.emit(Swaplace, "SwapCreated")
           .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
 
-        await expect(Swaplace.connect(owner).cancelSwap(lastSwap))
+        const balanceBefore = await owner.getBalance();
+
+        const lastSwap = await Swaplace.totalSwaps();
+        const tx = await Swaplace.connect(owner).cancelSwap(lastSwap);
+        const receipt = await tx.wait();
+        const gasUsed = receipt.gasUsed;
+        const gasPrice = receipt.effectiveGasPrice;
+
+        const balanceAfter = await owner.getBalance();
+        expect(balanceBefore.add(valueToSend)).to.be.equals(
+          balanceAfter.add(gasPrice.mul(gasUsed)),
+        );
+      });
+
+      it("Should be able to {cancelSwap} and return ethers to {owner} even after expiration", async function () {
+        const bidingAddr = [MockERC20.address];
+        const bidingAmountOrId = [50];
+
+        const askingAddr = [
+          MockERC20.address,
+          MockERC20.address,
+          MockERC20.address,
+        ];
+        const askingAmountOrId = [50, 100, 150];
+
+        const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
+
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          0,
+          valueToSend.div(1e12),
+        );
+
+        const swap: Swap = await composeSwap(
+          owner.address,
+          config,
+          bidingAddr,
+          bidingAmountOrId,
+          askingAddr,
+          askingAmountOrId,
+        );
+
+        await expect(
+          await Swaplace.connect(owner).createSwap(swap, {
+            value: valueToSend,
+          }),
+        )
+          .to.emit(Swaplace, "SwapCreated")
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
+
+        await network.provider.send("evm_increaseTime", [1000000]);
+
+        const balanceBefore = await owner.getBalance();
+
+        const lastSwap = await Swaplace.totalSwaps();
+        const tx = await Swaplace.connect(owner).cancelSwap(lastSwap);
+        const receipt = await tx.wait();
+        const gasUsed = receipt.gasUsed;
+        const gasPrice = receipt.effectiveGasPrice;
+
+        const balanceAfter = await owner.getBalance();
+        expect(balanceBefore.add(valueToSend)).to.be.equals(
+          balanceAfter.add(gasPrice.mul(gasUsed)),
+        );
+      });
+
+      it("Should be able to {cancelSwap} before expiration if the recipient is the {owner}", async function () {
+        const bidingAddr = [MockERC20.address];
+        const bidingAmountOrId = [50];
+
+        const askingAddr = [
+          MockERC20.address,
+          MockERC20.address,
+          MockERC20.address,
+        ];
+        const askingAmountOrId = [50, 100, 150];
+
+        const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
+
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          1,
+          valueToSend.div(1e12),
+        );
+
+        const swap: Swap = await composeSwap(
+          owner.address,
+          config,
+          bidingAddr,
+          bidingAmountOrId,
+          askingAddr,
+          askingAmountOrId,
+        );
+
+        await expect(await Swaplace.connect(owner).createSwap(swap))
+          .to.emit(Swaplace, "SwapCreated")
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
+
+        const lastSwap = await Swaplace.totalSwaps();
+        await expect(await Swaplace.connect(owner).cancelSwap(lastSwap))
           .to.emit(Swaplace, "SwapCanceled")
           .withArgs(lastSwap, owner.address);
+
+        await expect(
+          Swaplace.connect(owner).cancelSwap(lastSwap),
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
+      });
+
+      it("Should not be able to {cancelSwap} after expiration if the recipient is the {owner}", async function () {
+        const bidingAddr = [MockERC20.address];
+        const bidingAmountOrId = [50];
+
+        const askingAddr = [
+          MockERC20.address,
+          MockERC20.address,
+          MockERC20.address,
+        ];
+        const askingAmountOrId = [50, 100, 150];
+
+        const valueToSend: BigNumber = ethers.utils.parseEther("0.5");
+
+        const currentTimestamp = (await blocktimestamp()) + 1000000;
+        const config = await Swaplace.encodeConfig(
+          zeroAddress,
+          currentTimestamp,
+          1,
+          valueToSend.div(1e12),
+        );
+
+        const swap: Swap = await composeSwap(
+          owner.address,
+          config,
+          bidingAddr,
+          bidingAmountOrId,
+          askingAddr,
+          askingAmountOrId,
+        );
+
+        await expect(await Swaplace.connect(owner).createSwap(swap))
+          .to.emit(Swaplace, "SwapCreated")
+          .withArgs(await Swaplace.totalSwaps(), owner.address, zeroAddress);
+
+        await network.provider.send("evm_increaseTime", [1000000]);
+
+        const lastSwap = await Swaplace.totalSwaps();
+        await expect(
+          Swaplace.connect(owner).cancelSwap(lastSwap),
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidExpiry`);
       });
     });
 
@@ -1068,8 +1250,6 @@ describe("Swaplace", async function () {
       });
 
       it("Should revert when {expiry} is smaller than {block.timestamp}", async function () {
-        const [, expiry, ,] = await Swaplace.decodeConfig(swap.config);
-
         await network.provider.send("evm_increaseTime", [2000000]);
 
         const lastSwap = await Swaplace.totalSwaps();

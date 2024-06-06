@@ -50,8 +50,10 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       swap.config
     );
 
-    if (value > 0 && recipient == 0) {
-      if (value * 1e12 != msg.value) revert InvalidValue();
+    if (value > 0) {
+      if (recipient == 0) {
+        if (value * 1e12 != msg.value) revert InvalidValue();
+      } else if (msg.value > 0) revert InvalidValue();
     }
 
     emit SwapCreated(swapId, msg.sender, allowed);
@@ -104,10 +106,14 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
       swap.config
     );
 
-    if (expiry < block.timestamp) revert InvalidExpiry();
+    if (expiry < block.timestamp && (value == 0 || recipient > 0)) {
+      revert InvalidExpiry();
+    }
     _swaps[swapId].config = 0;
 
-    if (value > 0 && recipient == 0) _payNativeEth(msg.sender, value * 1e12);
+    if (value > 0 && recipient == 0) {
+      _payNativeEth(msg.sender, value * 1e12);
+    }
 
     emit SwapCanceled(swapId, msg.sender);
   }
@@ -143,7 +149,7 @@ contract Swaplace is SwapFactory, ISwaplace, IERC165 {
         if (!success) revert InvalidCall();
       } else {
         (bool success, ) = address(assets[i].addr).call(
-          abi.encodeWithSelector(0x23b872dd, from, to, tokenAmount)
+          abi.encodeWithSelector(0x23b872dd, from, to, assets[i].amountOrId)
         );
         if (!success) revert InvalidCall();
       }
