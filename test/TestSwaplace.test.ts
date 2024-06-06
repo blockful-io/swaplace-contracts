@@ -622,7 +622,7 @@ describe("Swaplace", async function () {
         );
         await expect(
           Swaplace.connect(owner).createSwap(swap, { value: valueToSend }),
-        ).to.be.revertedWithCustomError(Swaplace, `InvalidSender`);
+        ).to.be.revertedWithCustomError(Swaplace, `InvalidValue`);
       });
     });
   });
