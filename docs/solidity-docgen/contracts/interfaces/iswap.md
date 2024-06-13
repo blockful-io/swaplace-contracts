@@ -1,10 +1,10 @@
-# Solidity API
-
-## ISwap
+# ISwap
 
 _Interface for the Swap Struct, used in the {Swaplace} implementation._
 
-### Asset
+* [Source Code](https://github.com/blockful-io/swaplace-contracts/blob/develop/contracts/interfaces/ISwap.sol)
+
+### Asset{ }
 
 ```solidity
 struct Asset {
@@ -13,7 +13,7 @@ struct Asset {
 }
 ```
 
-### Swap
+### Swap{ }
 
 ```solidity
 struct Swap {
@@ -23,4 +23,3 @@ struct Swap {
   struct ISwap.Asset[] asking;
 }
 ```
-
