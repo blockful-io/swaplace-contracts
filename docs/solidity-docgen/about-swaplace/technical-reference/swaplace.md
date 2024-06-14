@@ -1,4 +1,4 @@
-# ✦ Swaplace
+# ✧ Swaplace
 
 Swaplace is a decentralized, cross-chain and feeless swap dApp focused on the OTC and gaming markets. As it is ownerless, it cannot be stopped. Its core function is to facilitate swaps between virtual assets using the ERC standard. As simple as that.
 
@@ -12,7 +12,7 @@ _Users can propose or accept swaps by allowing Swaplace to move their assets usi
 function getSwap(uint256 swapId) public view returns (struct ISwap.Swap)
 ```
 
-_See_[ ](contracts/interfaces/iswaplace.md#getswap)[_{ISwaplace-getSwap}_](#user-content-fn-1)[^1][_._](contracts/interfaces/iswaplace.md#getswap)
+_See_[ ](interfaces/iswaplace.md#getswap)[_{ISwaplace-getSwap}_](#user-content-fn-1)[^1][_._](interfaces/iswaplace.md#getswap)
 
 ### totalSwaps()
 

@@ -1,4 +1,4 @@
-# SwapFactory
+# ✧ SwapFactory
 
 SwapFactory is a helper for creating Swaps and making asset structs.
 
