@@ -34,8 +34,28 @@ const config: HardhatUserConfig = {
       url: `${process.env.SEPOLIA_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
-    mumbai: {
-      url: `${process.env.MUMBAI_RPC_URL}`,
+    amoy: {
+      url: `${process.env.AMOY_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    opsepolia: {
+      url: `${process.env.OPSEPOLIA_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    fuji: {
+      url: `${process.env.FUJI_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    bnb_testnet: {
+      url: `${process.env.BNB_TESTNET_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    arbitrum_sepolia: {
+      url: `${process.env.ARBITRUM_SEPOLIA_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    base_sepolia: {
+      url: `${process.env.BASE_SEPOLIA_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
     /**
