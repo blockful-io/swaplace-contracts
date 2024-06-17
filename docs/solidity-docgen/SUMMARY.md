@@ -2,11 +2,11 @@
 
 ## About Swaplace
 
-* [✦ Manifesto](README.md)
-* [✦ Overview](about-swaplace/overview.md)
-* [✦ Roadmap](about-swaplace/swapfactory.md)
-* [✦ Tokenomics](about-swaplace/tokenomics.md)
-* [✦ Guides](about-swaplace/guides/README.md)
+* [Manifesto](README.md)
+* [Overview](about-swaplace/overview.md)
+* [Roadmap](about-swaplace/swapfactory.md)
+* [Tokenomics](about-swaplace/tokenomics.md)
+* [Guides](about-swaplace/guides/README.md)
   * [✧ Overview](about-swaplace/guides/overview.md)
   * [✧ Setting up your local environment](about-swaplace/guides/setting-up-your-local-environment.md)
   * [✧ Preparing](about-swaplace/guides/preparing/README.md)
@@ -19,7 +19,7 @@
     * [Native Ether](about-swaplace/guides/creating/native-ether.md)
   * [✧ Accepting](about-swaplace/guides/accepting.md)
   * [✧ Canceling](about-swaplace/guides/canceling.md)
-* [✦ Technical Reference](about-swaplace/technical-reference/README.md)
+* [Technical Reference](about-swaplace/technical-reference/README.md)
   * [✧ Overview](about-swaplace/technical-reference/overview.md)
   * [✧ Swaplace](about-swaplace/technical-reference/swaplace.md)
   * [✧ SwapFactory](about-swaplace/technical-reference/swapfactory.md)
@@ -29,11 +29,8 @@
     * [✧ Swap](about-swaplace/technical-reference/interfaces/iswap.md)
     * [✧ SwapFactory](about-swaplace/technical-reference/interfaces/iswapfactory.md)
     * [✧ Swaplace](about-swaplace/technical-reference/interfaces/iswaplace.md)
-* [✦ Deployments](about-swaplace/deployments.md)
-
-***
-
-* [✦ Call for contributors](call-for-contributors/README.md)
-  * [✧ How to start](call-for-contributors/how-to-start.md)
-  * [✧ Incentives](call-for-contributors/incentives.md)
-* [✦ Community & Links](community-and-links.md)
+* [Deployments](about-swaplace/deployments.md)
+* [Call for contributors](about-swaplace/call-for-contributors/README.md)
+  * [✧ How to start](about-swaplace/call-for-contributors/how-to-start.md)
+  * [✧ Incentives](about-swaplace/call-for-contributors/incentives.md)
+* [Community & Links](about-swaplace/community-and-links.md)
