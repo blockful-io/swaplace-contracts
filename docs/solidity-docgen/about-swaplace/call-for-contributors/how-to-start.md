@@ -4,7 +4,7 @@
 
 Join us on [**Discord**](https://discord.gg/8D5MYSNuXt) and get your “Swaplace Builder 💻” role on the **“#✅・verify”** channel
 
-<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### 2nd: Let us know you're contributing!
 
