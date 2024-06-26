@@ -9,4 +9,4 @@ But pay attention to the rules:
 * You must be in our Discord server and let us know that you have made the pull-requests.
 * Rewards will be in _stablecoins_; make sure to inform us of your preferred wallet to receive the rewards (the value will be sent at the end of the round).
 
-<figure><img src="../../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (5) (1).png" alt=""><figcaption></figcaption></figure>

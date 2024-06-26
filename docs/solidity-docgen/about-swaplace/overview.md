@@ -1,50 +1,33 @@
 # Overview
 
-## Start Swaping with Swaplace
-
-### 1. Connect in the platform &#x20;
-
-start by connectying your wallet, clicking in the wallet icon inside the red area.
-
-Follow with the wallet instructions to sign in in the platform.
-
-<figure><img src="../.gitbook/assets/imagem 1.png" alt=""><figcaption></figcaption></figure>
-
-### 2. Mint your tokens
-
-In case you don't have any tokens to swap, click in the `mint your tokens` to start swaping and just select if you want an ERC721 or ERC20.
-
-You should see the `Token minted` message in your browser once the mint has worked.
-
-<figure><img src="../.gitbook/assets/imagem 4.png" alt=""><figcaption></figcaption></figure>
-
-<figure><img src="../.gitbook/assets/imagem 6.png" alt="" width="501"><figcaption></figcaption></figure>
-
-### 3. Choose who you are swaping with
-
-You can choose the address who you want to swap with and choose any of their assets.
-
-1. Click in `User`
-2. Paste the desired address in the search bar
-3. Select `Their Items` in the table to see the user's tokens
-4. Select the tokens you want to get
-5. See the selected tokens you want to get from the desired adddress
-
-<figure><img src="../.gitbook/assets/imagem 7.png" alt=""><figcaption></figcaption></figure>
-
-### 4. Pick what you want to swap
-
-1. Click in `Your Items` and pick the tokens you want to trade
-2. See the selected tokens you want to offer to the other address
-3. You can select an amount of the native cryptocurrency of the network you are in, you can also ask for this cryptocurrency
-4. Select an expiration date for this swap to have a deadline
 
 
+> **Swaps, Marketplace and Leaderboard**
 
-### 4. Approving your tokens and swapping
+### Feeless swaps&#x20;
 
-Click in `Swap` once evertying is ready and approve the tokens in order to proceed with the order transaction.
+Swaplace is a cutting-edge protocol that allows you to swap assets like ERC20, ERC721, and ERC1155 tokens with any user, all without transaction fees on EVM-compatible networks!
 
-<figure><img src="../.gitbook/assets/imagem 9.png" alt=""><figcaption></figcaption></figure>
+<table data-view="cards"><thead><tr><th>Network</th><th></th></tr></thead><tbody><tr><td><img src="../.gitbook/assets/ehter-bugado (1).png" alt="" data-size="line"> <strong><code>Sepolia</code></strong></td><td>                    ✅</td></tr><tr><td><img src="../.gitbook/assets/kakarot.png" alt="" data-size="line"><strong><code>Kakarot</code></strong></td><td>                    ✅</td></tr><tr><td><img src="../.gitbook/assets/optimism-ethereum-op-logo.png" alt="" data-size="line"> <strong><code>Optmism Sepolia</code></strong></td><td>                    ✅</td></tr><tr><td><img src="../.gitbook/assets/polygon-token.png" alt="" data-size="line"> <strong><code>Amoy</code></strong></td><td>                    ✅</td></tr><tr><td><img src="../.gitbook/assets/avalanche-avax-logo.png" alt="" data-size="line"> <strong><code>Fuji</code></strong></td><td>                    ✅</td></tr><tr><td><img src="../.gitbook/assets/bnb-bnb-logo.png" alt="" data-size="line"><strong><code>Bnb Tesnet</code></strong></td><td>                    ✅</td></tr><tr><td><img src="../.gitbook/assets/arbitrum-arb-logo.png" alt="" data-size="line"><strong><code>Arbitrum Sepolia</code></strong></td><td>                    ✅</td></tr><tr><td><img src="../.gitbook/assets/base-logo-in-blue.png" alt="" data-size="line"> <strong><code>Base Sepolia</code></strong></td><td>                    ✅</td></tr></tbody></table>
 
-&#x20;
+### [Swap](../developers/guides/preparing/make-swap.md)
+
+* **Select and Bid**: Choose the asset you want from any address and make an offer by bidding your own assets in exchange.
+* **Seamless Transactions**: Enjoy feeless swaps, making your trading experience smooth and cost-effective.
+
+### [Marketplace](marketplace.md)
+
+* **Public Offers**: Make your offers public so anyone can see and accept them.
+* **Wide Reach**: Increase your chances of successful trades by exposing your offers to a broader audience.
+
+### Leaderboard
+
+* **Competitive Edge**: Climb the leaderboard by actively trading.
+* **Earn Rewards**: The more you trade, the higher you rank, increasing your chances of earning juicy rewards!
+
+<div data-full-width="false">
+
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+
+</div>
+
