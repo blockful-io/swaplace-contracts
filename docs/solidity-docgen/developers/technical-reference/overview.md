@@ -4,11 +4,11 @@
 
 ### Events
 
-[SwapCreated](interfaces/iswaplace.md#swapcreated)
-
 [SwapAccepted](interfaces/iswaplace.md#swapaccepted)
 
 [SwapCanceled](interfaces/iswaplace.md#swapcanceled)
+
+[SwapCreated](interfaces/iswaplace.md#swapcreated)
 
 ### Functions
 

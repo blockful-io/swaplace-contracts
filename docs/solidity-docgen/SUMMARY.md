@@ -24,7 +24,7 @@
     * [Make Swap](developers/guides/preparing/make-swap.md)
   * [✧ Creating](developers/guides/creating/README.md)
     * [ERC20/ERC721](developers/guides/creating/erc20-erc721.md)
-    * [ERC1155 (🚧)](developers/guides/creating/erc1155.md)
+    * [ERC1155](developers/guides/creating/erc1155.md)
     * [Native Ether](developers/guides/creating/native-ether.md)
   * [✧ Accepting](developers/guides/accepting.md)
   * [✧ Canceling](developers/guides/canceling.md)
