@@ -40,8 +40,12 @@ interface ISwaplace {
    * - `biding` and `asking` must not be empty.
    *
    * Emits a {SwapCreated} event.
+   *
+   * @param Swap is the Swap struct to be created.
    */
-  function createSwap(ISwap.Swap calldata Swap) external returns (uint256);
+  function createSwap(
+    ISwap.Swap calldata Swap
+  ) external payable returns (uint256);
 
   /**
    * @dev Accepts a Swap. Once the Swap is accepted, the expiry is set
@@ -58,8 +62,14 @@ interface ISwaplace {
    *
    * NOTE: The expiry is set to 0, because if the Swap is expired it
    * will revert, preventing reentrancy attacks.
+   *
+   * @param swapId is the ID of the Swap to be accepted.
+   * @param receiver is the address that will receive the trading assets.
    */
-  function acceptSwap(uint256 swapId, address receiver) external returns (bool);
+  function acceptSwap(
+    uint256 swapId,
+    address receiver
+  ) external payable returns (bool);
 
   /**
    * @dev Cancels an active Swap by setting the expiry to zero.
@@ -73,6 +83,8 @@ interface ISwaplace {
    * - `expiry` must be bigger than timestamp.
    *
    * Emits a {SwapCanceled} event.
+   *
+   * @param swapId is the ID of the Swap to be canceled.
    */
   function cancelSwap(uint256 swapId) external;
 
@@ -82,6 +94,8 @@ interface ISwaplace {
    * NOTE: If the Swaps doesn't exist, the values will be defaulted to 0.
    * You can check if a Swap exists by checking if the `owner` is the zero address.
    * If the `owner` is the zero address, then the Swap doesn't exist.
+   *
+   * @param swapId is the ID of the Swap to be retrieved.
    */
   function getSwap(uint256 swapId) external view returns (ISwap.Swap memory);
 }

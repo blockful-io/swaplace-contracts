@@ -31,7 +31,7 @@ _Emitted when a Swap is canceled._
 ### createSwap
 
 ```solidity
-function createSwap(struct ISwap.Swap Swap) external returns (uint256)
+function createSwap(struct ISwap.Swap Swap) external payable returns (uint256)
 ```
 
 _Allow users to create a Swap. Each new Swap self-increments its ID by one.
@@ -44,10 +44,16 @@ Requirements:
 
 Emits a {SwapCreated} event._
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| Swap | struct ISwap.Swap | is the Swap struct to be created. |
+
 ### acceptSwap
 
 ```solidity
-function acceptSwap(uint256 swapId, address receiver) external returns (bool)
+function acceptSwap(uint256 swapId, address receiver) external payable returns (bool)
 ```
 
 _Accepts a Swap. Once the Swap is accepted, the expiry is set
@@ -64,6 +70,13 @@ Emits a {SwapAccepted} event.
 
 NOTE: The expiry is set to 0, because if the Swap is expired it
 will revert, preventing reentrancy attacks._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| swapId | uint256 | is the ID of the Swap to be accepted. |
+| receiver | address | is the address that will receive the trading assets. |
 
 ### cancelSwap
 
@@ -83,6 +96,12 @@ Requirements:
 
 Emits a {SwapCanceled} event._
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| swapId | uint256 | is the ID of the Swap to be canceled. |
+
 ### getSwap
 
 ```solidity
@@ -94,4 +113,10 @@ _Retrieves the details of a Swap based on the `swapId` provided.
 NOTE: If the Swaps doesn't exist, the values will be defaulted to 0.
 You can check if a Swap exists by checking if the `owner` is the zero address.
 If the `owner` is the zero address, then the Swap doesn't exist._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| swapId | uint256 | is the ID of the Swap to be retrieved. |
 

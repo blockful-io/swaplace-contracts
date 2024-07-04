@@ -4,11 +4,21 @@ import "solidity-docgen";
 import dotenv from "dotenv";
 dotenv.config();
 
+// Using a hardcoded solution to avoid GitHub actions issues
 const DEPLOYER_PRIVATE_KEY =
-  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+  process.env.DEPLOYER_PRIVATE_KEY ||
+  "";
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   etherscan: {
     apiKey: `${process.env.ETHERSCAN_API_KEY}`,
   },
@@ -16,30 +26,36 @@ const config: HardhatUserConfig = {
     /**
      * @dev Testnets
      */
-    sepolia: {
-      url: `${process.env.SEPOLIA_RPC_URL}`,
-      accounts: [
-        `${
-          process.env.DEPLOYER_PRIVATE_KEY
-            ? process.env.DEPLOYER_PRIVATE_KEY
-            : DEPLOYER_PRIVATE_KEY
-        }`,
-      ],
+    kakarot: {
+      url: `${process.env.KAKAROT_SEPOLIA_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
-    goerli: {
+    sepolia: {
       url: `${process.env.SEPOLIA_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
-    mumbai: {
-      url: `${process.env.MUMBAI_RPC_URL}`,
+    amoy: {
+      url: `${process.env.AMOY_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    opsepolia: {
+      url: `${process.env.OPSEPOLIA_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
     fuji: {
       url: `${process.env.FUJI_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
-    bnbtest: {
+    bnb_testnet: {
       url: `${process.env.BNB_TESTNET_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    arbitrum_sepolia: {
+      url: `${process.env.ARBITRUM_SEPOLIA_RPC_URL}`,
+      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    },
+    base_sepolia: {
+      url: `${process.env.BASE_SEPOLIA_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
     /**
@@ -53,17 +69,11 @@ const config: HardhatUserConfig = {
       url: `${process.env.MATIC_RPC_URL}`,
       accounts: [`${DEPLOYER_PRIVATE_KEY}`],
     },
-    avalanche: {
-      url: `${process.env.AVAX_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
-    },
-    binance: {
-      url: `${process.env.BNB_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
-    },
-    fantom: {
-      url: `${process.env.FTM_RPC_URL}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`],
+    /**
+     * @dev Localnet (Hardhat)
+     */
+    hardhat: {
+      chainId: 31337,
     },
   },
   defaultNetwork: "hardhat",
@@ -74,6 +84,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: true,
   },
+  allowUnlimitedContractSize: true,
 };
 
 export default config;
