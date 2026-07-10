@@ -1,6 +1,7 @@
 {
   "name": "swaplace",
   "dependencies": {
+    "foundry-gas-utils": "github:saifyoussuf/foundry-gas-utils",
     "hardhat": "^2.12.7"
   },
   "devDependencies": {
